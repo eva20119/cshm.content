@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+
+    <!-- 訓前的課程名稱和期數尚未處理 -->
+    <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: view.context.Title()}">職業安全衛生管理員學員訓前職能調查表</a> <br/>
+    <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: view.context.Title()}">荷重再一噸以上之堆高機操作人員學員訓前職能調查表</a><br/>
+    <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: view.context.Title()}">丙種職業安全衛生業務主管學員訓前職能調查表</a><br/>
+    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: view.context.Title()}">急救人員學員訓前職能調查表</a><br/>
+    <br/><br/>
+    <div tal:repeat="item view/data">
+        日期：<span>${python:item[0]}</span><br>
+        星期：<span>${python:item[1]}</span><br>
+        時間：<span>${python:item[2]}</span><br>
+        授課名稱：<span>${python:item[3]}</span><br>
+        時數：<span>${python:item[4]}</span><br>
+        講師：<span>${python:item[5]}</span><br>
+        教室：<span>${python:item[7]}</span><br>
+        <a href="${python:item[8]}">滿意度網址</a>
+        <br>
+        <img src="data:image/png;base64,${python:item[9]}" style="width:200px"/>
+        <hr/>
+    </div>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+
+<style>
+.c3{
+    display: inline;
+}
+.title{
+    display: flex;
+    justify-content: space-between;
+}
+p{
+    font-size: 22px;
+}
+</style>
+<p id="json_data" style='display:none'>${view/json_data}</p>
+
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">參訓目的</p>
+    <p style="margin-right: 360px;margin-top: 20px;">年齡</p>    
+</div>
+<div id="pie2"></div>
+<div id="pie3"></div>
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">行業別</p>
+    <p style="margin-right: 225px;margin-top: 20px;">您是如何知道本像訓練課程</p>    
+</div>
+<div id="pie4"></div>
+<div id="pie5"></div>
+<div class="title">
+    <p style="margin-left: 135px;margin-top: 20px;">您選擇本中心得因素(複選)</p>
+    <p style="margin-right: 75;margin-top: 20px;">據您所知，職業安全衛生法之中央主管機關為何單位</p>    
+</div>
+<div id="pie6"></div>
+<div id="pie7"></div>
+<div class="title">
+    <p style="margin-left: 222px;margin-top: 20px;">學歷</p>
+    <p style="margin-right: 322px;margin-top: 20px;">汽車駕駛執照</p>    
+</div>
+<div id="pie8"></div>
+<div id="pie9"></div>
+
+<script>
+$(document).ready(function () {
+    json_data = $('#json_data')[0].innerText
+    data = JSON.parse(json_data)
+    var pie_2 = []
+    var pie_3 = []
+    var pie_4 = []
+    var pie_5 = []
+    var pie_6 = []
+    var pie_7 = []
+    var pie_8 = []
+    var pie_9 = []
+    var pie_10 = []
+    var pie_11 = []
+    var pie_12 = []
+    var pie_13 = []
+    var pie_14 = []
+
+    for(let[key,value] of Object.entries(data['2'])){
+	    pie_2.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['3'])){
+	    pie_3.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['4'])){
+	    pie_4.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['5'])){
+	    pie_5.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['6'])){
+	    pie_6.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['7'])){
+	    pie_7.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['8'])){
+	    pie_8.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['9'])){
+	    pie_9.push([key,value])
+    }
+
+
+    var chart = c3.generate({
+        bindto: '#pie2',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_2,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie3',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_3,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie4',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_4,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie5',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_5,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie6',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_6,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie7',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_7,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie8',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_8,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie9',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_9,
+            type : 'pie',
+        }
+    });
+});
+
+</script>

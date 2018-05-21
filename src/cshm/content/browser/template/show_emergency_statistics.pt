@@ -1,0 +1,192 @@
+
+<style>
+.c3{
+    display: inline;
+}
+.title{
+    display: flex;
+    justify-content: space-between;
+}
+p{
+    font-size: 22px;
+}
+</style>
+
+<p id="json_data" style='display:none'>${view/json_data}</p>
+
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">參訓目的</p>
+    <p style="margin-right: 360px;margin-top: 20px;">年齡</p>    
+</div>
+<div id="pie2"></div>
+<div id="pie3"></div>
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">行業別</p>
+    <p style="margin-right: 225px;margin-top: 20px;">您是如何知道本像訓練課程</p>    
+</div>
+<div id="pie4"></div>
+<div id="pie5"></div>
+<div class="title">
+    <p style="margin-left: 135px;margin-top: 20px;">您選擇本中心得因素(複選)</p>
+    <p style="margin-right: 75;margin-top: 20px;">是否曾經從事醫護工作</p>    
+</div>
+<div id="pie6"></div>
+<div id="pie7"></div>
+<div class="title">
+    <p style="margin-left: 0px;margin-top: 20px;">預觸電患者急救時應先</p>
+    <p style="margin-right: 165px;margin-top: 20px;">遇到車禍事件，發現有人員受傷躺在現場，可否移動患者</p>    
+</div>
+<div id="pie8"></div>
+<div id="pie9"></div>
+<div class="title">
+    <p style="margin-left: 0px;margin-top: 20px;width:43%">發現民眾倒臥再旁，且呈現無意識，缺氧狀快，應於幾分鐘內施予急救</p>
+</div>
+<div id="pie10"></div>
+
+<script>
+$(document).ready(function () {
+    json_data = $('#json_data')[0].innerText
+    data = JSON.parse(json_data)
+    var pie_2 = []
+    var pie_3 = []
+    var pie_4 = []
+    var pie_5 = []
+    var pie_6 = []
+    var pie_7 = []
+    var pie_8 = []
+    var pie_9 = []
+    var pie_10 = []
+
+
+    for(let[key,value] of Object.entries(data['2'])){
+	    pie_2.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['3'])){
+	    pie_3.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['4'])){
+	    pie_4.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['5'])){
+	    pie_5.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['6'])){
+	    pie_6.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['7'])){
+	    pie_7.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['8'])){
+	    pie_8.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['9'])){
+	    pie_9.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['10'])){
+	    pie_10.push([key,value])
+    }
+
+
+    var chart = c3.generate({
+        bindto: '#pie2',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_2,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie3',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_3,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie4',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_4,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie5',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_5,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie6',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_6,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie7',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_7,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie8',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_8,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie9',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_9,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie10',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_10,
+            type : 'pie',
+        }
+    });
+
+});
+
+</script>

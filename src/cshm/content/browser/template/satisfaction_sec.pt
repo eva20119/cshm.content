@@ -1,0 +1,193 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+<style>
+td>label{
+    display: table;
+}
+label{
+    font-weight: normal;
+    font-size: 17px;
+}
+p{
+    font-weight: bold;
+    font-size: 18px;
+}
+</style>
+
+<form action="result_satisfaction" method="post">
+    <div>
+        <p>課程名稱：</p>
+        <input type="text" value='${view/subject_name}' readonly="readonly"  name='subject_name'/>    
+    </div>
+    <div>
+        <p>期數：</p>
+        <input type="text" value='${view/period}' readonly="readonly"  name='period'/>
+    </div>
+    <div>
+        <p>日期：</p>
+        <input type="text" value='${python:view.date}' readonly="readonly"  name='date'/>
+    </div>
+    <div>
+        <p>老師：</p>
+        <input type="text" value='${view/teacher}' readonly="readonly"  name='teacher'/>
+    </div>
+    <div>
+        <p>座號：</p>
+        <select name="seat" id="seat">
+        </select>
+    </div>
+    <div style='margin-top:15px'>
+        <p>教學態度</p>
+        <label>
+            <input type="radio" value='5' name='question1' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question1' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question1' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question1' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question1' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>教學方式能啟發學員</p>
+        <label>
+            <input type="radio" value='5' name='question2' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question2' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question2' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question2' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question2' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>能依課程、教材內容有進度、系統講授</p>
+        <label>
+            <input type="radio" value='5' name='question3' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question3' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question3' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question3' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question3' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>教授內容易懂、實務化</p>
+        <label>
+            <input type="radio" value='5' name='question4' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question4' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question4' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question4' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question4' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>上課音量、口音表達適當清晰</p>
+        <label>
+            <input type="radio" value='5' name='question5' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question5' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question5' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question5' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question5' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>提供技能檢定或考照之建議或協助</p>
+        <label>
+            <input type="radio" value='5' name='question8' required />非常滿意</label>
+        <label>
+            <input type="radio" value='4' name='question8' required />滿意</label>
+        <label>
+            <input type="radio" value='3' name='question8' required />尚可</label>
+        <label>
+            <input type="radio" value='2' name='question8' required />不太滿意</label>
+        <label>
+            <input type="radio" value='1' name='question8' required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>上課場地清潔、茶水供應是否充足?</p>
+            <label><input type="radio" name="question6" value="5" required />非常滿意</label>
+            <label><input type="radio" name="question6" value="4" required />滿意</label>
+            <label><input type="radio" name="question6" value="3" required />尚可</label>
+            <label><input type="radio" name="question6" value="2" required />不太滿意</label>
+            <label><input type="radio" name="question6" value="1" required />很不滿意</label>
+    </div>
+    <div style='margin-top:15px'>
+        <p>輔導員服務態度?</p>
+            <label><input type="radio" name="question7" value="5" required />非常滿意</label>
+            <label><input type="radio" name="question7" value="4" required />滿意</label>
+            <label><input type="radio" name="question7" value="3" required />尚可</label>
+            <label><input type="radio" name="question7" value="2" required />不太滿意</label>
+            <label><input type="radio" name="question7" value="1" required />很不滿意</label>
+    </div>    
+
+    <p>意見反應</p>
+
+    <p>一、教學內容</p>
+    <textarea name="question9" cols="30" rows="10"></textarea>
+    <p>二、講師授課表現</p>
+    <textarea name="question10" cols="30" rows="10"></textarea>
+
+    <p>三、上課環境與服務品質</p>
+    <textarea name="question11" cols="30" rows="10"></textarea>
+
+    <p>四、其他</p>
+    <textarea name="question12" cols="30" rows="10"></textarea>
+
+    
+    <input type="submit" value="送出" class='btn'/>
+    <input type="hidden" name="is_round" value="sec"/>
+    <input type="hidden" name="course" value='${view/course_name}'/>
+</form>
+
+<script>
+$(function(){
+    for(i=1; i<=100; i++){
+        $('#seat').append("<option value=" + i + ">" + i + "</option>")    
+    }
+    $('form').submit(function(){
+        question9 = $('textarea[name="question9"]').val()
+        question10 = $('textarea[name="question10"]').val()
+        question11 = $('textarea[name="question11"]').val()
+        question12 = $('textarea[name="question12"]').val()
+        count = 0
+
+        $('input:radio:checked').each(function(){
+            if($(this).val() == 1 || $(this).val() == 2){
+                if(!question9 && !question10 && !question11 && !question12){
+                    count += 1
+                }
+            }
+        })
+        if(count >= 1){
+            alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄')
+            return false; 
+        }
+    })
+})
+</script>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

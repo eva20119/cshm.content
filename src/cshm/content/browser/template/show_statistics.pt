@@ -1,0 +1,101 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+
+<metal:styleslot fill-slot="style_slot">
+    <link rel="stylesheet" href="++plone++cshm.content/c3.min.css" />
+    <script src="++plone++cshm.content/d3.v3.min.js"></script>
+    <script src="++plone++cshm.content/c3.min.js"></script>
+</metal:styleslot>
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+<style>
+input{
+    width: 20% !important;
+    display: inline !important;
+    margin-bottom: 15px;
+}
+td,th{
+    text-align: center;
+    padding: 5px 0;
+}
+td{
+    font-size: 17px;
+}
+th{
+    font-size: 20px;
+}
+</style>
+<?python
+from plone import api
+abs_url = api.portal.get().absolute_url()
+?>
+<button id='back' style='margin-bottom:20px'>回目錄</button>
+<br/>
+期數 <input type="number" id="period" name='period' required="required"/>
+課程名稱
+<select name="course" id="course">
+    <option value="職業安全衛生管理員">職業安全衛生管理員 </option>
+    <option value="荷重再一噸以上之堆高機操作人員">荷重再一噸以上之堆高機操作人員</option>
+    <option value="丙種職業安全衛生業務主管">丙種職業安全衛生業務主管</option>
+    <option value="急救人員">急救人員</option>
+</select>
+<select name="" id="selected">
+    <option value="1">滿意度</option>
+    <option value="2">訓前</option>
+</select>
+<button id='send'>送出</button>
+
+
+<div id="result"></div>
+<script>
+$(document).ready(function(){
+    $('#back').click(function(){
+        location.href = location.href.replace('show_satisfaction_statistics', 'folder_contents')    
+    })
+
+    $('#send').click(function(){
+        selected = $('#selected').val()
+        period = $('#period').val()
+        course = $('#course').val()
+        if(period == ''){
+            alert('請填寫期數')
+            return false
+        }
+        data = {
+            'period': period,
+            'course': course,
+        }
+        if(selected == 1){
+            url = location.href.replace('show_satisfaction_statistics', 'calculate_satisfaction')    
+        }
+        else{
+            url = location.href.replace('show_satisfaction_statistics', 'calculate_training')
+        }
+        $.ajax({
+            type: "post",
+            url: url,
+            data: data,
+            success: function (response) {
+                if(response != 'error'){
+                    $('#result').html(response)            
+                }else{
+                    alert('查無資料！！')
+                }
+            }
+        });
+    })
+});
+</script>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

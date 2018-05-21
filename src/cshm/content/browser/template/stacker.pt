@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+<style>
+label{
+    font-weight:normal;
+}
+.inline{
+    display:inline !important;
+}
+div{
+    font-size: 18.5px;
+}
+.ml{
+    margin-left:15px;
+}
+</style>
+<form action="result_stacker" method="post">
+    <input type="hidden" name='course_name' value="${python: view.course_title.split('_')[0]}"/>
+    <input type="hidden" name='course_period' value="${python: view.course_title.split('_')[1]}"/>
+    <h2>一、基本資料</h2>
+    <div>1.姓名:</div>
+    <div class='ml'><input type="text" name="anw1" id="" style='width:20%' required /></div>
+    <div>2.參訓目的:</div>
+    <div>
+        <label class='ml'><input type="radio" name="anw2" value="公司位符合法令" required />(1)公司位符合法令</label>
+        <label><input type="radio" name="anw2" value="公司儲備人員" required />(2)公司儲備人員</label>
+        <label><input type="radio" name="anw2" value="個人進修" required />(3)個人進修</label>
+        <label><input type="radio" name="anw2" value="求職考量" required />(4)求職考量</label>
+    </div>
+    <div>3.年齡:</div>
+    <div>
+        <label class='ml'><input type="radio" name="anw3" value="18-20" required />年滿18~20</label>
+        <label><input type="radio" name="anw3" value="21-40" required />21~40</label>
+        <label><input type="radio" name="anw3" value="41-65" required />41~65</label>
+        <label><input type="radio" name="anw3" value="65up" required />65以上</label>
+    </div>
+    <div>4.行業別:</div>
+    <div>
+        <label class='ml'><input type="radio" name="anw4" value="營造業" required />營造業</label>
+        <label><input type="radio" name="anw4" value="製造業" required />製造業</label>
+        <label><input type="radio" name="anw4" value="水電及燃氣供應業" required />水電及燃氣供應業</label>
+        <label><input type="radio" name="anw4" value="金融保險業" required />金融保險業</label>
+        <label><input type="radio" name="anw4" value="百貨商場" required />百貨商場</label>
+        <label><input type="radio" name="anw4" value="運輸及倉儲業" required />運輸及倉儲業</label>
+        <label><input type="radio" name="anw4" value="旅館及餐飲業" required />旅館及餐飲業</label>
+        <label><input type="radio" name="anw4" value="資訊及通訊傳播業" required />資訊及通訊傳播業</label>
+        <label><input type="radio" name="anw4" value="醫療保健服務業" required />醫療保健服務業</label>
+        <label><input type="radio" name="anw4" value="清潔服務業" required />清潔服務業</label>
+        <label><input type="radio" name="anw4" value="政府機關" required />政府機關</label>
+    </div>
+    <div>5.您是如何知道本像訓練課程:</div>
+    <div>
+        <label class='ml'><input type="radio" name="anw5" value="網路" required />網路</label>
+        <label><input type="radio" name="anw5" value="親友介紹" required />親友介紹</label>
+        <label><input type="radio" name="anw5" value="公司指派" required />公司指派</label>
+        <label><input type="radio" name="anw5" value="曾經參訓" required />曾經參訓</label>
+        <label><input type="radio" name="anw5" value="接獲本中心簡章" required />接獲本中心簡章</label>
+    </div>
+    <div>6.您選擇本中心得因素(複選):</div>
+    <div>
+        <label class='ml'><input type="checkbox" name="anw6" value="費用"/>費用</label>
+        <label><input type="checkbox" name="anw6" value="親友推薦"/>親友推薦</label>
+        <label><input type="checkbox" name="anw6" value="交通方便"/>交通方便</label>
+        <label><input type="checkbox" name="anw6" value="學習環境"/>學習環境</label>
+    </div>
+    <h2>二、職能概況</h2>
+    <div>1.學歷:</div>
+    <div>
+        <label class='ml'><input type="radio" name="anw7" value="國中(含)以下" required />國中(含)以下</label>
+        <label><input type="radio" name="anw7" value="高中(職)" required />高中(職)</label>
+        <label><input type="radio" name="anw7" value="大專(職)" required />大專(職)</label>
+        <label><input type="radio" name="anw7" value="研究所" required />研究所</label>
+    </div>
+    2.有無汽車駕駛執照:
+    <div>
+        <label class='ml'><input type="radio" value='無駕照' name='anw8' required />無駕照</label>
+        <label class='ml'><input type="radio" value='有駕照' name='anw8' required />有駕照,但不常開</label>
+        <label class='ml'><input type="radio" value='有駕照' name='anw8' required />有駕照,經常開</label>
+    </div>
+    <div>
+        <label class='ml'><input type="radio" name="anw9" value="未曾開過堆高機" required />未曾開過堆高機</label>
+        <label><input type="radio" name="anw9" value="曾經開過堆高機但不熟練" required />曾經開過堆高機但不熟練</label>
+        <label><input type="radio" name="anw9" value="會開堆高機且經常使用" required />會開堆高機且經常使用</label>
+    </div>
+    <input type="submit" value="送出"/>
+</form>
+<script>
+$(function(){
+    $('form').submit(function(){
+        if($('input[name="anw6"]:checked').length == 0){
+            alert('第六題請選擇')
+            return false
+        }
+    })
+})
+
+</script>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

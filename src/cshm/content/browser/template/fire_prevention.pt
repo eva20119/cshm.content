@@ -1,0 +1,538 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+<style>
+td>label{
+    display: table;
+    margin-left: 10px;
+}
+
+</style>
+
+<form action="result_fire_prevention" method="post">
+    <table>
+        <tr>
+            <td colspan="3">上課日期：
+                <input type="date" name="date1" id=""/>~
+                <input type="date" name="date2" id=""/></td>
+            <td>選擇：
+                <select name="select1" id="">
+                    <option value="初">初訓</option>
+                    <option value="複">複訓</option>
+                </select>
+            </td>
+
+            <td>期別</td>
+            <td><input type="text" name='period'/></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <p>一、您是否於本次課程期間認真投入課程內容學習?</p>
+                <label><input type="radio" name="6_1" value="5"/>5分(非常認真)</label>
+                <label><input type="radio" name="6_1" value="4"/>4分(很認真)</label>
+                <label><input type="radio" name="6_1" value="3"/>3分(尚可)</label>
+                <label><input type="radio" name="6_1" value="2"/>2分(不認真)</label>
+                <label><input type="radio" name="6_1" value="1"/>1分(非常不認真)</label>
+            </td>
+            <td colspan="3">
+                <p>二、您覺得本次課程期間，其他學員是否認真投入課程學習?</p>
+                <label><input type="radio" name="7_1" value="5"/>5分(非常認真)</label>
+                <label><input type="radio" name="7_1" value="4"/>4分(很認真)</label>
+                <label><input type="radio" name="7_1" value="3"/>3分(尚可)</label>
+                <label><input type="radio" name="7_1" value="2"/>2分(不認真)</label>
+                <label><input type="radio" name="7_1" value="1"/>1分(非常不認真)</label>
+            </td>
+        </tr>
+
+        <tr>
+            <td>課程項目</td>
+            <td><input type="text" name="course1"/></td>
+            <td><input type="text" name='course2'/></td>
+            <td><input type="text" name='course3'/></td>
+            <td><input type="text" name='course4'/></td>
+            <td><input type="text" name='course5'/></td>
+        </tr>
+        <tr>
+            <td style="position:relative">
+                講師姓名
+            </td>
+            <td><input type="text" name="teacher1"/></td>
+            <td><input type="text" name="teacher2"/></td>
+            <td><input type="text" name="teacher3"/></td>
+            <td><input type="text" name="teacher4"/></td>
+            <td><input type="text" name="teacher5"/></td>
+        </tr>
+
+        <tr>
+            <td>授課內容</td>
+            <td>
+                <label>
+                    <input type="radio" name="1_1" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_1" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_1" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="1_1" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_1" id="" value='1'/>很不滿意
+                </label>
+
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="2_1" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_1" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_1" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="2_1" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_1" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="3_1" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_1" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_1" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="3_1" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_1" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="4_1" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_1" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_1" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="4_1" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_1" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="5_1" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_1" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_1" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="5_1" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_1" id="" value='1'/>很不滿意
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>教學方式</td>
+            <td>
+                <label>
+                    <input type="radio" name="1_2" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_2" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_2" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="1_2" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_2" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="2_2" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_2" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_2" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="2_2" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_2" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="3_2" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_2" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_2" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="3_2" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_2" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="4_2" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_2" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_2" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="4_2" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_2" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="5_2" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_2" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_2" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="5_2" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_2" id="" value='1'/>很不滿意
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>表達能力</td>
+            <td>
+                <label>
+                    <input type="radio" name="1_3" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_3" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_3" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="1_3" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_3" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="2_3" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_3" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_3" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="2_3" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_3" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="3_3" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_3" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_3" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="3_3" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_3" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="4_3" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_3" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_3" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="4_3" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_3" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="5_3" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_3" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_3" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="5_3" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_3" id="" value='1'/>很不滿意
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>教學熱忱</td>
+            <td>
+                <label>
+                    <input type="radio" name="1_4" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_4" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_4" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="1_4" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_4" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="2_4" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_4" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_4" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="2_4" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_4" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="3_4" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_4" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_4" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="3_4" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_4" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="4_4" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_4" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_4" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="4_4" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_4" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="5_4" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_4" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_4" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="5_4" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_4" id="" value='1'/>很不滿意
+                </label>
+            </td>
+        </tr>
+            <tr>
+            <td>課程滿意度</td>
+            <td>
+                <label>
+                    <input type="radio" name="1_5" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_5" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_5" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="1_5" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="1_5" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="2_5" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_5" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_5" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="2_5" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="2_5" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="3_5" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_5" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_5" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="3_5" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="3_5" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="4_5" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_5" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_5" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="4_5" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="4_5" id="" value='1'/>很不滿意
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="radio" name="5_5" id="" value='5'/>非常滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_5" id="" value='4'/>滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_5" id="" value='3'/>尚可
+                </label>
+                <label>
+                    <input type="radio" name="5_5" id="" value='2'/>不太滿意
+                </label>
+                <label>
+                    <input type="radio" name="5_5" id="" value='1'/>很不滿意
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan='6'>
+                <textarea name="8_1" id="" cols="30" rows="10"
+                placeholder="給分1分課程(非常不滿意)項目,請說明原因,以利改進參考,如位題原因者,列2分"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td colspan='6'>
+                <textarea name="9_1" id="" cols="30" rows="10"
+                placeholder="意見回饋(或關於課程建議或滿意度給予1分之原因)"></textarea>
+            </td>
+        </tr>
+    </table>
+
+
+    <input type="submit" value="送出"/>
+</form>
+
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

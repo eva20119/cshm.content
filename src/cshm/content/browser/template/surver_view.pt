@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:v-on="http://vuejs.org"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+
+<div tal:repeat="item python:view.data">
+<h3>課程名稱：${item}</h3>
+<h3>訓前調查：<a href="${python:view.ex_url_data[item]}" target="_blank">訓前調查</a></h3> 
+
+    <div tal:repeat="tmp python:view.data[item]">
+        授課名稱：${tmp}<br>
+        期別：${python:view.data[item][tmp][0]}<br>
+        日期：${python:view.data[item][tmp][1]}<br>
+        星期：${python:view.data[item][tmp][2]}<br>
+        時間：${python:view.data[item][tmp][3]}<br>
+        導師：${python:view.data[item][tmp][4]}<br>
+        滿意度調查：<a href="${python:view.data[item][tmp][5]}" target="_blank">滿意度調查</a><br>
+        <br>
+    </div>
+</div>
+
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

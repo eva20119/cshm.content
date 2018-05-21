@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<object
+    i18n:domain="plone"
+    meta_type="Dexterity FTI"
+    name="Document"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+
+  <property name="view_methods">
+    <element value="document_view"/>
+    <element value="satisfaction_first"/>
+    <element value="satisfaction_sec"/>
+    <element value="manager"/>
+    <element value="stacker"/>
+    <element value="emergency"/>
+    <element value="c_type"/>
+    <element value="fire_prevention"/>
+    <element value="show_satisfaction_statistics"/>
+    <element value="show_manager_statistics"/>
+    <element value="show_fire_statistics"/>
+  </property>
+
+</object>

@@ -1,0 +1,261 @@
+
+<style>
+.c3{
+    display: inline;
+}
+.title{
+    display: flex;
+    justify-content: space-between;
+}
+p{
+    font-size: 22px;
+}
+</style>
+
+<p id="json_data" style='display:none'>${view/json_data}</p>
+
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">參訓目的</p>
+    <p style="margin-right: 360px;margin-top: 20px;">年齡</p>    
+</div>
+<div id="pie2"></div>
+<div id="pie3"></div>
+<div class="title">
+    <p style="margin-left: 205px;margin-top: 20px;">行業別</p>
+    <p style="margin-right: 225px;margin-top: 20px;">您是如何知道本像訓練課程</p>    
+</div>
+<div id="pie4"></div>
+<div id="pie5"></div>
+<div class="title">
+    <p style="margin-left: 135px;margin-top: 20px;">您選擇本中心得因素(複選)</p>
+    <p style="margin-right: 75;margin-top: 20px;">據您所知，職業安全衛生法之中央主管機關為何單位</p>    
+</div>
+<div id="pie6"></div>
+<div id="pie7"></div>
+<div class="title">
+    <p style="margin-left: 0px;margin-top: 20px;">防止職業災害，保障工作者健康及安全為下列合法之宗旨</p>
+    <p style="margin-right: 165px;margin-top: 20px;">何者為符合資格之職業安全衛生管理員</p>    
+</div>
+<div id="pie8"></div>
+<div id="pie9"></div>
+<div class="title">
+    <p style="margin-left: 0px;margin-top: 20px;width:43%">王先生受雇於OO建設有限公司，某日上班再公司內不小心跌倒導致右手閉骨折，是否屬於職業災害</p>
+    <p style="margin-left: 205px;margin-top: 20px;">職業安全衛生法已字103.7.3正式施行，其適用範圍(行業)為何</p>    
+</div>
+<div id="pie10"></div>
+<div id="pie11"></div>
+<div class="title">
+    <p style="margin-left: 25px;margin-top: 20px;">僱主對勞工實施必要之安全衛生教育訓練</p>
+    <p style="margin-right: 90px;margin-top: 20px;">作業中有物體飛落致為害勞工之虞，應置備何項防護具</p>    
+</div>
+<div id="pie12"></div>
+<div id="pie13"></div>
+<div class="title">
+    <p style="margin-left: 155px;margin-top: 20px;">下列何項為高架作業</p>
+</div>
+<div id="pie14"></div>
+<script>
+$(document).ready(function () {
+    json_data = $('#json_data')[0].innerText
+    data = JSON.parse(json_data)
+    var pie_2 = []
+    var pie_3 = []
+    var pie_4 = []
+    var pie_5 = []
+    var pie_6 = []
+    var pie_7 = []
+    var pie_8 = []
+    var pie_9 = []
+    var pie_10 = []
+    var pie_11 = []
+    var pie_12 = []
+    var pie_13 = []
+    var pie_14 = []
+
+    for(let[key,value] of Object.entries(data['2'])){
+	    pie_2.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['3'])){
+	    pie_3.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['4'])){
+	    pie_4.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['5'])){
+	    pie_5.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['6'])){
+	    pie_6.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['7'])){
+	    pie_7.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['8'])){
+	    pie_8.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['9'])){
+	    pie_9.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['10'])){
+	    pie_10.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['11'])){
+	    pie_11.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['12'])){
+	    pie_12.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['13'])){
+	    pie_13.push([key,value])
+    }
+    for(let[key,value] of Object.entries(data['14'])){
+	    pie_14.push([key,value])
+    }
+
+    var chart = c3.generate({
+        bindto: '#pie2',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_2,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie3',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_3,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie4',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_4,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie5',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_5,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie6',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_6,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie7',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_7,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie8',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_8,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie9',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_9,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie10',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_10,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie11',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_11,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie12',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_12,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie13',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_13,
+            type : 'pie',
+        }
+    });
+    var chart = c3.generate({
+        bindto: '#pie14',
+        size: {
+            width: 500,
+        },
+        data: {
+            // iris data from R
+            columns: pie_14,
+            type : 'pie',
+        }
+    });
+
+});
+
+</script>

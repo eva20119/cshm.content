@@ -1,0 +1,42 @@
+<style>
+td,th{
+    text-align: center;
+    padding: 5px 0;
+}
+td{
+    font-size: 17px;
+}
+th{
+    font-size: 20px;
+}
+</style>
+<table tal:define="course_list view/course_list">
+    <tr>
+        <td>承辦人姓名:</td>
+        <td><input type="text"/></td>
+        <td>電話</td>
+        <td><input type="text"/></td>
+    </tr>
+    <tr>
+        <td>信箱</td>
+        <td><input type="text"/></td>
+    </tr>   
+    <tr>
+        <td colspan='2'></td>
+        <th colspan='${python:len(course_list)}'>課程平均滿意度</th>
+    </tr>
+    <tr>
+        <th>班期</th>
+        <th>講師名稱</th>
+        <tal:course_list repeat="course course_list">
+            <th>${course}</th>
+        </tal:course_list>
+    </tr>
+    <tr tal:repeat="item view/data">
+        <td>${python:'第%s期%s'%(view.period, view.select)}</td>
+        <td>${item}</td>
+        <tal:point repeat="i python:view.course_list">
+            <td>${python:view.data[item][view.course_list.index(i)][1]}</td>
+        </tal:point>
+    </tr>
+</table>
