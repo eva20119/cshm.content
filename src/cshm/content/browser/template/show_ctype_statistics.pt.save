@@ -5,7 +5,7 @@
 }
 .title{
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 p{
     font-size: 22px;
@@ -13,39 +13,34 @@ p{
 </style>
 <p id="json_data" style='display:none'>${view/json_data}</p>
 
+<div class='title'>
     <div class="title">
-        <p style="">參訓目的</p>
-        <p style="">年齡</p>    
+        <p style="margin-left: 205px;margin-top: 20px;">參訓目的</p>
+        <p style="margin-right: 360px;margin-top: 20px;">年齡</p>    
     </div>
     <div class='title'>
         <div id="pie2"></div>
         <div id="pie3"></div>
     </div>
-
-<div class="title">
-    <p style="">行業別</p>
-    <p style="">您是如何知道本像訓練課程</p>    
 </div>
-<div class="title">
-    <div id="pie4"></div>
-    <div id="pie5"></div>
+    <p style="margin-left: 205px;margin-top: 20px;">行業別</p>
+    <p style="margin-right: 225px;margin-top: 20px;">您是如何知道本像訓練課程</p>    
 </div>
+<div id="pie4"></div>
+<div id="pie5"></div>
 <div class="title">
-    <p style="">您選擇本中心得因素(複選)</p>
-    <p style="">據您所知，職業安全衛生法之中央主管機關為何單位</p>    
+    <p style="margin-left: 135px;margin-top: 20px;">您選擇本中心得因素(複選)</p>
+    <p style="margin-right: 75;margin-top: 20px;">據您所知，職業安全衛生法之中央主管機關為何單位</p>    
 </div>
-<div class="title">
 <div id="pie6"></div>
 <div id="pie7"></div>
-</div>
 <div class="title">
-    <p style="">學歷</p>
-    <p style="">汽車駕駛執照</p>    
+    <p style="margin-left: 222px;margin-top: 20px;">學歷</p>
+    <p style="margin-right: 322px;margin-top: 20px;">汽車駕駛執照</p>    
 </div>
-<div class="title">
-    <div id="pie8"></div>
-    <div id="pie9"></div>
-</div>
+<div id="pie8"></div>
+<div id="pie9"></div>
+
 <script>
 $(document).ready(function () {
     json_data = $('#json_data')[0].innerText

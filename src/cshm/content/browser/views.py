@@ -9,6 +9,8 @@ import csv
 import base64
 import qrcode
 import datetime
+from plone.namedfile.field import NamedBlobImage,NamedBlobFile
+from plone import namedfile
 
 
 class CreateNews(BrowserView):
@@ -522,7 +524,7 @@ class UploadCsv(BrowserView):
         text = base64.b64decode(file_data)
         create_data = {}
         exist_data = {}
-        course_list = {}        
+        course_list = {}
         portal = api.portal.get()
         result = api.content.find(context=portal, portal_type='Course')
         # 蒐集現有Course的名子及uid,方便後面比對
@@ -571,6 +573,17 @@ class UploadCsv(BrowserView):
                 title=k,
                 subject_list=v,
                 container=portal)
+        # 新增或更新content file
+        file = api.content.find(context=portal['file_content'], portal_type='file')
+        if file:
+            """"""
+        else:
+            obj = api.content.create(
+                type='File',
+                title='重要檔案',
+                file=namedfile.NamedBlobFile(data=base64.b64decode(file_data), filename=unicode('file.csv')),
+                container=portal['file_content']
+            )
         api.portal.show_message(message='上傳成功!!!', type='info', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 

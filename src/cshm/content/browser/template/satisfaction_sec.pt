@@ -162,7 +162,7 @@ p{
 
 <script>
 $(function(){
-    for(i=1; i<=100; i++){
+    for(i=1; i<=60; i++){
         $('#seat').append("<option value=" + i + ">" + i + "</option>")    
     }
     $('form').submit(function(){
