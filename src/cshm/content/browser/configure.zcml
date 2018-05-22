@@ -178,4 +178,11 @@
       layer='cshm.content.interfaces.ICshmContentLayer'
       permission='zope2.View'
       />
+  <browser:page
+      name='get_surver'
+      for='*'
+      class='.views.GetSurver'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
 </configure>

@@ -576,7 +576,7 @@ class UploadCsv(BrowserView):
         # 新增或更新content file
         file = api.content.find(context=portal['file_content'], portal_type='file')
         if file:
-            """"""
+            import pdb;pdb.set_trace()
         else:
             obj = api.content.create(
                 type='File',
@@ -1102,3 +1102,10 @@ class CalculateTraining(BrowserView):
             json_data = json.dumps(data)
             self.json_data = json_data
             return self.template_stacker()
+
+class GetSurver(BrowserView):
+    def __call__(self):
+        portal = api.portal.get()
+        file = api.content.find(context=portal['file_content'], portal_type='File')
+        import pdb;pdb.set_trace()
+
