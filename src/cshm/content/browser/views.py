@@ -11,6 +11,7 @@ import qrcode
 import datetime
 from plone.namedfile.field import NamedBlobImage,NamedBlobFile
 from plone import namedfile
+from StringIO import StringIO
 
 
 class CreateNews(BrowserView):
@@ -43,7 +44,8 @@ class SatisfactionSec(BrowserView):
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-
+        portal = api.portal.get()
+        abs_url = portal.absolute_url()
         return self.template()
 
 
@@ -520,8 +522,10 @@ class UploadCsv(BrowserView):
     def __call__(self):
         request = self.request
         file_data = request.get('file_data')
-        file_data = file_data.split('data:text/csv;base64,')[1]
+        file_data = file_data.split(',')[1]
         text = base64.b64decode(file_data)
+        f = StringIO(text)
+        reader = csv.DictReader(f, delimiter=',')
         create_data = {}
         exist_data = {}
         course_list = {}
@@ -532,24 +536,20 @@ class UploadCsv(BrowserView):
             title = item.Title
             uid = item.UID
             course_list[title] = uid
-
-        for item in text.split('\n'):
+        for item in reader:
             try:
                 if item:
-                    tmp = item.split(',')
                     # 課程名稱 + '_' + 期間
-                    course = '%s_%s' %(tmp[0].replace('"', ''), tmp[1])
-                    date = '%s/%s' %(tmp[3], tmp[4])
-                    tmp[2] = tmp[2].replace('"', '')
-                    tmp[5] = tmp[5].replace('"', '')
-                    tmp[6] = tmp[6].replace('"', '')
-                    tmp[7] = tmp[7].replace('"', '')
-                    tmp[8] = tmp[8]
-                    tmp[9] = tmp[9].replace('"', '')
-                    tmp[10] = tmp[10]
-                    tmp[11] = tmp[11].replace('"', '')
-                    data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(tmp[2], date, tmp[5], tmp[6], 
-                                tmp[7], tmp[8], tmp[9], tmp[10], tmp[11])
+                    course = '%s_%s' %(item['course'], item['period'])
+                    date = '%s/%s/%s' %(item['year'], item['month'], item['date'])
+                    data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
+                                item['week'], item['subject'], item['hour'], item['teacher'], item['number'], item['classroom'])
+                    execStr = """INSERT INTO `course_list`(`course`, `period`, `date`, `time`, `week`, `subject`, `hour`, 
+                        `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
+                        """.format(item['course'], item['period'], date, item['time'], item['week'], item['subject'],
+                              item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
+                    execSql = SqlObj()
+                    execSql.execSql(execStr)
                     if course in course_list.keys():
                         course_uid = course_list[course]
                         if exist_data.has_key(course_uid):
@@ -561,8 +561,8 @@ class UploadCsv(BrowserView):
                             create_data[course] += data
                         else:
                             create_data[course] = data
-            except :
-                import pdb;pdb.set_trace()
+            except Exception as e:
+                print e
         # 更新
         for k,v in exist_data.items():
             api.content.get(UID=k).subject_list = v
@@ -573,17 +573,6 @@ class UploadCsv(BrowserView):
                 title=k,
                 subject_list=v,
                 container=portal)
-        # 新增或更新content file
-        file = api.content.find(context=portal['file_content'], portal_type='file')
-        if file:
-            import pdb;pdb.set_trace()
-        else:
-            obj = api.content.create(
-                type='File',
-                title='重要檔案',
-                file=namedfile.NamedBlobFile(data=base64.b64decode(file_data), filename=unicode('file.csv')),
-                container=portal['file_content']
-            )
         api.portal.show_message(message='上傳成功!!!', type='info', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 
@@ -604,22 +593,38 @@ class CourseView(BrowserView):
         for item in subject_list.split('\n'):
             if item:
                 tmp = item.split(',')
-                if tmp[0] == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, tmp[4], tmp[1], tmp[6], course_name, period)
-                else:
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, tmp[4], tmp[1], tmp[6], course_name, period)
-                # 製作qrcode
-                qr = qrcode.QRCode()
-                qr.add_data(url)
-                qr.make_image().save('url.png')
-                img = open('url.png', 'rb')
-                b64_img = base64.b64encode(img.read())
-
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7]
-                    , tmp[8], url, b64_img ])
-
+                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8]])
+        url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
+        # 製作qrcode
+        qr = qrcode.QRCode()
+        qr.add_data(url)
+        qr.make_image().save('url.png')
+        img = open('url.png', 'rb')
+        b64_img = base64.b64encode(img.read())
+        self.b64_img = b64_img
         self.data = data
         return self.template()
+
+
+class CheckSurver(BrowserView):
+    def __call__(self):
+        request = self.request
+        course_name = request.get('course_name')
+        period = request.get('period')
+        now = datetime.datetime.now()
+        date = now.strftime('%Y-%m-%d')
+        time = now.strftime('%H:%M')
+        already_write = request.cookie.get('already_write')
+
+        execSql = SqlObj()
+        execStr = """SELECT * FROM course_list WHERE course_name = '{}' AND period = '{}' AND date <= '{}'
+            """.format(course_name, period, date)
+        result = execSql.execSql(execStr)
+
+        for item in result:
+            tmp = dict(item)
+
+
 
 
 class ShowStatistics(BrowserView):
@@ -1102,10 +1107,4 @@ class CalculateTraining(BrowserView):
             json_data = json.dumps(data)
             self.json_data = json_data
             return self.template_stacker()
-
-class GetSurver(BrowserView):
-    def __call__(self):
-        portal = api.portal.get()
-        file = api.content.find(context=portal['file_content'], portal_type='File')
-        import pdb;pdb.set_trace()
 

@@ -21,13 +21,13 @@ input{
     <input type="hidden" id='text' name="file_data"/>
     <input type="submit" value="Send"/>
 </form>
-
 <script type="text/javascript">
 		function showPreview(source) {
 			var file = source.files[0];
 			if(window.FileReader) {
 				var fr = new FileReader();
-				fr.onloadend = function(e) {                
+				fr.onloadend = function(e) {
+                    debugger                
                     $('#text').val(e.currentTarget.result)
 				};
 				fr.readAsDataURL(file);

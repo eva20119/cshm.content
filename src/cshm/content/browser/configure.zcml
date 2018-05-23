@@ -179,10 +179,11 @@
       permission='zope2.View'
       />
   <browser:page
-      name='get_surver'
+      name='check_surver'
       for='*'
-      class='.views.GetSurver'
+      class='.views.CheckSurver'
       layer='cshm.content.interfaces.ICshmContentLayer'
       permission='zope2.View'
       />
+
 </configure>

@@ -24,7 +24,6 @@ p{
     margin:0;
 }
 </style>
-
 <form action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
