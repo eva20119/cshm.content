@@ -544,9 +544,10 @@ class UploadCsv(BrowserView):
                     date = '%s/%s/%s' %(item['year'], item['month'], item['date'])
                     data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
                                 item['week'], item['subject'], item['hour'], item['teacher'], item['number'], item['classroom'])
-                    execStr = """INSERT INTO `course_list`(`course`, `period`, `date`, `time`, `week`, `subject`, `hour`, 
-                        `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
-                        """.format(item['course'], item['period'], date, item['time'], item['week'], item['subject'],
+                    start_datetime = '%s %s:00:00' %(date, item['time'][:2])
+                    execStr = """INSERT INTO `course_list`(`course`, `period`, `datetime`, `week`, `subject`, `hour`, 
+                        `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
+                        """.format(item['course'], item['period'], start_datetime, item['week'], item['subject'],
                               item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
                     execSql = SqlObj()
                     execSql.execSql(execStr)
@@ -563,17 +564,21 @@ class UploadCsv(BrowserView):
                             create_data[course] = data
             except Exception as e:
                 print e
+                api.portal.show_message(message='上傳格式錯誤!!!', type='error', request=request)
         # 更新
-        for k,v in exist_data.items():
-            api.content.get(UID=k).subject_list = v
-        # 建立新的
-        for k,v in create_data.items():
-            obj = api.content.create(
-                type='Course',
-                title=k,
-                subject_list=v,
-                container=portal)
-        api.portal.show_message(message='上傳成功!!!', type='info', request=request)
+        try:
+            for k,v in exist_data.items():
+                api.content.get(UID=k).subject_list = v
+            # 建立新的
+            for k,v in create_data.items():
+                obj = api.content.create(
+                    type='Course',
+                    title=k,
+                    subject_list=v,
+                    container=portal)
+            api.portal.show_message(message='上傳成功!!!', type='info', request=request)
+        except:
+            api.portal.show_message(nessage='上傳格式錯誤!!!', type='erroe', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 
 
@@ -609,22 +614,34 @@ class CourseView(BrowserView):
 class CheckSurver(BrowserView):
     def __call__(self):
         request = self.request
+        portal = api.portal.get()
+        abs_url = portal.absolute_url()
         course_name = request.get('course_name')
         period = request.get('period')
         now = datetime.datetime.now()
-        date = now.strftime('%Y-%m-%d')
-        time = now.strftime('%H:%M')
-        already_write = request.cookie.get('already_write')
+        now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        already_write = json.loads(request.cookies.get('already_write'))
+        data = {}
 
         execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course_name = '{}' AND period = '{}' AND date <= '{}'
-            """.format(course_name, period, date)
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime <= '{}' ORDER BY 
+            datetime DESC""".format(course_name, period, now_datetime)
         result = execSql.execSql(execStr)
-
         for item in result:
             tmp = dict(item)
-
-
+            course = tmp['course']
+            period = tmp['period']
+            subject = tmp['subject']
+            quiz = tmp['quiz']
+            item_datetime = tmp['datetime']
+            teacher = tmp['teacher']
+            identify = '%s_%s_%s' %(course, period, subject)
+            if identify not in already_write:
+                if quiz == '是':
+                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                else:
+                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+        request.response.redirect(data['url'])
 
 
 class ShowStatistics(BrowserView):
