@@ -62,11 +62,9 @@ class SatisfactionFirst(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 break;
         if not ex_url:
             self.ex_url = False
@@ -112,11 +110,9 @@ class SatisfactionSec(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 break;
         if not ex_url:
             self.ex_url = False
@@ -128,6 +124,8 @@ class SatisfactionSec(BrowserView):
 class ResultSatisfaction(BrowserView):
     def __call__(self):
         request = self.request
+        portal = api.portal.get()
+        abs_url = portal.absolute_url()
         course = request.get('course')
         subject_name = request.get('subject_name')
         is_round = request.get('is_round')
@@ -160,11 +158,15 @@ class ResultSatisfaction(BrowserView):
             question6, question7, question8, question9, question10, question11, question12, seat)
         execSql.execSql(execStr)
         identify = '%s_%s_%s' %(course, period ,subject_name)
-        already_write = json.loads(request.cookies['already_write'])
+        already_write = request.cookies.get('already_write', [])
+        if already_write:
+            already_write = json.loads(already_write)
+        else:
+            already_write = []
         already_write.append(identify)
         request.response.setCookie('already_write', json.dumps(already_write))
-        api.portal.show_message(message='', type='info', request=request)
-        return '填寫完成'
+        api.portal.show_message(message='填寫完成', type='info', request=request)
+        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
 
 
 class Manager(BrowserView):
@@ -610,6 +612,8 @@ class UploadCsv(BrowserView):
         course_list = {}
         portal = api.portal.get()
         result = api.content.find(context=portal, portal_type='Course')
+        execSql = SqlObj()
+
         # 蒐集現有Course的名子及uid,方便後面比對
         for item in result:
             title = item.Title
@@ -619,33 +623,44 @@ class UploadCsv(BrowserView):
             try:
                 if item:
                     # 課程名稱 + '_' + 期間
-                    course = '%s_%s' %(item['course'], item['period'])
+                    course = item['course']
+                    period = item['period']
+                    subject = item['subject']
+                    course_period = '%s_%s' %(course, period)
                     date = '%s/%s/%s' %(item['year'], item['month'], item['date'])
+                    # 用在顯示格別科目
                     data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
-                                item['week'], item['subject'], item['hour'], item['teacher'], item['number'], item['classroom'])
+                                item['week'], subject, item['hour'], item['teacher'], item['number'], item['classroom'])
                     start_datetime = '%s %s:00:00' %(date, item['time'][:2])
-                    execStr = """INSERT INTO `course_list`(`course`, `period`, `datetime`, `week`, `subject`, `hour`, 
-                        `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
-                        """.format(item['course'], item['period'], start_datetime, item['week'], item['subject'],
-                              item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
-                    execSql = SqlObj()
+                    # 寫進資料庫，之後用來顯示問卷
+                    execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
+                                """.format(course, period, subject)
+                    if execSql.execSql(execStr):
+                        execStr = """UPDATE course_list SET datetime='{}', week='{}', hour='{}', teacher='{}', 
+                                    number='{}', classroom='{}' WHERE course = '{}' AND period = '{}' AND subject = '{}'
+                                    """.format(start_datetime, item['week'], item['hour'], item['teacher'], 
+                                    item['number'], item['classroom'], course, period, subject)
+                    else:
+                        execStr = """INSERT INTO `course_list`(`course`, `period`, `datetime`, `week`, `subject`, `hour`, 
+                            `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
+                            """.format(course, period, start_datetime, item['week'], subject,
+                               item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
                     execSql.execSql(execStr)
-                    if course in course_list.keys():
-                        course_uid = course_list[course]
+                    if course_period in course_list.keys():
+                        course_uid = course_list[course_period]
                         if exist_data.has_key(course_uid):
                             exist_data[course_uid] += data
                         else:
                             exist_data[course_uid] = data
                     else:
-                        if create_data.has_key(course):
-                            create_data[course] += data
+                        if create_data.has_key(course_period):
+                            create_data[course_period] += data
                         else:
-                            create_data[course] = data
+                            create_data[course_period] = data
             except Exception as e:
                 print e
-                api.portal.show_message(message='上傳格式錯誤!!!', type='error', request=request)
-        # 更新
         try:
+            # 更新
             for k,v in exist_data.items():
                 api.content.get(UID=k).subject_list = v
             # 建立新的
@@ -705,7 +720,7 @@ class CheckSurver(BrowserView):
             already_write = json.loads(already_write)
         else:
             already_write = []
-
+        url = ''
         data = {}
         execSql = SqlObj()
         execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime <= '{}' ORDER BY 
@@ -722,11 +737,9 @@ class CheckSurver(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write:
                 if quiz == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
                 else:
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
                 break;
         self.seat_number = request.cookies.get('seat_number', '請選擇')
         self.url = url
