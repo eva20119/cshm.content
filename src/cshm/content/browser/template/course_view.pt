@@ -17,6 +17,7 @@
     <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: view.context.Title()}">急救人員學員訓前職能調查表</a><br/>
     <br/><br/>
     <img src="data:image/png;base64,${view/b64_img}" style="width:200px"/>
+    <a href="${view/url}">問卷網址</a>
     <div tal:repeat="item view/data">
         日期：<span>${python:item[0]}</span><br>
         星期：<span>${python:item[1]}</span><br>
@@ -26,6 +27,7 @@
         講師：<span>${python:item[5]}</span><br>
         教室：<span>${python:item[7]}</span><br>
         <br>
+        <p>${python:item[8]}</p>
         <hr/>
     </div>
 </metal:content-core>
