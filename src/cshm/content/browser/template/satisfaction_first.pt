@@ -24,6 +24,9 @@ p{
     margin:0;
 }
 </style>
+
+<a href="${view/ex_url}" tal:condition="view/ex_url"> ex_url</a>
+
 <form action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>

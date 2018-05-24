@@ -12,6 +12,7 @@ import datetime
 from plone.namedfile.field import NamedBlobImage,NamedBlobFile
 from plone import namedfile
 from StringIO import StringIO
+import requests
 
 
 class CreateNews(BrowserView):
@@ -27,11 +28,25 @@ class SatisfactionFirst(BrowserView):
     template = ViewPageTemplateFile('template/satisfaction_first.pt')
     def __call__(self):
         request = self.request
+        portal = api.portal.get()
+        abs_url = portal.absolute_url()
         self.date = request.get('date')
         self.course_name = request.get('course_name')
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
+        ex_url = request.get('ex_url', '')
+        if ex_url:
+            item = json.loads(ex_url)
+            if item[0] == '是':
+                url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
+                    &period={}""".format(abs_url, item[1], item[2], item[3], item[4], item[5])
+            else:
+                url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name=
+                    {}&period={}""".format(abs_url, item[1], item[2], item[3], item[4], item[5])
+            self.ex_url = url
+        else:
+            self.ex_url = False
         return self.template()
 
 
@@ -637,12 +652,19 @@ class CheckSurver(BrowserView):
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write:
-                if quiz == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                else:
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-        request.response.redirect(data['url'])
+                if data.has_key('url') and data.has_key('ex_url'):
+                    break;
 
+                if not data.has_key('url'):
+                    if quiz == '是':
+                        url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                    else:
+                        url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                    data['url'] = url
+                else:
+                    data['ex_url'] = [quiz, subject, item_datetime.strftime('%Y-%m-%d'), teacher, course, period]
+        url = '%s&ex_url=%s' %(data['url'], json.dumps(data['ex_url']))
+        request.response.redirect(url)
 
 class ShowStatistics(BrowserView):
     template = ViewPageTemplateFile('template/show_statistics.pt')
