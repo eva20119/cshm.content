@@ -24,6 +24,7 @@ p{
 }
 </style>
 
+<a href="${view/ex_url}" tal:condition="view/ex_url">上個問卷</a>
 <form action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
@@ -43,8 +44,7 @@ p{
     </div>
     <div>
         <p>座號：</p>
-        <select name="seat" id="seat">
-        </select>
+        <input type='text' value="${view/seat_number}" name="seat" readonly="readonly">
     </div>
     <div style='margin-top:15px'>
         <p>教學態度</p>
@@ -162,9 +162,6 @@ p{
 
 <script>
 $(function(){
-    for(i=1; i<=60; i++){
-        $('#seat').append("<option value=" + i + ">" + i + "</option>")    
-    }
     $('form').submit(function(){
         question9 = $('textarea[name="question9"]').val()
         question10 = $('textarea[name="question10"]').val()
@@ -174,14 +171,15 @@ $(function(){
 
         $('input:radio:checked').each(function(){
             if($(this).val() == 1 || $(this).val() == 2){
-                if(!question9 && !question10 && !question11 && !question12){
-                    count += 1
-                }
+                count += 1
             }
         })
         if(count >= 1){
-            alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄')
-            return false; 
+            if(question9.length <= 15 && question10.length <=15 && question11.length <= 15 &&
+                question12.length <= 15){
+                alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄，字數需多餘15個字')
+                return false; 
+            }
         }
     })
 })

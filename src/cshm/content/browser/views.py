@@ -79,13 +79,49 @@ class SatisfactionSec(BrowserView):
     template = ViewPageTemplateFile('template/satisfaction_sec.pt')
     def __call__(self):
         request = self.request
+        portal = api.portal.get()
+        abs_url = portal.absolute_url()
         self.date = request.get('date')
         self.course_name = request.get('course_name')
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
+        seat_number = request.get('seat_number', '')
+        cookie_seat_number = request.cookies.get('seat_number', '')
+        self.seat_number = seat_number
+        if cookie_seat_number != seat_number:
+            request.response.setCookie('seat_number', seat_number)
+
+        already_write = request.cookies.get('already_write', [])
+        if already_write:
+            already_write = json.loads(already_write)
+        else:
+            already_write = []
+        ex_url = ''
+        execSql = SqlObj()
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime < '{}' ORDER BY
+                datetime DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
+        result = execSql.execSql(execStr)
+        for item in result:
+            tmp = dict(item)
+            course = tmp['course']
+            period = tmp['period']
+            subject = tmp['subject']
+            item_datetime = tmp['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+            teacher = tmp['teacher']
+            identify = '%s_%s_%s' %(course, period, subject)
+            if identify not in already_write and request.get('subject_name') != subject:
+                if item[5] == '是':
+                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
+                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                else:
+                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
+                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                break;
+        if not ex_url:
+            self.ex_url = False
+        else:
+            self.ex_url = ex_url
         return self.template()
 
 
