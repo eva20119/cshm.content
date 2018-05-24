@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+
+
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+
+<h3>${view/course} 第${view/period}期</h3>
+<label>
+    請填入座號
+    <select id='seat_number' data-number='${view/seat_number}' >
+        <option>請選擇</option>
+    </select>
+</label>
+<input type='hidden' id='url' value='${view/url}' />
+<button id='btn'>送出</button>
+<script>
+$(function(){
+    for(i=1; i<=60; i++){
+        $('#seat_number').append('<option value=' + i + '>' + i + '</option>' )
+    }
+    $('#seat_number').val($('#seat_number').data('number'))
+    $('#btn').click(function(){
+        url = $('#url').val()
+        seat_number = $('#seat_number').val()
+        url += '&seat_number=' + seat_number
+        location.href = url
+    })
+})
+</script>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

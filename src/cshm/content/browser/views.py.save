@@ -12,10 +12,8 @@ import datetime
 from plone.namedfile.field import NamedBlobImage,NamedBlobFile
 from plone import namedfile
 from StringIO import StringIO
-import requests
 
 
-class CreateNews(BrowserView):
     def __call__(self):
         portal = api.portal.get()
         obj = api.content.create(
@@ -28,50 +26,11 @@ class SatisfactionFirst(BrowserView):
     template = ViewPageTemplateFile('template/satisfaction_first.pt')
     def __call__(self):
         request = self.request
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
         self.date = request.get('date')
         self.course_name = request.get('course_name')
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-        seat_number = request.get('seat_number', '')
-        cookie_seat_number = request.cookies.get('seat_number', '')
-        self.seat_number = seat_number
-        if cookie_seat_number != seat_number:
-            request.response.setCookie('seat_number', seat_number)
-
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
-
-        ex_url = ''
-        execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime < '{}' ORDER BY
-                datetime DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
-        result = execSql.execSql(execStr)
-        for item in result:
-            tmp = dict(item)
-            course = tmp['course']
-            period = tmp['period']
-            subject = tmp['subject']
-            item_datetime = tmp['datetime'].strftime('%Y-%m-%d %H:%M:%S')
-            teacher = tmp['teacher']
-            identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write and request.get('subject_name') != subject:
-                if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                break;
-        if not ex_url:
-            self.ex_url = False
-        else:
-            self.ex_url = ex_url
         return self.template()
 
 
@@ -84,8 +43,7 @@ class SatisfactionSec(BrowserView):
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
+
         return self.template()
 
 
@@ -123,10 +81,7 @@ class ResultSatisfaction(BrowserView):
             period, date, teacher, question1, question2, question3, question4, question5, 
             question6, question7, question8, question9, question10, question11, question12, seat)
         execSql.execSql(execStr)
-        identify = '%s_%s_%s' %(course, period ,subject_name)
-        already_write = json.loads(request.cookies['already_write'])
-        already_write.append(identify)
-        request.response.setCookie('already_write', json.dumps(already_write))
+
         api.portal.show_message(message='', type='info', request=request)
         return '填寫完成'
 
@@ -568,7 +523,7 @@ class UploadCsv(BrowserView):
         file_data = file_data.split(',')[1]
         text = base64.b64decode(file_data)
         f = StringIO(text)
-        reader = csv.DictReader(f, delimiter=',')
+        reader = csv.reader(f, delimiter=',')
         create_data = {}
         exist_data = {}
         course_list = {}
@@ -579,21 +534,15 @@ class UploadCsv(BrowserView):
             title = item.Title
             uid = item.UID
             course_list[title] = uid
+
         for item in reader:
             try:
                 if item:
                     # 課程名稱 + '_' + 期間
-                    course = '%s_%s' %(item['course'], item['period'])
-                    date = '%s/%s/%s' %(item['year'], item['month'], item['date'])
-                    data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
-                                item['week'], item['subject'], item['hour'], item['teacher'], item['number'], item['classroom'])
-                    start_datetime = '%s %s:00:00' %(date, item['time'][:2])
-                    execStr = """INSERT INTO `course_list`(`course`, `period`, `datetime`, `week`, `subject`, `hour`, 
-                        `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
-                        """.format(item['course'], item['period'], start_datetime, item['week'], item['subject'],
-                              item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
-                    execSql = SqlObj()
-                    execSql.execSql(execStr)
+                    course = '%s_%s' %(item[0], item[1])
+                    date = '%s/%s/%s' %(item[3], item[4], item[5])
+                    data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item[2], date, item[6], 
+                                item[7], item[8], item[9], item[10], item[11], item[12])
                     if course in course_list.keys():
                         course_uid = course_list[course]
                         if exist_data.has_key(course_uid):
@@ -607,21 +556,28 @@ class UploadCsv(BrowserView):
                             create_data[course] = data
             except Exception as e:
                 print e
-                api.portal.show_message(message='上傳格式錯誤!!!', type='error', request=request)
         # 更新
-        try:
-            for k,v in exist_data.items():
-                api.content.get(UID=k).subject_list = v
-            # 建立新的
-            for k,v in create_data.items():
-                obj = api.content.create(
-                    type='Course',
-                    title=k,
-                    subject_list=v,
-                    container=portal)
-            api.portal.show_message(message='上傳成功!!!', type='info', request=request)
-        except:
-            api.portal.show_message(nessage='上傳格式錯誤!!!', type='erroe', request=request)
+        for k,v in exist_data.items():
+            api.content.get(UID=k).subject_list = v
+        # 建立新的
+        for k,v in create_data.items():
+            obj = api.content.create(
+                type='Course',
+                title=k,
+                subject_list=v,
+                container=portal)
+        # 新增或更新content file
+        file = api.content.find(context=portal['file_content'], portal_type='File')
+        if file:
+            file[0].getObject().file = namedfile.NamedBlobFile(data=text, filename=unicode('file.csv'))
+        else:
+            obj = api.content.create(
+                type='File',
+                title='重要檔案',
+                file=namedfile.NamedBlobFile(data=text, filename=unicode('file.csv')),
+                container=portal['file_content']
+            )
+        api.portal.show_message(message='上傳成功!!!', type='info', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 
 
@@ -641,61 +597,21 @@ class CourseView(BrowserView):
         for item in subject_list.split('\n'):
             if item:
                 tmp = item.split(',')
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8]])
-        url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
-        # 製作qrcode
-        qr = qrcode.QRCode()
-        qr.add_data(url)
-        qr.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        b64_img = base64.b64encode(img.read())
-        self.b64_img = b64_img
-        self.data = data
-        return self.template()
-
-
-class CheckSurver(BrowserView):
-    template = ViewPageTemplateFile('template/check_surver.pt')
-    def __call__(self):
-        request = self.request
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
-        course_name = request.get('course_name')
-        period = request.get('period')
-        now = datetime.datetime.now()
-        now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
-
-        data = {}
-        execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime <= '{}' ORDER BY 
-            datetime DESC""".format(course_name, period, now_datetime)
-        result = execSql.execSql(execStr)
-        for item in result:
-            tmp = dict(item)
-            course = tmp['course']
-            period = tmp['period']
-            subject = tmp['subject']
-            quiz = tmp['quiz']
-            item_datetime = tmp['datetime']
-            teacher = tmp['teacher']
-            identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write:
-                if quiz == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                if tmp[0] == '是':
+                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, tmp[4], tmp[1], tmp[6], course_name, period)
                 else:
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                break;
-        self.seat_number = request.cookies.get('seat_number', '請選擇')
-        self.url = url
-        self.course = course_name
-        self.period =period
+                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, tmp[4], tmp[1], tmp[6], course_name, period)
+                # 製作qrcode
+                qr = qrcode.QRCode()
+                qr.add_data(url)
+                qr.make_image().save('url.png')
+                img = open('url.png', 'rb')
+                b64_img = base64.b64encode(img.read())
+
+                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7]
+                    , tmp[8], url, b64_img ])
+
+        self.data = data
         return self.template()
 
 
@@ -1180,3 +1096,31 @@ class CalculateTraining(BrowserView):
             self.json_data = json_data
             return self.template_stacker()
 
+class GetSurver(BrowserView):
+    def __call__(self):
+        portal = api.portal.get()
+        request = self.request
+        file = api.content.find(context=portal['file_content'], portal_type='File')
+        for item in csv.reader(file[0].getObject().file.open()):
+            start_hour = item[7].split('-')[0]
+            start_time = '%s:%s' %(start_hour[:2], start_hour[2:4])
+            start_str = '%s-%s-%s %s' %(item[3], item[4], item[5], start_time)
+            start_date = datetime.datetime.strptime(start_str, '%Y-%m-%d %H:%M')
+
+            end_hour = item[7].split('-')[1]
+            end_time = '%s:%s' %(end_hour[:2], end_hour[2:4])
+            end_str = '%s-%s-%s %s' %(item[3], item[4], item[5], end_time)
+            end_date = datetime.datetime.strptime(end_str, '%Y-%m-%d %H:%M')
+            now = datetime.datetime.now()
+
+            abs_url = portal.absolute_url() 
+            if now > start_date and now < end_date:
+                date = '%s/%s/%s' %(item[3], item[4], item[5])
+                if item[2] == '是':
+                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}
+                            """.format(abs_url, item[8], date, item[10], item[0], item[1])
+                else:
+                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}
+                            """.format(abs_url, item[8], date, item[10], item[0], item[1])
+                break
+        request.response.redirect(url)

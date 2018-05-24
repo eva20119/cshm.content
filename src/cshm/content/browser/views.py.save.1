@@ -12,7 +12,6 @@ import datetime
 from plone.namedfile.field import NamedBlobImage,NamedBlobFile
 from plone import namedfile
 from StringIO import StringIO
-import requests
 
 
 class CreateNews(BrowserView):
@@ -28,50 +27,11 @@ class SatisfactionFirst(BrowserView):
     template = ViewPageTemplateFile('template/satisfaction_first.pt')
     def __call__(self):
         request = self.request
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
         self.date = request.get('date')
         self.course_name = request.get('course_name')
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-        seat_number = request.get('seat_number', '')
-        cookie_seat_number = request.cookies.get('seat_number', '')
-        self.seat_number = seat_number
-        if cookie_seat_number != seat_number:
-            request.response.setCookie('seat_number', seat_number)
-
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
-
-        ex_url = ''
-        execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime < '{}' ORDER BY
-                datetime DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
-        result = execSql.execSql(execStr)
-        for item in result:
-            tmp = dict(item)
-            course = tmp['course']
-            period = tmp['period']
-            subject = tmp['subject']
-            item_datetime = tmp['datetime'].strftime('%Y-%m-%d %H:%M:%S')
-            teacher = tmp['teacher']
-            identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write and request.get('subject_name') != subject:
-                if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                break;
-        if not ex_url:
-            self.ex_url = False
-        else:
-            self.ex_url = ex_url
         return self.template()
 
 
@@ -123,10 +83,7 @@ class ResultSatisfaction(BrowserView):
             period, date, teacher, question1, question2, question3, question4, question5, 
             question6, question7, question8, question9, question10, question11, question12, seat)
         execSql.execSql(execStr)
-        identify = '%s_%s_%s' %(course, period ,subject_name)
-        already_write = json.loads(request.cookies['already_write'])
-        already_write.append(identify)
-        request.response.setCookie('already_write', json.dumps(already_write))
+
         api.portal.show_message(message='', type='info', request=request)
         return '填寫完成'
 
@@ -594,7 +551,8 @@ class UploadCsv(BrowserView):
                               item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
                     execSql = SqlObj()
                     execSql.execSql(execStr)
-                    if course in course_list.keys():
+                    import pdb;pdb;set_trace()
+                    if course i course_list.keys():
                         course_uid = course_list[course]
                         if exist_data.has_key(course_uid):
                             exist_data[course_uid] += data
@@ -607,21 +565,18 @@ class UploadCsv(BrowserView):
                             create_data[course] = data
             except Exception as e:
                 print e
-                api.portal.show_message(message='上傳格式錯誤!!!', type='error', request=request)
+                import pdb;pdb.set_trace()
         # 更新
-        try:
-            for k,v in exist_data.items():
-                api.content.get(UID=k).subject_list = v
-            # 建立新的
-            for k,v in create_data.items():
-                obj = api.content.create(
-                    type='Course',
-                    title=k,
-                    subject_list=v,
-                    container=portal)
-            api.portal.show_message(message='上傳成功!!!', type='info', request=request)
-        except:
-            api.portal.show_message(nessage='上傳格式錯誤!!!', type='erroe', request=request)
+        for k,v in exist_data.items():
+            api.content.get(UID=k).subject_list = v
+        # 建立新的
+        for k,v in create_data.items():
+            obj = api.content.create(
+                type='Course',
+                title=k,
+                subject_list=v,
+                container=portal)
+        api.portal.show_message(message='上傳成功!!!', type='info', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 
 
@@ -655,48 +610,24 @@ class CourseView(BrowserView):
 
 
 class CheckSurver(BrowserView):
-    template = ViewPageTemplateFile('template/check_surver.pt')
     def __call__(self):
         request = self.request
-        portal = api.portal.get()
-        abs_url = portal.absolute_url()
         course_name = request.get('course_name')
         period = request.get('period')
         now = datetime.datetime.now()
-        now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
+        date = now.strftime('%Y-%m-%d')
+        time = now.strftime('%H:%M')
+        already_write = request.cookies.get('already_write')
 
-        data = {}
         execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime <= '{}' ORDER BY 
-            datetime DESC""".format(course_name, period, now_datetime)
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND date <= '{}'
+            """.format(course_name, period, date)
         result = execSql.execSql(execStr)
+
         for item in result:
             tmp = dict(item)
-            course = tmp['course']
-            period = tmp['period']
-            subject = tmp['subject']
-            quiz = tmp['quiz']
-            item_datetime = tmp['datetime']
-            teacher = tmp['teacher']
-            identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write:
-                if quiz == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                else:
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}
-                        &period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                break;
-        self.seat_number = request.cookies.get('seat_number', '請選擇')
-        self.url = url
-        self.course = course_name
-        self.period =period
-        return self.template()
+            import pdb;pdb.set_trace()
+
 
 
 class ShowStatistics(BrowserView):

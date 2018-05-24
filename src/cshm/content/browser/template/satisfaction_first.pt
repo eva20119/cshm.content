@@ -25,8 +25,7 @@ p{
 }
 </style>
 
-<a href="${view/ex_url}" tal:condition="view/ex_url"> ex_url</a>
-
+<a href="${view/ex_url}" tal:condition="view/ex_url">上個問卷</a>
 <form action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
@@ -46,8 +45,7 @@ p{
     </div>
     <div>
         <p>座號：</p>
-        <select name="seat" id="seat">
-        </select>
+        <input type='text' value="${view/seat_number}" name="seat" readonly="readonly">
     </div>
     <div style='margin-top:15px'>
         <p>教學態度</p>
@@ -153,9 +151,6 @@ p{
 
 <script>
 $(function(){
-    for(i=1; i<=100; i++){
-        $('#seat').append("<option value=" + i + ">" + i + "</option>")    
-    }
     $('form').submit(function(){
         question9 = $('textarea[name="question9"]').val()
         question10 = $('textarea[name="question10"]').val()
