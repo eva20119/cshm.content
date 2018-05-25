@@ -59,25 +59,27 @@ th{
 <p id='count_F' style='display:none'>${python:view.anw_data['count_F']}</p>
 <p style="justify-content:center;display:flex;margin-top:40px;font-size:22px">講師總整體滿意度</p>
 <div id="total_pie" style="justify-content:center;display:flex"></div>
+
 <div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX;margin:40px 0 0 20px ">教學態度</p>
-    <p style="font-size:22PX;margin:40px 88px 0 0 ">教學方式能啟發學員</p>
+    <p style="font-size:22PX;">教學態度</p>
+    <p style="font-size:22PX;">教學方式能啟發學員</p>
 </div>
-<div id="pie1" style="display:inline;margin-left:70px;"></div>
-<div id="pie2" style="display:inline;margin-left:155px;"></div>
+<div id="pie1" style="display:inline;"></div>
+<div id="pie2" style="display:inline;"></div>
 <div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX;margin:40px 66px 0 0 ">能依課程、教材、內容有進度、系統講授</p>
-    <p style="font-size:22PX;margin:40px 235px 0 0 ">講授易懂，實務化</p>
+    <p style="font-size:22PX;">能依課程、教材、內容有進度、系統講授</p>
+    <p style="font-size:22PX;">講授易懂，實務化</p>
 </div>
-<div id="pie3" style="display:inline;margin-left:70px"></div>
-<div id="pie4" style="display:inline;margin-left:155px"></div>
+<div id="pie3" style="display:inline;"></div>
+<div id="pie4" style="display:inline;"></div>
 <div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX;margin:40px 0 0 0 ">上課音量、口音表達適當、清晰</p>
-    <p style="font-size:22PX;margin:40px 85px 0 0 ">提供技能檢定或考照之建議或協助</p>
+    <p style="font-size:22PX; ">上課音量、口音表達適當、清晰</p>
+    <p style="font-size:22PX;">提供技能檢定或考照之建議或協助</p>
 </div>
-<div id="pie5" style="display:inline;margin-left:70px"></div>
-<div id="pie6" style="display:inline;margin-left:155px"></div>
+<div id="pie5" style="display:inline;"></div>
+<div id="pie6" style="display:inline;"></div>
 <hr/>
+
 <div id="each_teacher_pie" style='display:flex;flex-wrap:wrap;justify-content:space-around'>
 
 </div>

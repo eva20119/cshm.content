@@ -13,6 +13,7 @@ from plone.namedfile.field import NamedBlobImage,NamedBlobFile
 from plone import namedfile
 from StringIO import StringIO
 import requests
+from email.mime.text import MIMEText
 
 
 class CreateNews(BrowserView):
@@ -49,15 +50,15 @@ class SatisfactionFirst(BrowserView):
 
         ex_url = ''
         execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime < '{}' ORDER BY
-                datetime DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
+                start_time DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
         result = execSql.execSql(execStr)
         for item in result:
             tmp = dict(item)
             course = tmp['course']
             period = tmp['period']
             subject = tmp['subject']
-            item_datetime = tmp['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+            item_datetime = tmp['start_time'].strftime('%Y-%m-%d %H:%M:%S')
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
@@ -97,15 +98,15 @@ class SatisfactionSec(BrowserView):
             already_write = []
         ex_url = ''
         execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime < '{}' ORDER BY
-                datetime DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
+                start_time DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
         result = execSql.execSql(execStr)
         for item in result:
             tmp = dict(item)
             course = tmp['course']
             period = tmp['period']
             subject = tmp['subject']
-            item_datetime = tmp['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+            item_datetime = tmp['start_time'].strftime('%Y-%m-%d %H:%M:%S')
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
@@ -165,6 +166,18 @@ class ResultSatisfaction(BrowserView):
             already_write = []
         already_write.append(identify)
         request.response.setCookie('already_write', json.dumps(already_write))
+
+        # 寄信通知
+        if question9 or question10 or question11 or question12:
+            body_str = """%s<br/>%s<br/>%s<br/>%s""" %(question9, question10, question11, question12)
+            mime_text = MIMEText(body_str, 'html', 'utf-8') 
+            api.portal.send_email(
+                recipient="ah13441673@gmail.com",
+                sender="henry@mingtak.com.tw",
+                subject="意見提供",
+                body=mime_text.as_string(),
+            )
+
         api.portal.show_message(message='填寫完成', type='info', request=request)
         request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
 
@@ -631,19 +644,19 @@ class UploadCsv(BrowserView):
                     # 用在顯示格別科目
                     data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
                                 item['week'], subject, item['hour'], item['teacher'], item['number'], item['classroom'])
-                    start_datetime = '%s %s:00:00' %(date, item['time'][:2])
+                    start_time = '%s %s:00:00' %(date, item['time'][:2])
                     # 寫進資料庫，之後用來顯示問卷
                     execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
                                 """.format(course, period, subject)
                     if execSql.execSql(execStr):
-                        execStr = """UPDATE course_list SET datetime='{}', week='{}', hour='{}', teacher='{}', 
+                        execStr = """UPDATE course_list SET start_time='{}', week='{}', hour='{}', teacher='{}', 
                                     number='{}', classroom='{}' WHERE course = '{}' AND period = '{}' AND subject = '{}'
-                                    """.format(start_datetime, item['week'], item['hour'], item['teacher'], 
+                                    """.format(start_time, item['week'], item['hour'], item['teacher'], 
                                     item['number'], item['classroom'], course, period, subject)
                     else:
-                        execStr = """INSERT INTO `course_list`(`course`, `period`, `datetime`, `week`, `subject`, `hour`, 
+                        execStr = """INSERT INTO `course_list`(`course`, `period`, `start_time`, `week`, `subject`, `hour`, 
                             `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
-                            """.format(course, period, start_datetime, item['week'], subject,
+                            """.format(course, period, start_time, item['week'], subject,
                                item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
                     execSql.execSql(execStr)
 
@@ -733,8 +746,8 @@ class CheckSurver(BrowserView):
         url = ''
         data = {}
         execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND datetime <= '{}' ORDER BY 
-            datetime DESC""".format(course_name, period, now_datetime)
+        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time <= '{}' ORDER BY 
+            start_time DESC""".format(course_name, period, now_datetime)
         result = execSql.execSql(execStr)
         for item in result:
             tmp = dict(item)
@@ -742,7 +755,7 @@ class CheckSurver(BrowserView):
             period = tmp['period']
             subject = tmp['subject']
             quiz = tmp['quiz']
-            item_datetime = tmp['datetime']
+            item_datetime = tmp['start_time']
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write:
