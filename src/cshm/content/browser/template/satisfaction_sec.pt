@@ -24,7 +24,7 @@ p{
 }
 </style>
 
-<a href="${view/ex_url}" tal:condition="view/ex_url">上個問卷</a>
+<a href="${view/ex_url}" tal:condition="view/ex_url">尚未填完問卷</a>
 <form action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
@@ -154,7 +154,7 @@ p{
     <p>四、其他</p>
     <textarea name="question12" cols="30" rows="10"></textarea>
 
-    
+    <br/>    
     <input type="submit" value="送出" class='btn'/>
     <input type="hidden" name="is_round" value="sec"/>
     <input type="hidden" name="course" value='${view/course_name}'/>
@@ -177,7 +177,7 @@ $(function(){
         if(count >= 1){
             if(question9.length <= 15 && question10.length <=15 && question11.length <= 15 &&
                 question12.length <= 15){
-                alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄，字數需多餘15個字')
+                alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄，字數需多於15個字')
                 return false; 
             }
         }

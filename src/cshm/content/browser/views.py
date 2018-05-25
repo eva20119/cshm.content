@@ -611,7 +611,7 @@ class UploadCsv(BrowserView):
         exist_data = {}
         course_list = {}
         portal = api.portal.get()
-        result = api.content.find(context=portal, portal_type='Course')
+        result = api.content.find(context=portal['surver_content'], portal_type='Course')
         execSql = SqlObj()
 
         # 蒐集現有Course的名子及uid,方便後面比對
@@ -646,6 +646,7 @@ class UploadCsv(BrowserView):
                             """.format(course, period, start_datetime, item['week'], subject,
                                item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
                     execSql.execSql(execStr)
+
                     if course_period in course_list.keys():
                         course_uid = course_list[course_period]
                         if exist_data.has_key(course_uid):
@@ -669,7 +670,7 @@ class UploadCsv(BrowserView):
                     type='Course',
                     title=k,
                     subject_list=v,
-                    container=portal)
+                    container=portal['surver_content'])
             api.portal.show_message(message='上傳成功!!!', type='info', request=request)
         except:
             api.portal.show_message(nessage='上傳格式錯誤!!!', type='erroe', request=request)
@@ -694,7 +695,7 @@ class CourseView(BrowserView):
                 tmp = item.split(',')
                 subject= tmp[4]
                 execStr = """SELECT DISTINCT(seat) FROM satisfaction WHERE course = '{}' AND period = '{}' AND subject = '{}'
-                    """.format(course, period, subject)
+                    ORDER BY seat""".format(course, period, subject)
                 result = execSql.execSql(execStr)
                 seat_str = ''
                 for seat in result:
@@ -755,7 +756,6 @@ class CheckSurver(BrowserView):
         self.course = course_name
         self.period =period
         if url:
-            import pdb;pdb.set_trace()
             return self.template()
         else:
             return self.finished()
