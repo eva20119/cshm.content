@@ -24,8 +24,12 @@ p{
 }
 </style>
 
-<a href="${view/ex_url}" tal:condition="view/ex_url">尚未填完問卷</a>
-<form action="result_satisfaction" method="post">
+<p class="col-xs-12 col-sm-12" style="margin:0">尚未填寫完的問卷：</p>
+<select id='ex_data' class="col-xs-8 col-sm-8" tal:condition="view/ex_data" style="margin:0 15px 10px 15px ">
+    <option>請選擇</option>
+    <option tal:repeat="ex_data view/ex_data" data-url="${python:ex_data[1]}">${python:ex_data[0]}</option>
+</select>
+<form class="col-xs-12 col-sm-12" action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
         <input type="text" value='${view/subject_name}' readonly="readonly"  name='subject_name'/>    
@@ -162,6 +166,12 @@ p{
 
 <script>
 $(function(){
+    $('#ex_data').change(function(){
+        if($(this).val() != '請選擇'){
+            url = $('option:checked').data('url')
+            location.href = url
+        }
+    })
     $('form').submit(function(){
         question9 = $('textarea[name="question9"]').val()
         question10 = $('textarea[name="question10"]').val()

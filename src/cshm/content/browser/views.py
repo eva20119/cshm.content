@@ -38,6 +38,7 @@ class SatisfactionFirst(BrowserView):
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number', '')
         cookie_seat_number = request.cookies.get('seat_number', '')
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.seat_number = seat_number
         if cookie_seat_number != seat_number:
             request.response.setCookie('seat_number', seat_number)
@@ -49,9 +50,10 @@ class SatisfactionFirst(BrowserView):
             already_write = []
 
         ex_url = ''
+        ex_data = []
         execSql = SqlObj()
         execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
-                start_time DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
+                start_time DESC """.format(request.get('course_name'), request.get('period'), now_time)
         result = execSql.execSql(execStr)
         for item in result:
             tmp = dict(item)
@@ -66,11 +68,12 @@ class SatisfactionFirst(BrowserView):
                     ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                break;
-        if not ex_url:
-            self.ex_url = False
+                ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
+        if not ex_data:
+            self.ex_data = False
         else:
-            self.ex_url = ex_url
+            self.ex_data = ex_data
+
         return self.template()
 
 
@@ -86,6 +89,7 @@ class SatisfactionSec(BrowserView):
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number', '')
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         cookie_seat_number = request.cookies.get('seat_number', '')
         self.seat_number = seat_number
         if cookie_seat_number != seat_number:
@@ -97,9 +101,10 @@ class SatisfactionSec(BrowserView):
         else:
             already_write = []
         ex_url = ''
+        ex_data = []
         execSql = SqlObj()
         execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
-                start_time DESC """.format(request.get('course_name'), request.get('period'), request.get('date'))
+                start_time DESC """.format(request.get('course_name'), request.get('period'), now_time)
         result = execSql.execSql(execStr)
         for item in result:
             tmp = dict(item)
@@ -114,11 +119,12 @@ class SatisfactionSec(BrowserView):
                     ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
-                break;
-        if not ex_url:
-            self.ex_url = False
+                ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
+        if not ex_data:
+            self.ex_data = False
         else:
-            self.ex_url = ex_url
+            self.ex_data = ex_data
+
         return self.template()
 
 
@@ -626,7 +632,7 @@ class UploadCsv(BrowserView):
         portal = api.portal.get()
         result = api.content.find(context=portal['surver_content'], portal_type='Course')
         execSql = SqlObj()
-
+        count = 0
         # 蒐集現有Course的名子及uid,方便後面比對
         for item in result:
             title = item.Title
@@ -672,21 +678,26 @@ class UploadCsv(BrowserView):
                         else:
                             create_data[course_period] = data
             except Exception as e:
+                count += 1
+                import pdb;pdb.set_trace()
                 print e
-        try:
-            # 更新
-            for k,v in exist_data.items():
-                api.content.get(UID=k).subject_list = v
-            # 建立新的
-            for k,v in create_data.items():
-                obj = api.content.create(
-                    type='Course',
-                    title=k,
-                    subject_list=v,
-                    container=portal['surver_content'])
-            api.portal.show_message(message='上傳成功!!!', type='info', request=request)
-        except:
-            api.portal.show_message(nessage='上傳格式錯誤!!!', type='erroe', request=request)
+        if count == 0:
+            try:
+                # 更新
+                for k,v in exist_data.items():
+                    api.content.get(UID=k).subject_list = v
+                # 建立新的
+                for k,v in create_data.items():
+                    obj = api.content.create(
+                        type='Course',
+                        title=k,
+                        subject_list=v,
+                        container=portal['surver_content'])
+                api.portal.show_message(message='上傳成功！！！', type='info', request=request)
+            except:
+                api.portal.show_message(nessage='更新或建立失敗！！！', type='error', request=request)
+        else:
+            api.portal.show_message(message='上傳格式有錯！！！', type='error', request=request)
         request.response.redirect('%s/folder_contents' %portal.absolute_url())
 
 
