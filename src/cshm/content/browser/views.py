@@ -36,18 +36,18 @@ class SatisfactionFirst(BrowserView):
         self.period = request.get('period')
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
-        seat_number = request.get('seat_number', '')
-        cookie_seat_number = request.cookies.get('seat_number', '')
+        seat_number = request.get('seat_number')
+#        cookie_seat_number = request.cookies.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.seat_number = seat_number
-        if cookie_seat_number != seat_number:
-            request.response.setCookie('seat_number', seat_number)
+#        if cookie_seat_number != seat_number:
+#            request.response.setCookie('seat_number', seat_number)
 
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
+#        already_write = request.cookies.get('already_write', [])
+#        if already_write:
+#            already_write = json.loads(already_write)
+#        else:
+#            already_write = []
 
         ex_url = ''
         ex_data = []
@@ -55,6 +55,18 @@ class SatisfactionFirst(BrowserView):
         execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
                 start_time DESC """.format(request.get('course_name'), request.get('period'), now_time)
         result = execSql.execSql(execStr)
+
+        execStr = """SELECT course,period,subject FROM `satisfaction` WHERE seat = '{}' AND course = '{}' AND 
+            period = '{}'""".format(seat_number, request.get('course_name'), request.get('period'))
+        satisfaction_result = execSql.execSql(execStr)
+        already_write = []
+        for item in satisfaction_result:
+            tmp = dict(item)
+            course = tmp['course']
+            period = tmp['period']
+            subject = tmp['subject']
+            already_write.append('%s_%s_%s' %(course, period, subject))
+
         for item in result:
             tmp = dict(item)
             course = tmp['course']
@@ -90,22 +102,34 @@ class SatisfactionSec(BrowserView):
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        cookie_seat_number = request.cookies.get('seat_number', '')
+#        cookie_seat_number = request.cookies.get('seat_number', '')
         self.seat_number = seat_number
-        if cookie_seat_number != seat_number:
-            request.response.setCookie('seat_number', seat_number)
+#        if cookie_seat_number != seat_number:
+#            request.response.setCookie('seat_number', seat_number)
 
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
-            already_write = []
+#        already_write = request.cookies.get('already_write', [])
+#        if already_write:
+#            already_write = json.loads(already_write)
+#        else:
+#            already_write = []
         ex_url = ''
         ex_data = []
         execSql = SqlObj()
         execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time < '{}' ORDER BY
                 start_time DESC """.format(request.get('course_name'), request.get('period'), now_time)
         result = execSql.execSql(execStr)
+
+        execStr = """SELECT course,period,subject FROM `satisfaction` WHERE seat = '{}' AND course = '{}' AND 
+            period = '{}'""".format(seat_number, request.get('course_name'), request.get('period'))
+        satisfaction_result = execSql.execSql(execStr)
+        already_write = []
+        for item in satisfaction_result:
+            tmp = dict(item)
+            course = tmp['course']
+            period = tmp['period']
+            subject = tmp['subject']
+            already_write.append('%s_%s_%s' %(course, period, subject))
+
         for item in result:
             tmp = dict(item)
             course = tmp['course']
@@ -156,35 +180,41 @@ class ResultSatisfaction(BrowserView):
         user = api.user.get_current().getId()
         execSql = SqlObj()
 
-        execStr = """INSERT INTO `satisfaction`(`user`, `course`, `subject`, `period`, `date`, 
-            `teacher`, `question1`, `question2`, `question3`, `question4`, `question5`, 
-            `question6`, `question7`, `question8`,question9,question10,question11,question12,seat) 
-            VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',
-            '{}','{}','{}','{}','{}')""".format(user, course, subject_name, 
-            period, date, teacher, question1, question2, question3, question4, question5, 
-            question6, question7, question8, question9, question10, question11, question12, seat)
-        execSql.execSql(execStr)
-        identify = '%s_%s_%s' %(course, period ,subject_name)
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
+        execStr = """SELECT course FROM satisfaction WHERE course = '{}' AND period = '{}' AND seat = '{}'
+            """.format(course, period, seat)
+        if execSql.execSql(execStr):
+            api.portal.show_message(message='請勿重複填寫問卷', type='error', request=request)
         else:
-            already_write = []
-        already_write.append(identify)
-        request.response.setCookie('already_write', json.dumps(already_write))
+            execStr = """INSERT INTO `satisfaction`(`user`, `course`, `subject`, `period`, `date`, 
+                `teacher`, `question1`, `question2`, `question3`, `question4`, `question5`, 
+                `question6`, `question7`, `question8`,question9,question10,question11,question12,seat) 
+                VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',
+                '{}','{}','{}','{}','{}')""".format(user, course, subject_name, 
+                period, date, teacher, question1, question2, question3, question4, question5, 
+                question6, question7, question8, question9, question10, question11, question12, seat)
+            execSql.execSql(execStr)
+#        identify = '%s_%s_%s' %(course, period ,subject_name)
+#        already_write = request.cookies.get('already_write', [])
+#        if already_write:
+#            already_write = json.loads(already_write)
+#        else:
+#            already_write = []
+#        already_write.append(identify)
+#        request.response.setCookie('already_write', json.dumps(already_write))
 
         # 寄信通知
-        if question9 or question10 or question11 or question12:
-            body_str = """%s<br/>%s<br/>%s<br/>%s""" %(question9, question10, question11, question12)
-            mime_text = MIMEText(body_str, 'html', 'utf-8') 
-            api.portal.send_email(
-                recipient="lin@cshm.org.tw",
-                sender="henry@mingtak.com.tw",
-                subject="意見提供",
-                body=mime_text.as_string(),
-            )
+            if question9 or question10 or question11 or question12:
+                body_str = """%s<br/>%s<br/>%s<br/>%s""" %(question9, question10, question11, question12)
+                mime_text = MIMEText(body_str, 'html', 'utf-8') 
+                api.portal.send_email(
+                    recipient="lin@cshm.org.tw",
+                    sender="henry@mingtak.com.tw",
+                    subject="意見提供",
+                   body=mime_text.as_string(),
+                )
 
-        api.portal.show_message(message='填寫完成', type='info', request=request)
+            api.portal.show_message(message='填寫完成', type='info', request=request)
+
         request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
 
 
@@ -754,42 +784,49 @@ class CheckSurver(BrowserView):
         abs_url = portal.absolute_url()
         course_name = request.get('course_name')
         period = request.get('period')
-        now = datetime.datetime.now()
-        now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        already_write = request.cookies.get('already_write', [])
-        if already_write:
-            already_write = json.loads(already_write)
-        else:
+        seat_number = request.get('seat_number', '')
+        if seat_number:
+            now = datetime.datetime.now()
+            now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
+            url = ''
+            data = {}
             already_write = []
-        url = ''
-        data = {}
-        execSql = SqlObj()
-        execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time <= '{}' ORDER BY 
-            start_time DESC""".format(course_name, period, now_datetime)
-        result = execSql.execSql(execStr)
-        for item in result:
-            tmp = dict(item)
-            course = tmp['course']
-            period = tmp['period']
-            subject = tmp['subject']
-            quiz = tmp['quiz']
-            item_datetime = tmp['start_time']
-            teacher = tmp['teacher']
-            identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write:
-                if quiz == '是':
-                    url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                else:
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                break;
-        self.seat_number = request.cookies.get('seat_number', '請選擇')
-        self.url = url
+            execSql = SqlObj()
+            execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time <= '{}' ORDER BY            
+                start_time DESC""".format(course_name, period, now_datetime)
+            result = execSql.execSql(execStr)
+
+            execStr = """SELECT course,period,subject FROM `satisfaction` WHERE seat = '{}' AND course = '{}' AND 
+                period = '{}'""".format(seat_number, course_name, period)
+            satisfaction_result = execSql.execSql(execStr)
+            for item in satisfaction_result:
+                tmp = dict(item)
+                course = tmp['course']
+                period = tmp['period']
+                subject = tmp['subject']
+                already_write.append('%s_%s_%s' %(course, period, subject))
+
+            for item in result:
+                tmp = dict(item)
+                course = tmp['course']
+                period = tmp['period']
+                subject = tmp['subject']
+                quiz = tmp['quiz']
+                item_datetime = tmp['start_time']
+                teacher = tmp['teacher']
+                identify = '%s_%s_%s' %(course, period, subject)
+                if identify not in already_write:
+                    if quiz == '是':
+                        url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    else:
+                        url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    break;
+            request.response.redirect(url)
+            return
+
         self.course = course_name
         self.period =period
-        if url:
-            return self.template()
-        else:
-            return self.finished()
+        return self.template()
 
 
 class ShowStatistics(BrowserView):

@@ -12,26 +12,47 @@
 <metal:content-core define-macro="content-core"
                     tal:define="toc context/table_of_contents|nothing;">
 
-<h3>${view/course} 第${view/period}期</h3>
-<label>
-    請填入座號
-    <select id='seat_number' data-number='${view/seat_number}' >
-        <option>請選擇</option>
-    </select>
-</label>
-<input type='hidden' id='url' value='${view/url}' />
-<button id='btn'>送出</button>
+<style>
+.btn{
+    background: black;
+    color: white;
+    font-size: 12px;
+    font-weight: 900;
+    border: medium none;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+}
+.btn:hover{
+    color: #4d4d4d;
+    background: #ccc;
+    border-color: #939393;
+}
+
+</style>
+<form method="post" action="check_surver">
+  <h3>${view/course} 第${view/period}期</h3>
+  <label>
+      請填入座號
+      <select name='seat_number'  id="seat_number">
+          <option selected>請選擇</option>
+      </select>
+  </label>
+  <input type="hidden" value="${view/course}" name="course_name">
+  <input type="hidden" value="${view/period}" name="period">
+  <input type="submit" value="送出" class="btn">
+</form>
+
 <script>
 $(function(){
     for(i=1; i<=60; i++){
         $('#seat_number').append('<option value=' + i + '>' + i + '</option>' )
     }
-    $('#seat_number').val($('#seat_number').data('number'))
-    $('#btn').click(function(){
-        url = $('#url').val()
-        seat_number = $('#seat_number').val()
-        url += '&seat_number=' + seat_number
-        location.href = url
+    $('form').submit(function(){
+        if( $('#seat_number').val() == '請選擇'){
+            alert('請選擇座號')
+            return false
+        }
     })
 })
 </script>

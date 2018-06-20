@@ -22,13 +22,37 @@ p{
     font-weight: bold;
     font-size: 18px;
 }
+.btn{
+    background: black;
+    color: white;
+    font-size: 12px;
+    font-weight: 900;
+    border: medium none;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+}
+.btn:hover{
+    color: #4d4d4d;
+    background: #ccc;
+    border-color: #939393;
+}
 </style>
 
+<?python
+from plone import api
+abs_url = api.portal.get().absolute_url()
+?>
 <p class="col-xs-12 col-sm-12" style="margin:0">尚未填寫完的問卷：</p>
 <select id='ex_data' class="col-xs-8 col-sm-8" tal:condition="view/ex_data" style="margin:0 15px 10px 15px ">
     <option>請選擇</option>
     <option tal:repeat="ex_data view/ex_data" data-url="${python:ex_data[1]}">${python:ex_data[0]}</option>
 </select>
+
+<a class="btn col-xs-3 col-sm-3" href="${abs_url}/check_surver?course_name=${view/course_name}&period=${view/period}">
+   重選座號
+</a>
+
 <form class="col-xs-12 col-sm-12" action="result_satisfaction" method="post">
     <div>
         <p>課程名稱：</p>
@@ -159,7 +183,7 @@ p{
     <textarea name="question12" cols="30" rows="10"></textarea>
 
     <br/>    
-    <input type="submit" value="送出" class='btn'/>
+    <input type="submit" value="送出" class='btn' style="margin-bottom:15px"/>
     <input type="hidden" name="is_round" value="sec"/>
     <input type="hidden" name="course" value='${view/course_name}'/>
 </form>
