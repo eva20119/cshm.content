@@ -65,9 +65,9 @@ class SatisfactionFirst(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                   ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
         if not ex_data:
             self.ex_data = False
@@ -116,9 +116,9 @@ class SatisfactionSec(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 else:
-                   ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                   ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
         if not ex_data:
             self.ex_data = False
@@ -178,7 +178,7 @@ class ResultSatisfaction(BrowserView):
             body_str = """%s<br/>%s<br/>%s<br/>%s""" %(question9, question10, question11, question12)
             mime_text = MIMEText(body_str, 'html', 'utf-8') 
             api.portal.send_email(
-                recipient="ah13441673@gmail.com",
+                recipient="lin@cshm.org.tw",
                 sender="henry@mingtak.com.tw",
                 subject="意見提供",
                 body=mime_text.as_string(),
@@ -624,6 +624,11 @@ class UploadCsv(BrowserView):
         file_data = request.get('file_data')
         file_data = file_data.split(',')[1]
         text = base64.b64decode(file_data)
+        try:
+            text = text.decode('utf-8')
+        except:
+            text = text.decode('big5')
+
         f = StringIO(text)
         reader = csv.DictReader(f, delimiter=',')
         create_data = {}
@@ -664,6 +669,8 @@ class UploadCsv(BrowserView):
                             `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
                             """.format(course, period, start_time, item['week'], subject,
                                item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
+                    print '33333'
+#                    import pdb; pdb.set_trace()
                     execSql.execSql(execStr)
 
                     if course_period in course_list.keys():
@@ -679,7 +686,7 @@ class UploadCsv(BrowserView):
                             create_data[course_period] = data
             except Exception as e:
                 count += 1
-                import pdb;pdb.set_trace()
+#                import pdb;pdb.set_trace()
                 print e
         if count == 0:
             try:
@@ -771,9 +778,9 @@ class CheckSurver(BrowserView):
             identify = '%s_%s_%s' %(course, period, subject)
             if identify not in already_write:
                 if quiz == '是':
-                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
-                else:
                     url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
+                else:
+                    url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}""".format(abs_url, subject, item_datetime, teacher, course, period)
                 break;
         self.seat_number = request.cookies.get('seat_number', '請選擇')
         self.url = url
@@ -788,6 +795,11 @@ class CheckSurver(BrowserView):
 class ShowStatistics(BrowserView):
     template = ViewPageTemplateFile('template/show_statistics.pt')
     def __call__(self):
+        execSql = SqlObj()
+
+        execStr = """SELECT DISTINCT(course) FROM `course_list`"""
+        result = execSql.execSql(execStr)
+        self.result = result
         return self.template()
 
 

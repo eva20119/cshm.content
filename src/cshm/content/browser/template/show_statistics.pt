@@ -39,32 +39,41 @@ abs_url = api.portal.get().absolute_url()
 ?>
 <button id='back' style='margin-bottom:20px'>回目錄</button>
 <br/>
-期數 <input type="number" id="period" name='period' required="required"/>
-課程名稱
-<select name="course" id="course">
+訓前
+<select name="course" id="course1">
     <option value="職業安全衛生管理員">職業安全衛生管理員 </option>
     <option value="荷重再一噸以上之堆高機操作人員">荷重再一噸以上之堆高機操作人員</option>
     <option value="丙種職業安全衛生業務主管">丙種職業安全衛生業務主管</option>
     <option value="急救人員">急救人員</option>
 </select>
-<select name="" id="selected">
-    <option value="1">滿意度</option>
-    <option value="2">訓前</option>
+
+期數 <input type="number" id="period1"  />
+
+<button class='send' data-target="1" data-selected="1">送出</button>
+<br>
+
+滿意度
+<select id="course2">
+    <option tal:repeat="item view/result" value="${python: item[0]}">${python:item[0]}</option>
 </select>
-<button id='send'>送出</button>
+期數 <input type="number" id="period2"  />
+<button class='send' data-target="2" data-selected="2">送出</button>
 
 
 <div id="result"></div>
+
+
 <script>
 $(document).ready(function(){
     $('#back').click(function(){
         location.href = location.href.replace('show_satisfaction_statistics', 'folder_contents')    
     })
 
-    $('#send').click(function(){
-        selected = $('#selected').val()
-        period = $('#period').val()
-        course = $('#course').val()
+    $('.send').click(function(){
+        selected = $(this).data('selected')
+        target = $(this).data('target')
+        period = $('#period' + target).val()
+        course = $('#course' + target).val()
         if(period == ''){
             alert('請填寫期數')
             return false
@@ -73,12 +82,13 @@ $(document).ready(function(){
             'period': period,
             'course': course,
         }
-        if(selected == 1){
+        if(selected == 2){
             url = location.href.replace('show_satisfaction_statistics', 'calculate_satisfaction')    
         }
-        else{
+        else if(selected == 1){
             url = location.href.replace('show_satisfaction_statistics', 'calculate_training')
         }
+debugger
         $.ajax({
             type: "post",
             url: url,
