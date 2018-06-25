@@ -968,6 +968,10 @@ class CalculateSatisfaction(BrowserView):
 
             elif environment == 1:
                 tmp_envir[4] += 1
+
+        self.envir_data = [tmp_envir[0], tmp_envir[1], tmp_envir[2], tmp_envir[3], tmp_envir[4]]
+        self.space_data = [tmp_space[0], tmp_space[1], tmp_space[2], tmp_space[3], tmp_space[4]]
+
         # 計算環境分數
         origin_space = tmp_space[0] + tmp_space[1] + tmp_space[2] + tmp_space[3] + tmp_space[4] 
         weight_space = tmp_space[0] * 5 + tmp_space[1] * 4 + tmp_space[2] * 3 + tmp_space[3] * 2 + tmp_space[4] * 1

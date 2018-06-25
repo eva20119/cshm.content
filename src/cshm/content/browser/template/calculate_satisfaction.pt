@@ -57,27 +57,52 @@ th{
 <p id='count_D' style='display:none'>${python:view.anw_data['count_D']}</p>
 <p id='count_E' style='display:none'>${python:view.anw_data['count_E']}</p>
 <p id='count_F' style='display:none'>${python:view.anw_data['count_F']}</p>
-<p style="justify-content:center;display:flex;margin-top:40px;font-size:22px">講師總整體滿意度</p>
-<div id="total_pie" style="justify-content:center;display:flex"></div>
+<p id='envir_data' style='display:none'>${python:view.envir_data}</p>
+<p id='space_data' style='display:none'>${python:view.space_data}</p>
+<br>
 
-<div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX;">教學態度</p>
-    <p style="font-size:22PX;">教學方式能啟發學員</p>
-</div>
-<div id="pie1" style="display:inline;"></div>
-<div id="pie2" style="display:inline;"></div>
-<div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX;">能依課程、教材、內容有進度、系統講授</p>
-    <p style="font-size:22PX;">講授易懂，實務化</p>
-</div>
-<div id="pie3" style="display:inline;"></div>
-<div id="pie4" style="display:inline;"></div>
-<div style="display:flex;justify-content:space-around">
-    <p style="font-size:22PX; ">上課音量、口音表達適當、清晰</p>
-    <p style="font-size:22PX;">提供技能檢定或考照之建議或協助</p>
-</div>
-<div id="pie5" style="display:inline;"></div>
-<div id="pie6" style="display:inline;"></div>
+<table>
+  <tr>
+    <th colspan='2'>講師總整體滿意度</th>
+  </tr>
+  <tr>
+    <td id="total_pie" colspan='2'></td>
+  </tr>
+  <tr>
+    <th>教學態度</th>
+    <th>教學方式能啟發學員</th>
+  </tr>
+  <tr>
+    <td id="pie1"></td>
+    <td id="pie2"></td>
+  </tr>
+  <tr>
+    <th>能依課程、教材、內容有進度、系統講授</th>
+    <th>講授易懂，實務化</th>
+  </tr>
+  <tr>
+    <td id="pie3"></td>
+    <td id="pie4"></td>
+  </tr>
+  <tr>
+    <th>上課音量、口音表達適當、清晰</th>
+    <th>提供技能檢定或考照之建議或協助</th>
+  </tr>
+  <tr>
+    <td id="pie5"></td>
+    <td id="pie6"></td>
+  </tr>
+  <tr>
+    <th>學習環境</th>
+    <th>訓練服務</th>
+  </tr>
+  <tr>
+    <td id="pie7"></td>
+    <td id="pie8"></td>
+  </tr>
+</table>
+
+
 <hr/>
 
 <div id="each_teacher_pie" style='display:flex;flex-wrap:wrap;justify-content:space-around'>

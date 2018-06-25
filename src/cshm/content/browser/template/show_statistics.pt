@@ -88,7 +88,6 @@ $(document).ready(function(){
         else if(selected == 1){
             url = location.href.replace('show_satisfaction_statistics', 'calculate_training')
         }
-debugger
         $.ajax({
             type: "post",
             url: url,
