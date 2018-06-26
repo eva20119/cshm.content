@@ -10,6 +10,31 @@ th{
     font-size: 20px;
 }
 </style>
+<?python
+import json
+?>
+<form action="download_excel" method="post" style='margin-bottom: 20px'>
+    <input value="${view/each_teacher_data}" type='hidden' name="each_teacher_data">
+    <input value="${view/total_anw}" type='hidden' name='total_anw'>
+    <input value="${python:view.anw_data['count_A']}" type='hidden' name='count_A'>
+    <input value="${python:view.anw_data['count_B']}" type='hidden' name='count_B'>
+    <input value="${python:view.anw_data['count_C']}" type='hidden' name='count_C'>
+    <input value="${python:view.anw_data['count_D']}" type='hidden' name='count_D'>
+    <input value="${python:view.anw_data['count_E']}" type='hidden' name='count_E'>
+    <input value="${python:view.anw_data['count_F']}" type='hidden' name='count_F'>
+    <input value="${python:view.envir_data}" type='hidden' name='envir_data'>
+    <input value="${python:view.space_data}" type='hidden' name='space_data'>
+
+    <input value="${python:view.period}" type='hidden' name='period'>
+    <input value="${python:view.course}" type='hidden' name='course'>
+    <input value="${python: json.dumps(view.count_data)}" type='hidden' name='count_data'>
+    <input value="${python:view.point_space}" type='hidden' name='point_space'>
+    <input value="${python:view.point_envir}" type='hidden' name='point_envir'>
+    <input value="${python:view.point_teacher}" type='hidden' name='point_teacher'>
+    <input value="${python:view.point_total}" type='hidden' name='point_total'>
+    <input type='submit' value='下載Excel' />
+</form>
+
 <table>
     <tr>
         <th colspan='3'>中國勞工安全衛生管理學會</th>

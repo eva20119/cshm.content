@@ -14,7 +14,8 @@ from plone import namedfile
 from StringIO import StringIO
 import requests
 from email.mime.text import MIMEText
-
+import xlsxwriter
+import inspect
 
 class CreateNews(BrowserView):
     def __call__(self):
@@ -1007,11 +1008,11 @@ class CalculateSatisfaction(BrowserView):
                     anw_1 += 1
             total_anw = [anw_5, anw_4, anw_3, anw_2, anw_1]
             # 單問題的圓餅圖資料
-            anw_A = float(v.count(5)) / float(teacher_numbers)
-            anw_B = float(v.count(4)) / float(teacher_numbers)
-            anw_C = float(v.count(3)) / float(teacher_numbers)
-            anw_D = float(v.count(2)) / float(teacher_numbers)
-            anw_E = float(v.count(1)) / float(teacher_numbers)
+            anw_A = int(v.count(5))
+            anw_B = int(v.count(4))
+            anw_C = int(v.count(3))
+            anw_D = int(v.count(2))
+            anw_E = int(v.count(1))
             anw_data[k] = [anw_A, anw_B, anw_C, anw_D, anw_E]
         self.anw_data = anw_data
         self.total_anw = total_anw
@@ -1319,3 +1320,218 @@ class CalculateTraining(BrowserView):
             self.json_data = json_data
             return self.template_stacker()
 
+
+class DownloadExcel(BrowserView):
+    def __call__(self):
+        request = self.request
+        response = request.response
+
+        count_A = []
+        count_B = []
+        count_C = []
+        count_D = []
+        count_E = []
+        count_F = []
+        envir_data = []
+        space_data = []
+        each_teacher_data = json.loads(request.get('each_teacher_data'))
+        total_anw = []
+
+        for item in request.get('count_A').split('[')[1].split(']')[0].split(','):
+            count_A.append(int(item))
+        for item in request.get('count_B').split('[')[1].split(']')[0].split(','):
+            count_B.append(int(item))
+        for item in request.get('count_C').split('[')[1].split(']')[0].split(','):
+            count_C.append(int(item))
+        for item in request.get('count_D').split('[')[1].split(']')[0].split(','):
+            count_D.append(int(item))
+        for item in request.get('count_E').split('[')[1].split(']')[0].split(','):
+            count_E.append(int(item))
+        for item in request.get('count_F').split('[')[1].split(']')[0].split(','):
+            count_F.append(int(item))
+        for item in request.get('space_data').split('[')[1].split(']')[0].split(','):
+            space_data.append(int(item))
+        for item in request.get('envir_data').split('[')[1].split(']')[0].split(','):
+            envir_data.append(int(item))
+        for item in request.get('total_anw').split('[')[1].split(']')[0].split(','):
+            total_anw.append(int(item))
+
+        period = request.get('period')
+        course = request.get('course')
+        count_data = json.loads(request.get('count_data'))
+        point_space = request.get('point_space')
+        point_envir = request.get('point_envir')
+        point_teacher = request.get('point_teacher')
+        point_total = request.get('point_total')
+
+        output = StringIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+
+        #headings = ['非常满意', '满意', '尚可', '不满意', '非常不满意']
+        data = [
+            count_A,
+            count_B,
+            count_C,
+            count_D,
+            count_E,
+            count_F,
+            envir_data,
+            space_data,
+            total_anw,
+            ['非常满意', '满意', '尚可', '不满意', '非常不满意']
+        ]
+
+        worksheet.write_column('A1', data[0])
+        worksheet.write_column('B1', data[1])
+        worksheet.write_column('C1', data[2])
+        worksheet.write_column('D1', data[3])
+        worksheet.write_column('E1', data[4])
+        worksheet.write_column('F1', data[5])
+
+        worksheet.write_column('G1', data[9])
+
+        worksheet.write_column('H1', data[6])
+        worksheet.write_column('I1', data[7])
+        worksheet.write_column('J1', data[8])
+
+        chart1 = workbook.add_chart({'type': 'pie'})
+        chart1.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$A$1:$A$5',
+            'data_labels': {'percentage': True},
+        })
+        chart1.set_title({'name': '教學態度'})
+        worksheet.insert_chart('A6', chart1)
+
+        chart2 = workbook.add_chart({'type': 'pie'})
+        chart2.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$B$1:$B$5',
+            'data_labels': {'percentage': True},
+        })
+        chart2.set_title({'name': '教學方式能啟發學員'})
+        worksheet.insert_chart('I6', chart2)
+
+        chart3 = workbook.add_chart({'type': 'pie'})
+        chart3.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$C$1:$C$5',
+            'data_labels': {'percentage': True},
+        })
+        chart3.set_title({'name': '能依課程、教材、內容有進度、系統講授'})
+        worksheet.insert_chart('A22', chart3)
+
+        chart4 = workbook.add_chart({'type': 'pie'})
+        chart4.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$D$1:$D$5',
+            'data_labels': {'percentage': True},
+        })
+        chart4.set_title({'name': '講授易懂，實務化'})
+        worksheet.insert_chart('I22', chart4)
+
+        chart5 = workbook.add_chart({'type': 'pie'})
+        chart5.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$E$1:$E$5',
+            'data_labels': {'percentage': True},
+        })
+        chart5.set_title({'name': '上課音量、口音表達適當、清晰'})
+        worksheet.insert_chart('A38', chart5)
+
+        chart6 = workbook.add_chart({'type': 'pie'})
+        chart6.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$F$1:$F$5',
+            'data_labels': {'percentage': True},
+        })
+        chart6.set_title({'name': '提供技能檢定或考照之建議或協助'})
+        worksheet.insert_chart('I38', chart6)
+
+        chart7 = workbook.add_chart({'type': 'pie'})
+        chart7.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$H$1:$H$5',
+            'data_labels': {'percentage': True},
+        })
+        chart7.set_title({'name': '學習環境'})
+        worksheet.insert_chart('A54', chart7)
+
+        chart8 = workbook.add_chart({'type': 'pie'})
+        chart8.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$I$1:$I$5',
+            'data_labels': {'percentage': True},
+        })
+        chart8.set_title({'name': '訓練服務'})
+        worksheet.insert_chart('I54', chart8)
+
+        chart9 = workbook.add_chart({'type': 'pie'})
+        chart9.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet1!$G$1:$G$5',
+            'values':     '=Sheet1!$J$1:$J$5',
+            'data_labels': {'percentage': True},
+        })
+        chart9.set_title({'name': '講師總整體滿意度'})
+        worksheet.insert_chart('A70', chart9)
+
+        word_dict = {
+            1: 'K',2: 'L',
+            3: 'M',4: 'N',
+            5: 'O',6: 'P',
+            7: 'Q',8: 'R',
+            9: 'S',10: 'T',
+            11: 'U',12: 'V',
+            13: 'W',14: 'X',
+            15: 'Y',16: 'Z',
+        }
+        count = 1
+        for k,v in each_teacher_data.items():
+            worksheet.write_column('%s1' %word_dict[count], v)
+            tmp = workbook.add_chart({'type': 'pie'})
+            tmp.add_series({
+                'name':       k,
+                'categories': '=Sheet1!$G$1:$G$5',
+                'values':     '=Sheet1!$%s$1:$%s$5' %(word_dict[count], word_dict[count]),
+                'data_labels': {'percentage': True},
+            })
+            tmp.set_title({'nanme': k})
+            number = 85 + (count -1) * 16
+            worksheet.insert_chart('A%s' %number, tmp)
+            count += 1
+
+        worksheet.write_string  (1, 17, '第%s期' %period)
+        worksheet.write_string  (1, 18, course)
+        worksheet.write_string  (2, 17, '環境權值分數')
+        worksheet.write_string  (2, 18, '輔導員權值分數')
+        worksheet.write_string  (2, 19, '講師整體權值分數')
+        worksheet.write_string  (3, 17, point_envir)
+        worksheet.write_string  (3, 18, point_space)
+        worksheet.write_string  (3, 19, point_teacher)
+        worksheet.write_string  (4, 17, '總體權值分數')
+        worksheet.write_string  (5,17, point_total)
+        col = 7
+        row = 17
+        worksheet.write_string  (6,17, '講師')
+        worksheet.write_string  (6,18, '平均權值')
+        worksheet.write_string  (6,19, '權值分數')
+        for k,v in count_data.items():
+            worksheet.write_string  (col,row, k)
+            worksheet.write_number  (col,row + 1, v)
+            worksheet.write_number  (col,row + 2, v * 20)
+            col += 1
+        workbook.close()
+
+        response.setHeader('Content-type',  'application/x-xlsx')
+        response.setHeader('Content-Disposition', 'aaa.xlsx')
+        return output.getvalue()

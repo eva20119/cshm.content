@@ -185,5 +185,13 @@
       layer='cshm.content.interfaces.ICshmContentLayer'
       permission='zope2.View'
       />
+  <browser:page
+      name='download_excel'
+      for='*'
+      class='.views.DownloadExcel'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+
 
 </configure>
