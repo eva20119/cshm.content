@@ -17,14 +17,10 @@ from email.mime.text import MIMEText
 import xlsxwriter
 import inspect
 
+
 class CreateNews(BrowserView):
     def __call__(self):
-        portal = api.portal.get()
-        obj = api.content.create(
-            type='Document',
-            title='My Content',
-            container=portal)
-
+        import pdb;pdb.set_trace()
 
 class SatisfactionFirst(BrowserView):
     template = ViewPageTemplateFile('template/satisfaction_first.pt')
@@ -181,8 +177,8 @@ class ResultSatisfaction(BrowserView):
         user = api.user.get_current().getId()
         execSql = SqlObj()
 
-        execStr = """SELECT course FROM satisfaction WHERE course = '{}' AND period = '{}' AND seat = '{}'
-            """.format(course, period, seat)
+        execStr = """SELECT course FROM satisfaction WHERE course = '{}' AND period = '{}' AND seat = '{}' AND subject = '{}'
+            """.format(course, period, seat, subject_name)
         if execSql.execSql(execStr):
             api.portal.show_message(message='請勿重複填寫問卷', type='error', request=request)
         else:
@@ -205,12 +201,13 @@ class ResultSatisfaction(BrowserView):
 
         # 寄信通知
             if question9 or question10 or question11 or question12:
-                body_str = """%s<br/>%s<br/>%s<br/>%s""" %(question9, question10, question11, question12)
-                mime_text = MIMEText(body_str, 'html', 'utf-8') 
+                body_str = """科目:%s<br>課程:%s<br>期數:%s<br/>座號:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
+                    """ %(course, subject_name, period, seat, question9, question10, question11, question12)
+                mime_text = MIMEText(body_str, 'html', 'utf-8')
                 api.portal.send_email(
-                    recipient="lin@cshm.org.tw",
+                    recipient="henrymingtak@gmail.com",
                     sender="henry@mingtak.com.tw",
-                    subject="意見提供",
+                    subject="%s-%s  意見提供" %(course, period),
                    body=mime_text.as_string(),
                 )
 
@@ -658,6 +655,7 @@ class UploadCsv(BrowserView):
         try:
             text = text.decode('utf-8')
         except:
+            import pdb;pdb.set_trace()
             text = text.decode('big5')
 
         f = StringIO(text)
@@ -1366,10 +1364,12 @@ class DownloadExcel(BrowserView):
 
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
-        worksheet = workbook.add_worksheet()
+        worksheet1 = workbook.add_worksheet('Sheet1')
+        worksheet2 = workbook.add_worksheet('Sheet2')
 
-        #headings = ['非常满意', '满意', '尚可', '不满意', '非常不满意']
         data = [
+            ['非常满意', '满意', '尚可', '不满意', '非常不满意'],
+            total_anw,
             count_A,
             count_B,
             count_C,
@@ -1378,158 +1378,149 @@ class DownloadExcel(BrowserView):
             count_F,
             envir_data,
             space_data,
-            total_anw,
-            ['非常满意', '满意', '尚可', '不满意', '非常不满意']
         ]
 
-        worksheet.write_column('A1', data[0])
-        worksheet.write_column('B1', data[1])
-        worksheet.write_column('C1', data[2])
-        worksheet.write_column('D1', data[3])
-        worksheet.write_column('E1', data[4])
-        worksheet.write_column('F1', data[5])
+        worksheet2.write_column('A1', data[0])
+        worksheet2.write_column('B1', data[1])
+        worksheet2.write_column('C1', data[2])
+        worksheet2.write_column('D1', data[3])
+        worksheet2.write_column('E1', data[4])
+        worksheet2.write_column('F1', data[5])
+        worksheet2.write_column('G1', data[6])
+        worksheet2.write_column('H1', data[7])
+        worksheet2.write_column('I1', data[8])
+        worksheet2.write_column('J1', data[9])
 
-        worksheet.write_column('G1', data[9])
-
-        worksheet.write_column('H1', data[6])
-        worksheet.write_column('I1', data[7])
-        worksheet.write_column('J1', data[8])
+        chart_total = workbook.add_chart({'type': 'pie'})
+        chart_total.add_series({
+            'name':       'Pie sales data',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$B$1:$B$5',
+            'data_labels': {'percentage': True},
+        })
+        chart_total.set_title({'name': '講師總整體滿意度'})
+        worksheet1.insert_chart('A1', chart_total)
 
         chart1 = workbook.add_chart({'type': 'pie'})
         chart1.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$A$1:$A$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$C$1:$C$5',
             'data_labels': {'percentage': True},
         })
         chart1.set_title({'name': '教學態度'})
-        worksheet.insert_chart('A6', chart1)
+        worksheet1.insert_chart('A16', chart1)
 
         chart2 = workbook.add_chart({'type': 'pie'})
         chart2.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$B$1:$B$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$D$1:$D$5',
             'data_labels': {'percentage': True},
         })
         chart2.set_title({'name': '教學方式能啟發學員'})
-        worksheet.insert_chart('I6', chart2)
+        worksheet1.insert_chart('I16', chart2)
 
         chart3 = workbook.add_chart({'type': 'pie'})
         chart3.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$C$1:$C$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$E$1:$E$5',
             'data_labels': {'percentage': True},
         })
         chart3.set_title({'name': '能依課程、教材、內容有進度、系統講授'})
-        worksheet.insert_chart('A22', chart3)
+        worksheet1.insert_chart('A32', chart3)
 
         chart4 = workbook.add_chart({'type': 'pie'})
         chart4.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$D$1:$D$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$F$1:$F$5',
             'data_labels': {'percentage': True},
         })
         chart4.set_title({'name': '講授易懂，實務化'})
-        worksheet.insert_chart('I22', chart4)
+        worksheet1.insert_chart('I32', chart4)
 
         chart5 = workbook.add_chart({'type': 'pie'})
         chart5.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$E$1:$E$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$G$1:$G$5',
             'data_labels': {'percentage': True},
         })
         chart5.set_title({'name': '上課音量、口音表達適當、清晰'})
-        worksheet.insert_chart('A38', chart5)
+        worksheet1.insert_chart('A48', chart5)
 
         chart6 = workbook.add_chart({'type': 'pie'})
         chart6.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$F$1:$F$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$H$1:$H$5',
             'data_labels': {'percentage': True},
         })
         chart6.set_title({'name': '提供技能檢定或考照之建議或協助'})
-        worksheet.insert_chart('I38', chart6)
+        worksheet1.insert_chart('I48', chart6)
 
         chart7 = workbook.add_chart({'type': 'pie'})
         chart7.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$H$1:$H$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$I$1:$I$5',
             'data_labels': {'percentage': True},
         })
         chart7.set_title({'name': '學習環境'})
-        worksheet.insert_chart('A54', chart7)
+        worksheet1.insert_chart('A64', chart7)
 
         chart8 = workbook.add_chart({'type': 'pie'})
         chart8.add_series({
             'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$I$1:$I$5',
+            'categories': '=Sheet2!$A$1:$A$5',
+            'values':     '=Sheet2!$J$1:$J$5',
             'data_labels': {'percentage': True},
         })
         chart8.set_title({'name': '訓練服務'})
-        worksheet.insert_chart('I54', chart8)
-
-        chart9 = workbook.add_chart({'type': 'pie'})
-        chart9.add_series({
-            'name':       'Pie sales data',
-            'categories': '=Sheet1!$G$1:$G$5',
-            'values':     '=Sheet1!$J$1:$J$5',
-            'data_labels': {'percentage': True},
+        worksheet1.insert_chart('I64', chart8)
+        merge_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
         })
-        chart9.set_title({'name': '講師總整體滿意度'})
-        worksheet.insert_chart('A70', chart9)
+        merge_format2 = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_color': '#FFFFFF',
+            'bg_color': '#000000'
+        })
 
-        word_dict = {
-            1: 'K',2: 'L',
-            3: 'M',4: 'N',
-            5: 'O',6: 'P',
-            7: 'Q',8: 'R',
-            9: 'S',10: 'T',
-            11: 'U',12: 'V',
-            13: 'W',14: 'X',
-            15: 'Y',16: 'Z',
-        }
+        worksheet1.merge_range('A80:C81', '第%s期' %period, merge_format2)
+        worksheet1.merge_range('D80:I81', course, merge_format2)
+        worksheet1.merge_range('J80:L81', '訓練班', merge_format2)
+        worksheet1.merge_range('A83:L83', '總體權值分數', merge_format2)
+        worksheet1.merge_range('A84:L84', point_total, merge_format)
+        worksheet1.merge_range('A85:D85', '環境權值分數', merge_format2)
+        worksheet1.merge_range('E85:H85', '輔導員權值分數', merge_format2)
+        worksheet1.merge_range('I85:L85', '講師整體權值分數', merge_format2)
+        worksheet1.merge_range('A86:D86', point_space, merge_format)
+        worksheet1.merge_range('E86:H86', point_envir, merge_format)
+        worksheet1.merge_range('I86:L86', point_teacher, merge_format)
+
+        worksheet1.merge_range('A87:C87', '項目', merge_format2)
+        worksheet1.merge_range('D87:F87', '講師', merge_format2)
+        worksheet1.merge_range('G87:I87', '平均權值', merge_format2)
+        worksheet1.merge_range('J87:L87', '權值分數', merge_format2)
+
         count = 1
-        for k,v in each_teacher_data.items():
-            worksheet.write_column('%s1' %word_dict[count], v)
-            tmp = workbook.add_chart({'type': 'pie'})
-            tmp.add_series({
-                'name':       k,
-                'categories': '=Sheet1!$G$1:$G$5',
-                'values':     '=Sheet1!$%s$1:$%s$5' %(word_dict[count], word_dict[count]),
-                'data_labels': {'percentage': True},
-            })
-            tmp.set_title({'nanme': k})
-            number = 85 + (count -1) * 16
-            worksheet.insert_chart('A%s' %number, tmp)
-            count += 1
-
-        worksheet.write_string  (1, 17, '第%s期' %period)
-        worksheet.write_string  (1, 18, course)
-        worksheet.write_string  (2, 17, '環境權值分數')
-        worksheet.write_string  (2, 18, '輔導員權值分數')
-        worksheet.write_string  (2, 19, '講師整體權值分數')
-        worksheet.write_string  (3, 17, point_envir)
-        worksheet.write_string  (3, 18, point_space)
-        worksheet.write_string  (3, 19, point_teacher)
-        worksheet.write_string  (4, 17, '總體權值分數')
-        worksheet.write_string  (5,17, point_total)
-        col = 7
-        row = 17
-        worksheet.write_string  (6,17, '講師')
-        worksheet.write_string  (6,18, '平均權值')
-        worksheet.write_string  (6,19, '權值分數')
+        row = 88
         for k,v in count_data.items():
-            worksheet.write_string  (col,row, k)
-            worksheet.write_number  (col,row + 1, v)
-            worksheet.write_number  (col,row + 2, v * 20)
-            col += 1
+            worksheet1.merge_range('A%s:C%s' %(row, row), count, merge_format)
+            worksheet1.merge_range('D%s:F%s' %(row, row), k, merge_format)
+            worksheet1.merge_range('G%s:I%s' %(row, row), v, merge_format)
+            worksheet1.merge_range('J%s:L%s' %(row, row), v * 20, merge_format)
+            count += 1
+            row += 1
         workbook.close()
 
         response.setHeader('Content-type',  'application/x-xlsx')

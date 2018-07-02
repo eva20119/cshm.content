@@ -49,7 +49,8 @@ class ICourse(Interface):
         required=True,
     )
 
-    effective_date = schema.Date(
-        title=_(u'Effective date'),
-        required=False
+    number = schema.Int(
+        title=_(u'number of student'),
+        required=False,
     )
+
