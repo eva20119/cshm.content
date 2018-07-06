@@ -31,6 +31,7 @@
         教室：<span>${python:item[7]}</span><br>
         <br>
         <p>以填座號：${python:item[8]}</p>
+        <p>回收率: ${python: item[9]}</p>
         <hr/>
     </div>
 </metal:content-core>

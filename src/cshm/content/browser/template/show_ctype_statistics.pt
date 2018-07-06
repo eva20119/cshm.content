@@ -1,8 +1,5 @@
 
 <style>
-.c3{
-    display: inline;
-}
 .title{
     display: flex;
     justify-content: space-around;
@@ -11,41 +8,52 @@ p{
     font-size: 22px;
 }
 </style>
+<form action="download_ctype_excel" method="post">
+  <input type='hidden' name="data" value="${view/json_data}">
+  <input type='hidden' name="course" value="${view/course}">
+  <input type='hidden' name="period" value="${view/period}">
+
+  <input type='submit' value="Download Excel">
+</form>
+
 <p id="json_data" style='display:none'>${view/json_data}</p>
 
-    <div class="title">
-        <p style="">參訓目的</p>
-        <p style="">年齡</p>    
-    </div>
-    <div class='title'>
-        <div id="pie2"></div>
-        <div id="pie3"></div>
-    </div>
 
-<div class="title">
-    <p style="">行業別</p>
-    <p style="">您是如何知道本像訓練課程</p>    
-</div>
-<div class="title">
-    <div id="pie4"></div>
-    <div id="pie5"></div>
-</div>
-<div class="title">
-    <p style="">您選擇本中心得因素(複選)</p>
-    <p style="">據您所知，職業安全衛生法之中央主管機關為何單位</p>    
-</div>
-<div class="title">
-<div id="pie6"></div>
-<div id="pie7"></div>
-</div>
-<div class="title">
-    <p style="">學歷</p>
-    <p style="">汽車駕駛執照</p>    
-</div>
-<div class="title">
-    <div id="pie8"></div>
-    <div id="pie9"></div>
-</div>
+<table>
+  <tr>
+    <th>參訓目的</th>
+    <th>年齡</th>
+  </tr>
+  <tr>
+   <td id="pie2"></td>
+   <td id="pie3"></td>
+ </tr>
+  <tr>
+    <th>行業別</th>
+    <th>您是如何知道本像訓練課程:</th>
+  </tr>
+  <tr>
+   <td id="pie4"></td>
+   <td id="pie5"></td>
+ </tr>
+  <tr>
+    <th>您選擇本中心得因素(複選)</th>
+    <th>職業安全衛生法之中央主管機關為何單位</th>
+  </tr>
+  <tr>
+   <td id="pie6"></td>
+   <td id="pie7"></td>
+ </tr>
+  <tr>
+    <th>職業安全衛生法之中央主管機關為何單位</th>
+    <th>丙種職業安全衛生業務主管式用於僱用多少人以下之事業單位</th>
+  </tr>
+  <tr>
+   <td id="pie8"></td>
+   <td id="pie9"></td>
+ </tr>
+
+</table>
 <script>
 $(document).ready(function () {
     json_data = $('#json_data')[0].innerText
@@ -93,7 +101,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie2',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -104,7 +112,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie3',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -115,7 +123,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie4',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -126,7 +134,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie5',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -137,7 +145,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie6',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -148,7 +156,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie7',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -159,7 +167,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie8',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -170,7 +178,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie9',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R

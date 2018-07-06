@@ -49,7 +49,7 @@ class ICourse(Interface):
         required=True,
     )
 
-    number = schema.Int(
+    numbers = schema.Int(
         title=_(u'number of student'),
         required=False,
     )

@@ -1,8 +1,5 @@
 
 <style>
-.c3{
-    display: inline;
-}
 .title{
     display: flex;
     justify-content: space-between;
@@ -11,37 +8,56 @@ p{
     font-size: 22px;
 }
 </style>
+<form action="download_emergency_excel" method="post">
+  <input type='hidden' name="data" value="${view/json_data}">
+  <input type='hidden' name="course" value="${view/course}">
+  <input type='hidden' name="period" value="${view/period}">
+
+  <input type='submit' value="Download Excel">
+</form>
 
 <p id="json_data" style='display:none'>${view/json_data}</p>
 
-<div class="title">
-    <p style="margin-left: 205px;margin-top: 20px;">參訓目的</p>
-    <p style="margin-right: 360px;margin-top: 20px;">年齡</p>    
-</div>
-<div id="pie2"></div>
-<div id="pie3"></div>
-<div class="title">
-    <p style="margin-left: 205px;margin-top: 20px;">行業別</p>
-    <p style="margin-right: 225px;margin-top: 20px;">您是如何知道本像訓練課程</p>    
-</div>
-<div id="pie4"></div>
-<div id="pie5"></div>
-<div class="title">
-    <p style="margin-left: 135px;margin-top: 20px;">您選擇本中心得因素(複選)</p>
-    <p style="margin-right: 75;margin-top: 20px;">是否曾經從事醫護工作</p>    
-</div>
-<div id="pie6"></div>
-<div id="pie7"></div>
-<div class="title">
-    <p style="margin-left: 0px;margin-top: 20px;">預觸電患者急救時應先</p>
-    <p style="margin-right: 165px;margin-top: 20px;">遇到車禍事件，發現有人員受傷躺在現場，可否移動患者</p>    
-</div>
-<div id="pie8"></div>
-<div id="pie9"></div>
-<div class="title">
-    <p style="margin-left: 0px;margin-top: 20px;width:43%">發現民眾倒臥再旁，且呈現無意識，缺氧狀快，應於幾分鐘內施予急救</p>
-</div>
-<div id="pie10"></div>
+<table>
+  <tr>
+    <th>參訓目的</th>
+    <th>年齡</th>
+  </tr>
+  <tr>
+   <td id="pie2"></td>
+   <td id="pie3"></td>
+ </tr>
+  <tr>
+    <th>行業別</th>
+    <th>您是如何知道本像訓練課程</th>
+  </tr>
+  <tr>
+   <td id="pie4"></td>
+   <td id="pie5"></td>
+ </tr>
+  <tr>
+    <th>您選擇本中心得因素(複選)</th>
+    <th>是否曾經從事醫護工作</th>
+  </tr>
+  <tr>
+   <td id="pie6"></td>
+   <td id="pie7"></td>
+ </tr>
+  <tr>
+    <th>預觸電患者急救時應先</th>
+    <th>可否移動患者</th>
+  </tr>
+  <tr>
+   <td id="pie8"></td>
+   <td id="pie9"></td>
+ </tr>
+  <tr>
+    <th>應於幾分鐘內施予急救</th>
+  </tr>
+  <tr>
+   <td id="pie10"></td>
+ </tr>
+</table>
 
 <script>
 $(document).ready(function () {
@@ -90,7 +106,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie2',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -101,7 +117,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie3',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -112,7 +128,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie4',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -123,7 +139,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie5',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -134,7 +150,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie6',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -145,7 +161,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie7',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -156,7 +172,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie8',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -167,7 +183,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie9',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R
@@ -178,7 +194,7 @@ $(document).ready(function () {
     var chart = c3.generate({
         bindto: '#pie10',
         size: {
-            width: 500,
+            width: 350,height: 350,
         },
         data: {
             // iris data from R

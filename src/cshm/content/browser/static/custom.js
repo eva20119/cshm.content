@@ -203,21 +203,6 @@ $(function(){
         $('#teacher' + count ).prepend("<h3 style='display:flex;justify-content:center'>" + key + "</h3>")        
         count += 1
     })
-
-    $('#download_excel').click(function(){
-        url = location.href.replace('show_satisfaction_statistics', 'download_excel')
-        data = {'123': 123}
-        $.ajax({
-            type: "post",
-            url: url,
-            data: data,
-            success: function (response) {
-debugger
-            }
-        });
-    })
-
-
 });
 
 

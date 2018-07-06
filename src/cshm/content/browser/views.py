@@ -205,7 +205,7 @@ class ResultSatisfaction(BrowserView):
                     """ %(course, subject_name, period, seat, question9, question10, question11, question12)
                 mime_text = MIMEText(body_str, 'html', 'utf-8')
                 api.portal.send_email(
-                    recipient="henrymingtak@gmail.com",
+                    recipient="lin@cshm.org.tw",
                     sender="henry@mingtak.com.tw",
                     subject="%s-%s  意見提供" %(course, period),
                    body=mime_text.as_string(),
@@ -655,7 +655,6 @@ class UploadCsv(BrowserView):
         try:
             text = text.decode('utf-8')
         except:
-            import pdb;pdb.set_trace()
             text = text.decode('big5')
 
         f = StringIO(text)
@@ -749,6 +748,7 @@ class CourseView(BrowserView):
         today = datetime.date.today()
         course = context.title.split('_')[0]
         period = context.title.split('_')[1]
+        numbers = context.numbers
         execSql = SqlObj()
         for item in subject_list.split('\n'):
             if item:
@@ -758,9 +758,15 @@ class CourseView(BrowserView):
                     ORDER BY seat""".format(course, period, subject)
                 result = execSql.execSql(execStr)
                 seat_str = ''
+                count = 0
                 for seat in result:
+                    count += 1
                     seat_str += '%s,' %dict(seat)['seat']
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str ])
+                if numbers:
+                    rate ='%s%%' %(round(float(count) / float(numbers), 2) * 100)
+                else:
+                    rate = '尚未設定學生人數'
+                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate])
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
         # 製作qrcode
         qr = qrcode.QRCode()
@@ -1028,6 +1034,8 @@ class CalculateTraining(BrowserView):
         request = self.request
         course = request.get('course')
         period = request.get('period')
+        self.course = course
+        self.period = period
         execSql = SqlObj()
         if course == '職業安全衛生管理員':
             data = {
@@ -1045,7 +1053,7 @@ class CalculateTraining(BrowserView):
                 '13': {},
                 '14': {},
             }
-            execStr = """SELECT * FROM manager"""
+            execStr = """SELECT * FROM manager WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             if not result:
                 return 'error'
@@ -1121,9 +1129,9 @@ class CalculateTraining(BrowserView):
             self.json_data = json_data
             self.result = result
             return self.template_manager()
-        
+
         elif course == '荷重再一噸以上之堆高機操作人員':
-            execStr = """SELECT * FROM stacker"""
+            execStr = """SELECT * FROM stacker WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
                     '2': {},
@@ -1187,7 +1195,7 @@ class CalculateTraining(BrowserView):
             return self.template_stacker()
 
         elif course == '丙種職業安全衛生業務主管':
-            execStr = """SELECT * FROM c_type"""
+            execStr = """SELECT * FROM c_type WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
                     '2': {},
@@ -1251,7 +1259,7 @@ class CalculateTraining(BrowserView):
             return self.template_ctype()
 
         elif course == '急救人員':
-            execStr = """SELECT * FROM emergency"""
+            execStr = """SELECT * FROM emergency WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
                     '2': {},
@@ -1316,7 +1324,7 @@ class CalculateTraining(BrowserView):
                     data['10'][tmp['anw10']] = 1
             json_data = json.dumps(data)
             self.json_data = json_data
-            return self.template_stacker()
+            return self.template_emergency()
 
 
 class DownloadExcel(BrowserView):
@@ -1523,6 +1531,6 @@ class DownloadExcel(BrowserView):
             row += 1
         workbook.close()
 
-        response.setHeader('Content-type',  'application/x-xlsx')
-        response.setHeader('Content-Disposition', 'aaa.xlsx')
+        response.setHeader('Content-Type',  'application/x-xlsx')
+        response.setHeader('Content-Disposition', 'attachment; filename="%s-%s.xlsx"' %(course, period))
         return output.getvalue()

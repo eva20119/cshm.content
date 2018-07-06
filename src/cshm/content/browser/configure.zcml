@@ -192,6 +192,27 @@
       layer='cshm.content.interfaces.ICshmContentLayer'
       permission='zope2.View'
       />
+  <browser:page
+      name='download_manager_excel'
+      for='*'
+      class='.download_excel.DownloadManagerExcel'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
+      name='download_stacker_excel'
+      for='*'
+      class='.download_excel.DownloadStackerExcel'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
+      name='download_emergency_excel'
+      for='*'
+      class='.download_excel.DownloadEmergencyExcel'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
 
 
 </configure>
