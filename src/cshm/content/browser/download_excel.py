@@ -91,7 +91,7 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$H$1:$H$5',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '您是如何知道本像訓練課程'})
+        chart_total.set_title({'name': '您是如何知道本項訓練課程'})
         worksheet1.insert_chart('I16', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
@@ -258,7 +258,7 @@ class DownloadStackerExcel(BrowserView):
             'values':     '=Sheet2!$H$1:$H$5',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '您是如何知道本像訓練課程'})
+        chart_total.set_title({'name': '您是如何知道本項訓練課程'})
         worksheet1.insert_chart('I16', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
@@ -375,7 +375,7 @@ class DownloadCtypeExcel(BrowserView):
             'values':     '=Sheet2!$H$1:$H$5',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '您是如何知道本像訓練課程'})
+        chart_total.set_title({'name': '您是如何知道本項訓練課程'})
         worksheet1.insert_chart('I16', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
@@ -494,7 +494,7 @@ class DownloadEmergencyExcel(BrowserView):
             'values':     '=Sheet2!$H$1:$H$5',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '您是如何知道本像訓練課程'})
+        chart_total.set_title({'name': '您是如何知道本項訓練課程'})
         worksheet1.insert_chart('I16', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
