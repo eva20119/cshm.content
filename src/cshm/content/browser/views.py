@@ -954,32 +954,38 @@ class CalculateSatisfaction(BrowserView):
             # 表格的各老師分數，以data為key
             if tmp_date_teacher.has_key(date):
                 if tmp_date_teacher[date].has_key(teacher):
-                    tmp_date_teacher[date][teacher].append(anwA)
-                    tmp_date_teacher[date][teacher].append(anwB)
-                    tmp_date_teacher[date][teacher].append(anwC)
-                    tmp_date_teacher[date][teacher].append(anwD)
-                    tmp_date_teacher[date][teacher].append(anwE)
-                    tmp_date_teacher[date][teacher].append(anwF)
+                    if tmp_date_teacher[date][teacher].has_key(subject):
+                        tmp_date_teacher[date][teacher][subject].append(anwA)
+                        tmp_date_teacher[date][teacher][subject].append(anwB)
+                        tmp_date_teacher[date][teacher][subject].append(anwC)
+                        tmp_date_teacher[date][teacher][subject].append(anwD)
+                        tmp_date_teacher[date][teacher][subject].append(anwE)
+                        tmp_date_teacher[date][teacher][subject].append(anwF)
+                    else:
+                        tmp_date_teacher[date][teacher][subject] = [anwA, anwB, anwC, anwD, anwE, anwF]
                 else:
-                    tmp_date_teacher[date][teacher] = [anwA, anwB, anwC, anwD, anwE, anwF]
+                    tmp_date_teacher[date][teacher] = {subject: [anwA, anwB, anwC, anwD, anwE, anwF]}
+#                    tmp_date_teacher[date][teacher] = [anwA, anwB, anwC, anwD, anwE, anwF]
             else:
-                tmp_date_teacher[date] = {teacher: [[anwA, anwB, anwC, anwD, anwE, anwF], subject]}
+                tmp_date_teacher[date] = {teacher: {subject: [anwA, anwB, anwC, anwD, anwE, anwF]}}
+#                tmp_date_teacher[date] = {teacher: [[anwA, anwB, anwC, anwD, anwE, anwF], subject]}
 
         date_teacher = []
         for k,v in tmp_date_teacher.items():
             for k2,v2 in v.items():
-                count_5 = v2[0].count(5)
-                count_4 = v2[0].count(4)
-                count_3 = v2[0].count(3)
-                count_2 = v2[0].count(2)
-                count_1 = v2[0].count(1)
-                weight_5 = count_5 * 5
-                weight_4 = count_4 * 4
-                weight_3 = count_3 * 3
-                weight_2 = count_2 * 2
-                weight_1 = count_1 * 1
-                point = round((float(weight_5) + float(weight_4) + float(weight_3) + float(weight_2) + float(weight_1)) / (float(count_5) + float(count_4) + float(count_3) + float(count_2) + float(count_1)),2)
-                date_teacher.append([k, k2, point, v2[1]])
+                for k3,v3 in v2.items():
+                    count_5 = v3.count(5)
+                    count_4 = v3.count(4)
+                    count_3 = v3.count(3)
+                    count_2 = v3.count(2)
+                    count_1 = v3.count(1)
+                    weight_5 = count_5 * 5
+                    weight_4 = count_4 * 4
+                    weight_3 = count_3 * 3
+                    weight_2 = count_2 * 2
+                    weight_1 = count_1 * 1
+                    point = round((float(weight_5) + float(weight_4) + float(weight_3) + float(weight_2) + float(weight_1)) / (float(count_5) + float(count_4) + float(count_3) + float(count_2) + float(count_1)),2)
+                    date_teacher.append([k, k2, point, k3])
         self.date_teacher = sorted(date_teacher, key=lambda x:x[0])
         self.option1_data = option1_data
         self.option2_data = option2_data
