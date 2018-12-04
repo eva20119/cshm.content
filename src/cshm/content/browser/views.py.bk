@@ -34,17 +34,8 @@ class SatisfactionFirst(BrowserView):
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number')
-#        cookie_seat_number = request.cookies.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.seat_number = seat_number
-#        if cookie_seat_number != seat_number:
-#            request.response.setCookie('seat_number', seat_number)
-
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
 
         ex_url = ''
         ex_data = []
@@ -99,16 +90,8 @@ class SatisfactionSec(BrowserView):
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#        cookie_seat_number = request.cookies.get('seat_number', '')
         self.seat_number = seat_number
-#        if cookie_seat_number != seat_number:
-#            request.response.setCookie('seat_number', seat_number)
 
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
         ex_url = ''
         ex_data = []
         execSql = SqlObj()
@@ -190,16 +173,7 @@ class ResultSatisfaction(BrowserView):
                 period, date, teacher, question1, question2, question3, question4, question5, 
                 question6, question7, question8, question9, question10, question11, question12, seat)
             execSql.execSql(execStr)
-#        identify = '%s_%s_%s' %(course, period ,subject_name)
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
-#        already_write.append(identify)
-#        request.response.setCookie('already_write', json.dumps(already_write))
-
-        # 寄信通知
+            # 寄信通知
             if question9 or question10 or question11 or question12:
                 body_str = """科目:%s<br>課程:%s<br>期數:%s<br/>座號:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
                     """ %(course, subject_name, period, seat, question9, question10, question11, question12)
@@ -242,7 +216,6 @@ class ResultManager(BrowserView):
         anw14 = request.get('anw14')
         course_name = request.get('course_name')
         course_period = request.get('course_period')
-        uid = self.context.UID()
         # 處理複選
         new_anw6= ''
         if type(anw6) == list:
@@ -253,10 +226,10 @@ class ResultManager(BrowserView):
 
         execSql = SqlObj()
         execStr = """INSERT INTO `manager`(course, period, `user`, `anw2`, `anw3`, `anw4`, `anw5`, 
-            `anw6`, `anw7`, `anw8`, `anw9`, `anw10`, `anw11`, `anw12`, `anw13`, `anw14`, `uid`) VALUES 
-            ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
+            `anw6`, `anw7`, `anw8`, `anw9`, `anw10`, `anw11`, `anw12`, `anw13`, `anw14`) VALUES 
+            ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')
             """.format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, anw9, anw10, anw11, 
-            anw12, anw13, anw14, uid)
+            anw12, anw13, anw14)
         execSql.execSql(execStr)
         api.portal.show_message(message='填寫完成', type='info', request=request)
         request.response.redirect('%s/@@manager?course_title=%s_%s' %(api.portal.get().absolute_url(), course_name, course_period) )
@@ -769,40 +742,12 @@ class CourseView(BrowserView):
                     rate = '尚未設定學生人數'
                 data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate])
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
-        # 滿意度
+        # 製作qrcode
         qr = qrcode.QRCode()
         qr.add_data(url)
         qr.make_image().save('url.png')
         img = open('url.png', 'rb')
         b64_img = base64.b64encode(img.read())
-
-        # 四個訓前
-        qr1 = qrcode.QRCode()
-        title = context.title
-        qr1.add_data('%s/@@manager?course_title=%s' %(abs_url, title))
-        qr1.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.managerQRcode = base64.b64encode(img.read())
-
-        qr2 = qrcode.QRCode()
-        qr2.add_data('%s/@@stacker?course_title=%s' %(abs_url, title))
-        qr2.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.stackerQRcode = base64.b64encode(img.read())
-
-        qr3 = qrcode.QRCode()
-        qr3.add_data('%s/@@c_type?course_title=%s' %(abs_url, title))
-        qr3.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.c_typeQRcode = base64.b64encode(img.read())
-
-        qr4 = qrcode.QRCode()
-        qr4.add_data('%s/@@emergency?course_title=%s' %(abs_url, title))
-        qr4.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.emergencyQRcode = base64.b64encode(img.read())
-
-
         self.url = url
         self.b64_img = b64_img
         self.data = data
@@ -849,7 +794,6 @@ class CheckSurver(BrowserView):
                 item_datetime = tmp['start_time']
                 teacher = tmp['teacher']
                 identify = '%s_%s_%s' %(course, period, subject)
-
                 if identify not in already_write:
                     if quiz == '是':
                         url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
@@ -888,7 +832,6 @@ class CalculateSatisfaction(BrowserView):
         if not result:
             return 'error'
         tmp_data = {}
-        tmp_date_teacher = {}
         anw_set = {}
         anw_set['count_A'] = []
         anw_set['count_B'] = []
@@ -901,21 +844,9 @@ class CalculateSatisfaction(BrowserView):
         option3_data = []
         option4_data = []
 
-        numbers = api.content.find(portal_type='Course', SearchableText='%s_%s' %(course, period))[0].getObject().numbers
-        execStr = """SELECT COUNT(id) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-        write_number = execSql.execSql(execStr)
-        if numbers:
-            self.count = write_number[0][0]
-            self.numbers = numbers
-            self.write_rate = round((float(write_number[0][0]) / float(numbers) * 100) , 2)
-        else:
-            return '<h3>請設定學生人數</h3>'
-
         for item in result:
             tmp = dict(item)
             teacher = tmp['teacher'].strip()
-            date = tmp['date'][:10]
-            subject = tmp['subject']
             # question 1,2,3,4,5,8 為基本問題
             # 6,7 為輔導員及場地茶水問題
             # 9,10,11,12 為意見
@@ -951,36 +882,6 @@ class CalculateSatisfaction(BrowserView):
                 tmp_data[teacher].append(anwF)
             else:
                 tmp_data[teacher] = [anwA, anwB, anwC, anwD, anwE, anwF]
-            # 表格的各老師分數，以data為key
-            if tmp_date_teacher.has_key(date):
-                if tmp_date_teacher[date].has_key(teacher):
-                    tmp_date_teacher[date][teacher].append(anwA)
-                    tmp_date_teacher[date][teacher].append(anwB)
-                    tmp_date_teacher[date][teacher].append(anwC)
-                    tmp_date_teacher[date][teacher].append(anwD)
-                    tmp_date_teacher[date][teacher].append(anwE)
-                    tmp_date_teacher[date][teacher].append(anwF)
-                else:
-                    tmp_date_teacher[date][teacher] = [anwA, anwB, anwC, anwD, anwE, anwF]
-            else:
-                tmp_date_teacher[date] = {teacher: [[anwA, anwB, anwC, anwD, anwE, anwF], subject]}
-
-        date_teacher = []
-        for k,v in tmp_date_teacher.items():
-            for k2,v2 in v.items():
-                count_5 = v2[0].count(5)
-                count_4 = v2[0].count(4)
-                count_3 = v2[0].count(3)
-                count_2 = v2[0].count(2)
-                count_1 = v2[0].count(1)
-                weight_5 = count_5 * 5
-                weight_4 = count_4 * 4
-                weight_3 = count_3 * 3
-                weight_2 = count_2 * 2
-                weight_1 = count_1 * 1
-                point = round((float(weight_5) + float(weight_4) + float(weight_3) + float(weight_2) + float(weight_1)) / (float(count_5) + float(count_4) + float(count_3) + float(count_2) + float(count_1)),2)
-                date_teacher.append([k, k2, point, v2[1]])
-        self.date_teacher = sorted(date_teacher, key=lambda x:x[0])
         self.option1_data = option1_data
         self.option2_data = option2_data
         self.option3_data = option3_data
@@ -1061,9 +962,9 @@ class CalculateSatisfaction(BrowserView):
 
         self.point_total = round((float(self.point_space * 10) + float(self.point_envir * 20) + float(self.point_teacher * 70)) / 100,2) 
         # 圓餅圖的資料整理
-#        execStr = """SELECT COUNT(DISTINCT(teacher)) as teacher_numbers FROM satisfaction"""
-#        result = execSql.execSql(execStr)
-#        teacher_numbers = dict(result[0])['teacher_numbers']
+        execStr = """SELECT COUNT(DISTINCT(teacher)) as teacher_numbers FROM satisfaction"""
+        result = execSql.execSql(execStr)
+        teacher_numbers = dict(result[0])['teacher_numbers']
         anw_data = {}
         anw_5 = 0
         anw_4 = 0
@@ -1091,7 +992,6 @@ class CalculateSatisfaction(BrowserView):
             anw_D = int(v.count(2))
             anw_E = int(v.count(1))
             anw_data[k] = [anw_A, anw_B, anw_C, anw_D, anw_E]
-
         self.anw_data = anw_data
         self.total_anw = total_anw
         self.period = period
@@ -1127,20 +1027,6 @@ class CalculateTraining(BrowserView):
                 '13': {},
                 '14': {},
             }
-            execStr = """SELECT COUNT(id), uid FROM manager WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
-            content = api.content.get(UID=uid)
-            numbers = content.numbers
-            if numbers:
-                self.count = count
-                self.numbers = numbers
-                self.rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
-            else:
-                self.rate = False
-                self.abs_url = content.absolute_url()
-
             execStr = """SELECT * FROM manager WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             if not result:
@@ -1219,20 +1105,6 @@ class CalculateTraining(BrowserView):
             return self.template_manager()
 
         elif course == '荷重再一噸以上之堆高機操作人員':
-            execStr = """SELECT COUNT(id), uid FROM stacker WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
-            content = api.content.get(UID=uid)
-            numbers = content.numbers
-            if numbers:
-                self.count = count
-                self.numbers = numbers
-                self.rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
-            else:
-                self.rate = False
-                self.abs_url = content.absolute_url()
-
             execStr = """SELECT * FROM stacker WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
@@ -1297,20 +1169,6 @@ class CalculateTraining(BrowserView):
             return self.template_stacker()
 
         elif course == '丙種職業安全衛生業務主管':
-            execStr = """SELECT COUNT(id), uid FROM c_type WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
-            content = api.content.get(UID=uid)
-            numbers = content.numbers
-            if numbers:
-                self.count = count
-                self.numbers = numbers
-                self.rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
-            else:
-                self.rate = False
-                self.abs_url = content.absolute_url()
-
             execStr = """SELECT * FROM c_type WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
@@ -1375,20 +1233,6 @@ class CalculateTraining(BrowserView):
             return self.template_ctype()
 
         elif course == '急救人員':
-            execStr = """SELECT COUNT(id), uid FROM emergency WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
-            content = api.content.get(UID=uid)
-            numbers = content.numbers
-            if numbers:
-                self.count = count
-                self.numbers = numbers
-                self.rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
-            else:
-                self.rate = False
-                self.abs_url = content.absolute_url()
-
             execStr = """SELECT * FROM emergency WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {
@@ -1494,7 +1338,7 @@ class DownloadExcel(BrowserView):
 
         period = request.get('period')
         course = request.get('course')
-        date_teacher = json.loads(request.get('date_teacher'))
+        count_data = json.loads(request.get('count_data'))
         point_space = request.get('point_space')
         point_envir = request.get('point_envir')
         point_teacher = request.get('point_teacher')
@@ -1645,26 +1489,18 @@ class DownloadExcel(BrowserView):
         worksheet1.merge_range('E86:H86', point_envir, merge_format)
         worksheet1.merge_range('I86:L86', point_teacher, merge_format)
 
-        worksheet1.merge_range('A87:B87', '日期', merge_format2)
-        worksheet1.merge_range('C87:F87', '科目', merge_format2)
-        worksheet1.merge_range('G87:H87', '講師', merge_format2)
-        worksheet1.merge_range('I87:J87', '平均權值', merge_format2)
-        worksheet1.merge_range('K87:L87', '權值分數', merge_format2)
-
-        write_rate = request.get('write_rate')
-        count = request.get('count')
-        numbers = request.get('numbers')
-        worksheet1.merge_range('N87:Q87', '已填人數 / 總人數 = 回收率', merge_format2)
-        worksheet1.merge_range('N88:Q88', '%s / %s = %s%%' %(count, numbers, write_rate), merge_format)
+        worksheet1.merge_range('A87:C87', '項目', merge_format2)
+        worksheet1.merge_range('D87:F87', '講師', merge_format2)
+        worksheet1.merge_range('G87:I87', '平均權值', merge_format2)
+        worksheet1.merge_range('J87:L87', '權值分數', merge_format2)
 
         count = 1
         row = 88
-        for i in date_teacher:
-            worksheet1.merge_range('A%s:B%s' %(row, row), i[0], merge_format)
-            worksheet1.merge_range('C%s:F%s' %(row, row), i[3], merge_format)
-            worksheet1.merge_range('G%s:H%s' %(row, row), i[1], merge_format)
-            worksheet1.merge_range('I%s:J%s' %(row, row), i[2], merge_format)
-            worksheet1.merge_range('K%s:L%s' %(row, row), i[2] * 20, merge_format)
+        for k,v in count_data.items():
+            worksheet1.merge_range('A%s:C%s' %(row, row), count, merge_format)
+            worksheet1.merge_range('D%s:F%s' %(row, row), k, merge_format)
+            worksheet1.merge_range('G%s:I%s' %(row, row), v, merge_format)
+            worksheet1.merge_range('J%s:L%s' %(row, row), v * 20, merge_format)
             count += 1
             row += 1
         workbook.close()

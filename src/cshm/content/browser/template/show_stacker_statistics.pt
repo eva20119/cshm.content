@@ -21,6 +21,20 @@ p{
 
 
 <table>
+  <tr colspan=2>
+    <th colspan=2>已填人數 / 總人數 = 回收率</th>
+  </tr>
+  <tr colspan=2>
+    <tal:cond condition='view/rate'>
+      <th colspan=2>${view/count} / ${view/numbers} = ${view/rate}</th>
+    </tal:cond>
+    <tal:cond condition='not: view/rate'>
+      <th colspan=2>
+        <a href="${view/abs_url}/edit">尚未設定總人數</a>
+      </th>
+    </tal:cond>
+  </tr>
+
   <tr>
     <th>參訓目的</th>
     <th>年齡</th>

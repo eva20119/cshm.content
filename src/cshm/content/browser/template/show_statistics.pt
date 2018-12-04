@@ -48,7 +48,6 @@ abs_url = api.portal.get().absolute_url()
 </select>
 
 期數 <input type="number" id="period1"  />
-
 <button class='send' data-target="1" data-selected="1">送出</button>
 <br>
 
@@ -83,10 +82,10 @@ $(document).ready(function(){
             'course': course,
         }
         if(selected == 2){
-            url = location.href.replace('show_satisfaction_statistics', 'calculate_satisfaction')    
+            url = location.href.replace('show_satisfaction', 'calculate_satisfaction')    
         }
         else if(selected == 1){
-            url = location.href.replace('show_satisfaction_statistics', 'calculate_training')
+            url = location.href.replace('show_satisfaction', 'calculate_training')
         }
         $.ajax({
             type: "post",

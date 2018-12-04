@@ -10,21 +10,59 @@
 <metal:content-core fill-slot="content-core">
 <metal:content-core define-macro="content-core"
                     tal:define="toc context/table_of_contents|nothing;">
+<style>
+table{
+    width: 80%;
+}
+td, th{
+    font-size: 20px;
+    text-align: center;
+}
+</style>
+    <table>
+      <tr>
+        <th>
+             <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: view.context.Title()}">
+職業安全衛生管理員學員訓前職能調查表</a>
+        </th>
+        <th>
+        <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: view.context.Title()}">
+荷重再一噸以上之堆高機操作人員學員訓前職能調查表</a>
+        </th>
+      </tr>
+      <tr>
+        <td><img src="data:image/png;base64,${view/managerQRcode}" style="width:200px"/></td>
+        <td><img src="data:image/png;base64,${view/stackerQRcode}" style="width:200px"/></td>
+      </tr>
+      <tr>
+        <th>
+          <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: view.context.Title()}">
+丙種職業安全衛生業務主管學員訓前職能調查表</a>
+        </th>
+        <th>
+    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: view.context.Title()}">
+急救人員學員訓前職能調查表</a>
+        </th>
+      </tr>
+      <tr>
+        <td><img src="data:image/png;base64,${view/c_typeQRcode}" style="width:200px"/></td>
+        <td><img src="data:image/png;base64,${view/emergencyQRcode}" style="width:200px"/></td>
+      </tr>
+      <tr>
+        <th colspan=2><a href="${view/url}">問卷網址</a></th>
+      </tr>
+      <tr >
+        <td colspan=2>
+          <img src="data:image/png;base64,${view/b64_img}" style="width:200px"/>
+        </td>
+      </tr>
+    </table>
 
-    <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: view.context.Title()}">職業安全衛生管理員學員訓前職能調查表</a> <br/>
-    <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: view.context.Title()}">荷重再一噸以上之堆高機操作人員學員訓前職能調查表</a><br/>
-    <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: view.context.Title()}">丙種職業安全衛生業務主管學員訓前職能調查表</a><br/>
-    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: view.context.Title()}">急救人員學員訓前職能調查表</a><br/>
-    <br/><br/>
-    <img src="data:image/png;base64,${view/b64_img}" style="width:200px"/>
-    <br/>
-    <a href="${view/url}">問卷網址</a>
-    <br/>
     <br/>
     <div tal:repeat="item view/data">
         日期：<span>${python:item[0]}</span><br>
-        星期：<span>${python:item[1]}</span><br>
-        時間：<span>${python:item[2]}</span><br>
+        時間：<span>${python:item[1]}</span><br>
+        星期：<span>${python:item[2]}</span><br>
         授課名稱：<span>${python:item[3]}</span><br>
         時數：<span>${python:item[4]}</span><br>
         講師：<span>${python:item[5]}</span><br>

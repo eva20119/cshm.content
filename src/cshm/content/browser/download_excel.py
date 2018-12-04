@@ -21,6 +21,18 @@ class DownloadManagerExcel(BrowserView):
         course = request.get('course')
         period = request.get('period')
 
+        execSql = SqlObj()
+        execStr = """SELECT COUNT(id), uid FROM manager WHERE period = '{}' GROUP by uid""".format(period)
+        count_result = execSql.execSql(execStr)[0]
+        count = count_result[0]
+        uid = count_result[1]
+        content = api.content.get(UID=uid)
+        numbers = content.numbers
+        if numbers:
+            rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
+        else:
+            rate = False
+
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet1 = workbook.add_worksheet('Sheet1')
@@ -53,6 +65,17 @@ class DownloadManagerExcel(BrowserView):
         worksheet2.write_column('Y1', data['14'].keys())
         worksheet2.write_column('Z1', data['14'].values())
 
+        title_style = workbook.add_format({'align': 'center','valign': 'vcenter', 'font_size': '20'})
+
+        worksheet1.merge_range('A1:P3', '中國勞工安全衛生管理學會', title_style)
+        worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
+        worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
+
+        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        if rate:
+            worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
+        else:
+            worksheet1.merge_range('Q3:W4', '尚未設定人數', title_style)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -62,7 +85,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '參訓目的'})
-        worksheet1.insert_chart('A1', chart_total)
+        worksheet1.insert_chart('A10', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -72,7 +95,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '年齡'})
-        worksheet1.insert_chart('I1', chart_total)
+        worksheet1.insert_chart('I10', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -82,7 +105,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '行業別'})
-        worksheet1.insert_chart('A16', chart_total)
+        worksheet1.insert_chart('A26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -92,7 +115,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您是如何知道本項訓練課程'})
-        worksheet1.insert_chart('I16', chart_total)
+        worksheet1.insert_chart('I26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -102,7 +125,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您選擇本中心得因素(複選)'})
-        worksheet1.insert_chart('A31', chart_total)
+        worksheet1.insert_chart('A41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -111,8 +134,8 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$L$1:$L$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '據您所知，職業安全衛生法之中央主管機關為何單位'})
-        worksheet1.insert_chart('I31', chart_total)
+        chart_total.set_title({'name': '據您所知，職業安全衛生法之中央主管機關為何單位', 'name_font': {'size': 13}})
+        worksheet1.insert_chart('I41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -121,8 +144,8 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$N$1:$N$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '保障工作者健康及安全為下列合法之宗旨'})
-        worksheet1.insert_chart('A46', chart_total)
+        chart_total.set_title({'name': '防止職業災害，保障工作者健康及安全為下列合法之宗旨', 'name_font': {'size': 13}})
+        worksheet1.insert_chart('A56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -132,7 +155,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '何者為符合資格之職業安全衛生管理員'})
-        worksheet1.insert_chart('I46', chart_total)
+        worksheet1.insert_chart('I56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -141,8 +164,8 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$R$1:$R$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '王先生受雇於OO建設有限公司'})
-        worksheet1.insert_chart('A61', chart_total)
+        chart_total.set_title({'name': '王先生受雇於OO建設有限公司，某日上班再公司內不小心跌倒導致右手閉骨折，是否屬於職業災害', 'name_font': {'size': 9}})
+        worksheet1.insert_chart('A71', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -151,8 +174,8 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$T$1:$T$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '職業安全衛生法已字103.7.3正式施行'})
-        worksheet1.insert_chart('I61', chart_total)
+        chart_total.set_title({'name': '職業安全衛生法已字103.7.3正式施行，其適用範圍(行業)為何', 'name_font': {'size': 13}})
+        worksheet1.insert_chart('I71', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -162,7 +185,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '僱主對勞工實施必要之安全衛生教育訓練'})
-        worksheet1.insert_chart('A76', chart_total)
+        worksheet1.insert_chart('A86', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -171,8 +194,8 @@ class DownloadManagerExcel(BrowserView):
             'values':     '=Sheet2!$X$1:$X$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '作業中有物體飛落致為害勞工之虞'})
-        worksheet1.insert_chart('I76', chart_total)
+        chart_total.set_title({'name': '作業中有物體飛落致為害勞工之虞，下列何者正確'})
+        worksheet1.insert_chart('I86', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -182,7 +205,7 @@ class DownloadManagerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '下列何項為高架作業'})
-        worksheet1.insert_chart('A91', chart_total)
+        worksheet1.insert_chart('A101', chart_total)
 
         workbook.close()
 
@@ -199,6 +222,18 @@ class DownloadStackerExcel(BrowserView):
         course = request.get('course')
         period = request.get('period')
 
+        execSql = SqlObj()
+        execStr = """SELECT COUNT(id), uid FROM stacker WHERE period = '{}' GROUP by uid""".format(period)
+        count_result = execSql.execSql(execStr)[0]
+        count = count_result[0]
+        uid = count_result[1]
+        content = api.content.get(UID=uid)
+        numbers = content.numbers
+        if numbers:
+            rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
+        else:
+            rate = False
+
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet1 = workbook.add_worksheet('Sheet1')
@@ -221,6 +256,18 @@ class DownloadStackerExcel(BrowserView):
         worksheet2.write_column('O1', data['9'].keys())
         worksheet2.write_column('P1', data['9'].values())
 
+        title_style = workbook.add_format({'align': 'center','valign': 'vcenter', 'font_size': '20'})
+
+        worksheet1.merge_range('A1:P3', '中國勞工安全衛生管理學會', title_style)
+        worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
+        worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
+
+        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        if rate:
+            worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
+        else:
+            worksheet1.merge_range('Q3:W4', '尚未設定人數', title_style)
+
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
             'name':       'Pie sales data',
@@ -229,7 +276,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '參訓目的'})
-        worksheet1.insert_chart('A1', chart_total)
+        worksheet1.insert_chart('A11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -239,7 +286,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '年齡'})
-        worksheet1.insert_chart('I1', chart_total)
+        worksheet1.insert_chart('I11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -249,7 +296,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '行業別'})
-        worksheet1.insert_chart('A16', chart_total)
+        worksheet1.insert_chart('A26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -259,7 +306,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您是如何知道本項訓練課程'})
-        worksheet1.insert_chart('I16', chart_total)
+        worksheet1.insert_chart('I26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -269,7 +316,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您選擇本中心得因素(複選)'})
-        worksheet1.insert_chart('A31', chart_total)
+        worksheet1.insert_chart('A41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -279,7 +326,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '學歷'})
-        worksheet1.insert_chart('I31', chart_total)
+        worksheet1.insert_chart('I41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -289,7 +336,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '有無汽車駕駛執照'})
-        worksheet1.insert_chart('A46', chart_total)
+        worksheet1.insert_chart('A56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -299,7 +346,7 @@ class DownloadStackerExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '堆高機'})
-        worksheet1.insert_chart('I46', chart_total)
+        worksheet1.insert_chart('I56', chart_total)
 
         workbook.close()
 
@@ -316,6 +363,18 @@ class DownloadCtypeExcel(BrowserView):
         course = request.get('course')
         period = request.get('period')
 
+        execSql = SqlObj()
+        execStr = """SELECT COUNT(id), uid FROM c_type WHERE period = '{}' GROUP by uid""".format(period)
+        count_result = execSql.execSql(execStr)[0]
+        count = count_result[0]
+        uid = count_result[1]
+        content = api.content.get(UID=uid)
+        numbers = content.numbers
+        if numbers:
+            rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
+        else:
+            rate = False
+
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet1 = workbook.add_worksheet('Sheet1')
@@ -338,6 +397,18 @@ class DownloadCtypeExcel(BrowserView):
         worksheet2.write_column('O1', data['9'].keys())
         worksheet2.write_column('P1', data['9'].values())
 
+        title_style = workbook.add_format({'align': 'center','valign': 'vcenter', 'font_size': '20'})
+
+        worksheet1.merge_range('A1:P3', '中國勞工安全衛生管理學會', title_style)
+        worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
+        worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
+
+        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        if rate:
+            worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
+        else:
+            worksheet1.merge_range('Q3:W4', '尚未設定人數', title_style)
+
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
             'name':       'Pie sales data',
@@ -346,7 +417,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '參訓目的'})
-        worksheet1.insert_chart('A1', chart_total)
+        worksheet1.insert_chart('A11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -356,7 +427,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '年齡'})
-        worksheet1.insert_chart('I1', chart_total)
+        worksheet1.insert_chart('I11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -366,7 +437,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '行業別'})
-        worksheet1.insert_chart('A16', chart_total)
+        worksheet1.insert_chart('A26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -376,7 +447,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您是如何知道本項訓練課程'})
-        worksheet1.insert_chart('I16', chart_total)
+        worksheet1.insert_chart('I26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -386,7 +457,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您選擇本中心得因素(複選)'})
-        worksheet1.insert_chart('A31', chart_total)
+        worksheet1.insert_chart('A41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -396,7 +467,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '職業安全衛生法之中央主管機關為何單位'})
-        worksheet1.insert_chart('I31', chart_total)
+        worksheet1.insert_chart('I41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -406,7 +477,7 @@ class DownloadCtypeExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '勞動契約係以下列何種目的為正確'})
-        worksheet1.insert_chart('A46', chart_total)
+        worksheet1.insert_chart('A56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -415,8 +486,8 @@ class DownloadCtypeExcel(BrowserView):
             'values':     '=Sheet2!$P$1:$P$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '僱用多少人以下之事業單位'})
-        worksheet1.insert_chart('I46', chart_total)
+        chart_total.set_title({'name': '丙種職業安全衛生業務主管式用於僱用多少人以下之事業單位', 'name_font': {'size': 13}})
+        worksheet1.insert_chart('I56', chart_total)
 
         workbook.close()
 
@@ -432,6 +503,18 @@ class DownloadEmergencyExcel(BrowserView):
         data = json.loads(request.get('data'))
         course = request.get('course')
         period = request.get('period')
+
+        execSql = SqlObj()
+        execStr = """SELECT COUNT(id), uid FROM emergency WHERE period = '{}' GROUP by uid""".format(period)
+        count_result = execSql.execSql(execStr)[0]
+        count = count_result[0]
+        uid = count_result[1]
+        content = api.content.get(UID=uid)
+        numbers = content.numbers
+        if numbers:
+            rate = '%s%%' %round(float(count) / float(numbers) * 100, 1)
+        else:
+            rate = False
 
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
@@ -457,6 +540,18 @@ class DownloadEmergencyExcel(BrowserView):
         worksheet2.write_column('Q1', data['10'].keys())
         worksheet2.write_column('R1', data['10'].values())
 
+        title_style = workbook.add_format({'align': 'center','valign': 'vcenter', 'font_size': '20'})
+
+        worksheet1.merge_range('A1:P3', '中國勞工安全衛生管理學會', title_style)
+        worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
+        worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
+
+        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        if rate:
+            worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
+        else:
+            worksheet1.merge_range('Q3:W4', '尚未設定人數', title_style)
+
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
             'name':       'Pie sales data',
@@ -465,7 +560,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '參訓目的'})
-        worksheet1.insert_chart('A1', chart_total)
+        worksheet1.insert_chart('A11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -475,7 +570,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '年齡'})
-        worksheet1.insert_chart('I1', chart_total)
+        worksheet1.insert_chart('I11', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -485,7 +580,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '行業別'})
-        worksheet1.insert_chart('A16', chart_total)
+        worksheet1.insert_chart('A26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -495,7 +590,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您是如何知道本項訓練課程'})
-        worksheet1.insert_chart('I16', chart_total)
+        worksheet1.insert_chart('I26', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -505,7 +600,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '您選擇本中心得因素(複選)'})
-        worksheet1.insert_chart('A31', chart_total)
+        worksheet1.insert_chart('A41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -515,7 +610,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '是否曾經從事醫護工作'})
-        worksheet1.insert_chart('I31', chart_total)
+        worksheet1.insert_chart('I41', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -525,7 +620,7 @@ class DownloadEmergencyExcel(BrowserView):
             'data_labels': {'percentage': True},
         })
         chart_total.set_title({'name': '預觸電患者急救時應先'})
-        worksheet1.insert_chart('A46', chart_total)
+        worksheet1.insert_chart('A56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -534,8 +629,8 @@ class DownloadEmergencyExcel(BrowserView):
             'values':     '=Sheet2!$P$1:$P$4',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '可否移動患者'})
-        worksheet1.insert_chart('I46', chart_total)
+        chart_total.set_title({'name': '遇到車禍事件，發現有人員受傷躺在現場，可否移動患者', 'name_font': {'size': 13},})
+        worksheet1.insert_chart('I56', chart_total)
 
         chart_total = workbook.add_chart({'type': 'pie'})
         chart_total.add_series({
@@ -544,8 +639,11 @@ class DownloadEmergencyExcel(BrowserView):
             'values':     '=Sheet2!$R$1:$R$3',
             'data_labels': {'percentage': True},
         })
-        chart_total.set_title({'name': '應於幾分鐘內施予急救'})
-        worksheet1.insert_chart('A61', chart_total)
+        chart_total.set_title({
+            'name': '發現民眾倒臥再旁，且呈現無意識，缺氧狀快，應於幾分鐘內施予急救',
+            'name_font': {'size': 13},
+        })
+        worksheet1.insert_chart('A71', chart_total)
 
         workbook.close()
 

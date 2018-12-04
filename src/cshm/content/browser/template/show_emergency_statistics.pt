@@ -19,6 +19,20 @@ p{
 <p id="json_data" style='display:none'>${view/json_data}</p>
 
 <table>
+  <tr colspan=2>
+    <th colspan=2>已填人數 / 總人數 = 回收率</th>
+  </tr>
+  <tr colspan=2>
+    <tal:cond condition='view/rate'>
+      <th colspan=2>${view/count} / ${view/numbers} = ${view/rate}</th>
+    </tal:cond>
+    <tal:cond condition='not: view/rate'>
+      <th colspan=2>
+        <a href="${view/abs_url}/edit">尚未設定總人數</a>
+      </th>
+    </tal:cond>
+  </tr>
+
   <tr>
     <th>參訓目的</th>
     <th>年齡</th>
@@ -45,14 +59,14 @@ p{
  </tr>
   <tr>
     <th>預觸電患者急救時應先</th>
-    <th>可否移動患者</th>
+    <th>遇到車禍事件，發現有人員受傷躺在現場，可否移動患者</th>
   </tr>
   <tr>
    <td id="pie8"></td>
    <td id="pie9"></td>
  </tr>
   <tr>
-    <th>應於幾分鐘內施予急救</th>
+    <th>發現民眾倒臥再旁，且呈現無意識，缺氧狀快，應於幾分鐘內施予急救<th>
   </tr>
   <tr>
    <td id="pie10"></td>

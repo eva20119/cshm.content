@@ -18,6 +18,20 @@ p{
 <p id="json_data" style='display:none'>${view/json_data}</p>
 
 <table>
+  <tr colspan=2>
+    <th colspan=2>已填人數 / 總人數 = 回收率</th>
+  </tr>
+  <tr colspan=2>
+    <tal:cond condition='view/rate'>
+      <th colspan=2>${view/count} / ${view/numbers} = ${view/rate}</th>
+    </tal:cond>
+    <tal:cond condition='not: view/rate'>
+      <th colspan=2>
+        <a href="${view/abs_url}/edit">尚未設定總人數</a>
+      </th>
+    </tal:cond>
+  </tr>
+
   <tr>
     <th>參訓目的</th>
     <th>年齡</th>
@@ -36,14 +50,14 @@ p{
  </tr>
   <tr>
     <th>您選擇本中心得因素(複選)</th>
-    <th>職業安全衛生法之中央主管機關為何單位</th>
+    <th>據您所知，職業安全衛生法之中央主管機關為何單位</th>
   </tr>
   <tr>
    <td id="pie6"></td>
    <td id="pie7"></td>
  </tr>
   <tr>
-    <th>保障工作者健康及安全為下列合法之宗旨</th>
+    <th>防止職業災害，保障工作者健康及安全為下列合法之宗旨</th>
     <th>何者為符合資格之職業安全衛生管理員</th>
   </tr>
   <tr>
@@ -51,23 +65,23 @@ p{
    <td id="pie9"></td>
   </tr>
   <tr>
-    <th>是否屬於職業災害</th>
-    <th>其適用範圍(行業)為何</th>
+    <th style='font-size: 16px'>王先生受雇於OO建設有限公司，某日上班再公司內不小心跌倒導致右手閉骨折，是否屬於職業災害</th>
+    <th>職業安全衛生法已字103.7.3正式施行，其適用範圍(行業)為何</th>
   </tr>
   <tr>
    <td id="pie10"></td>
    <td id="pie11"></td>
  </tr>
   <tr>
-    <th>僱主對勞工實施必要之安全衛生教育訓練</th>
-    <th>作業中有物體飛落致為害勞工之虞</th>
+    <th>僱主對勞工實施必要之安全衛生教育訓練，下列何者正確</th>
+    <th>作業中有物體飛落致為害勞工之虞，應置備何項防護具</th>
   </tr>
   <tr>
    <td id="pie12"></td>
    <td id="pie13"></td>
   </tr>
   <tr>
-    <th>作業中有物體飛落致為害勞工之虞</th>
+    <th>下列何項為高架作業</th>
   </tr>
   <tr>
    <td id='pie14'></td>

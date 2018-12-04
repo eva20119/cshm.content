@@ -116,7 +116,7 @@
       permission='zope2.View'
       />
   <browser:page
-      name='show_satisfaction_statistics'
+      name='show_satisfaction'
       for='*'
       class='.views.ShowStatistics'
       layer='cshm.content.interfaces.ICshmContentLayer'
