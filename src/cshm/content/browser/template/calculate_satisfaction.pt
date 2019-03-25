@@ -81,7 +81,7 @@ import json
         <td colspan='5'>${view/point_total}</td>
     </tr>
     <tr>
-        <th colspan='5'>已填人數 / 總人數 = 回收率</th>
+        <th colspan='5'>已填份數 / 總份數 = 回收率</th>
     </tr>
     <tr>
         <td colspan='5'>${view/count} / ${view/numbers} = ${view/write_rate}%</td>

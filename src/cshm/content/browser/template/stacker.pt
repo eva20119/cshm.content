@@ -27,6 +27,8 @@ div{
 <form action="result_stacker" method="post">
     <input type="hidden" name='course_name' value="${python: view.course_title.split('_')[0]}"/>
     <input type="hidden" name='course_period' value="${python: view.course_title.split('_')[1]}"/>
+    <input type='hidden' name='uid' value="" id='uid'/>
+
     <h2>一、基本資料</h2>
     <div>1.姓名:</div>
     <div class='ml'><input type="text" name="anw1" id="" style='width:20%' required /></div>
@@ -87,6 +89,7 @@ div{
         <label class='ml'><input type="radio" value='有駕照' name='anw8' required />有駕照,但不常開</label>
         <label class='ml'><input type="radio" value='有駕照' name='anw8' required />有駕照,經常開</label>
     </div>
+    3.有無開過堆高機:
     <div>
         <label class='ml'><input type="radio" name="anw9" value="未曾開過堆高機" required />未曾開過堆高機</label>
         <label><input type="radio" name="anw9" value="曾經開過堆高機但不熟練" required />曾經開過堆高機但不熟練</label>
@@ -96,6 +99,10 @@ div{
 </form>
 <script>
 $(function(){
+    uid = location.href.split('uid=')[1]
+    $('#uid').val(uid)
+    $('.documentFirstHeading').html('<h2>中國勞工安全衛生管理學會</h2>')
+
     $('form').submit(function(){
         if($('input[name="anw6"]:checked').length == 0){
             alert('第六題請選擇')

@@ -22,10 +22,17 @@ class DownloadManagerExcel(BrowserView):
         period = request.get('period')
 
         execSql = SqlObj()
-        execStr = """SELECT COUNT(id), uid FROM manager WHERE period = '{}' GROUP by uid""".format(period)
-        count_result = execSql.execSql(execStr)[0]
-        count = count_result[0]
-        uid = count_result[1]
+#        execStr = """SELECT COUNT(id), uid FROM manager WHERE period = '{}' GROUP by uid""".format(period)
+#        count_result = execSql.execSql(execStr)[0]
+#        count = count_result[0]
+#        uid = count_result[1]
+
+        execStr = """SELECT COUNT(id) FROM manager WHERE period = '{}'""".format(period)
+        count = execSql.execSql(execStr)[0][0]
+        execStr = """SELECT uid FROM manager WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+        uid = execSql.execSql(execStr)[0][0]
+
+
         content = api.content.get(UID=uid)
         numbers = content.numbers
         if numbers:
@@ -71,7 +78,7 @@ class DownloadManagerExcel(BrowserView):
         worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
         worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
 
-        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        worksheet1.merge_range('Q1:W2', '已填份數 / 總份數 = 回收率', title_style)
         if rate:
             worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
         else:
@@ -223,10 +230,16 @@ class DownloadStackerExcel(BrowserView):
         period = request.get('period')
 
         execSql = SqlObj()
-        execStr = """SELECT COUNT(id), uid FROM stacker WHERE period = '{}' GROUP by uid""".format(period)
-        count_result = execSql.execSql(execStr)[0]
-        count = count_result[0]
-        uid = count_result[1]
+#        execStr = """SELECT COUNT(id), uid FROM stacker WHERE period = '{}' GROUP by uid""".format(period)
+#        count_result = execSql.execSql(execStr)[0]
+#        count = count_result[0]
+#        uid = count_result[1]
+
+        execStr = """SELECT COUNT(id) FROM stacker WHERE period = '{}'""".format(period)
+        count = execSql.execSql(execStr)[0][0]
+        execStr = """SELECT uid FROM stacker WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+        uid = execSql.execSql(execStr)[0][0]
+
         content = api.content.get(UID=uid)
         numbers = content.numbers
         if numbers:
@@ -262,7 +275,7 @@ class DownloadStackerExcel(BrowserView):
         worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
         worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
 
-        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        worksheet1.merge_range('Q1:W2', '已填份數 / 總份數 = 回收率', title_style)
         if rate:
             worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
         else:
@@ -364,10 +377,16 @@ class DownloadCtypeExcel(BrowserView):
         period = request.get('period')
 
         execSql = SqlObj()
-        execStr = """SELECT COUNT(id), uid FROM c_type WHERE period = '{}' GROUP by uid""".format(period)
-        count_result = execSql.execSql(execStr)[0]
-        count = count_result[0]
-        uid = count_result[1]
+#        execStr = """SELECT COUNT(id), uid FROM c_type WHERE period = '{}' GROUP by uid""".format(period)
+#        count_result = execSql.execSql(execStr)[0]
+#        count = count_result[0]
+#        uid = count_result[1]
+
+        execStr = """SELECT COUNT(id) FROM c_type WHERE period = '{}'""".format(period)
+        count = execSql.execSql(execStr)[0][0]
+        execStr = """SELECT uid FROM c_type WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+        uid = execSql.execSql(execStr)[0][0]
+
         content = api.content.get(UID=uid)
         numbers = content.numbers
         if numbers:
@@ -403,7 +422,7 @@ class DownloadCtypeExcel(BrowserView):
         worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
         worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
 
-        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        worksheet1.merge_range('Q1:W2', '已填份數 / 總份數 = 回收率', title_style)
         if rate:
             worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
         else:
@@ -505,10 +524,17 @@ class DownloadEmergencyExcel(BrowserView):
         period = request.get('period')
 
         execSql = SqlObj()
-        execStr = """SELECT COUNT(id), uid FROM emergency WHERE period = '{}' GROUP by uid""".format(period)
-        count_result = execSql.execSql(execStr)[0]
-        count = count_result[0]
-        uid = count_result[1]
+
+#        execStr = """SELECT COUNT(id), uid FROM emergency WHERE period = '{}' GROUP by uid""".format(period)
+#        count_result = execSql.execSql(execStr)[0]
+#        count = count_result[0]
+#        uid = count_result[1]
+
+        execStr = """SELECT COUNT(id) FROM emergency WHERE period = '{}'""".format(period)
+        count = execSql.execSql(execStr)[0][0]
+        execStr = """SELECT uid FROM emergency WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+        uid = execSql.execSql(execStr)[0][0]
+
         content = api.content.get(UID=uid)
         numbers = content.numbers
         if numbers:
@@ -546,7 +572,7 @@ class DownloadEmergencyExcel(BrowserView):
         worksheet1.merge_range('A4:P6', '第%s期   【   %s   】   訓練班'  %(period, course), title_style)
         worksheet1.merge_range('A7:P9', '訓前調查表', title_style)
 
-        worksheet1.merge_range('Q1:W2', '已填人數 / 總人數 = 回收率', title_style)
+        worksheet1.merge_range('Q1:W2', '已填份數 / 總份數 = 回收率', title_style)
         if rate:
             worksheet1.merge_range('Q3:W4', '%s / %s = %s' %(count, numbers, rate), title_style)
         else:

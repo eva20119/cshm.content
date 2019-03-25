@@ -42,7 +42,7 @@ abs_url = api.portal.get().absolute_url()
 訓前
 <select name="course" id="course1">
     <option value="職業安全衛生管理員">職業安全衛生管理員 </option>
-    <option value="荷重再一噸以上之堆高機操作人員">荷重再一噸以上之堆高機操作人員</option>
+    <option value="荷重在一公噸以上之堆高機操作人員">荷重在一公噸以上之堆高機操作人員</option>
     <option value="丙種職業安全衛生業務主管">丙種職業安全衛生業務主管</option>
     <option value="急救人員">急救人員</option>
 </select>
@@ -97,6 +97,9 @@ $(document).ready(function(){
                 }else{
                     alert('查無資料！！')
                 }
+            },
+            error: function(){
+                alert('查無資料！！')
             }
         });
     })

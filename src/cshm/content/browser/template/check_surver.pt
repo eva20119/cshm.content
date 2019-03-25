@@ -30,8 +30,11 @@
 }
 
 </style>
+<?python
+import base64
+?>
 <form method="post" action="check_surver">
-  <h3>${view/course} 第${view/period}期</h3>
+  <h3>${python: view.course} 第${view/period}期</h3>
   <label>
       請填入座號
       <select name='seat_number'  id="seat_number">
@@ -45,6 +48,8 @@
 
 <script>
 $(function(){
+    $('.documentFirstHeading').html('<h2>中國勞工安全衛生管理學會</h2>')
+
     for(i=1; i<=60; i++){
         $('#seat_number').append('<option value=' + i + '>' + i + '</option>' )
     }

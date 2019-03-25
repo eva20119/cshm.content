@@ -19,15 +19,18 @@ td, th{
     text-align: center;
 }
 </style>
+<?python
+import base64
+?>
     <table>
       <tr>
         <th>
-             <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: view.context.Title()}">
+             <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: base64.b64encode(view.context.Title())}&uid=${view/context/UID}">
 職業安全衛生管理員學員訓前職能調查表</a>
         </th>
         <th>
-        <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: view.context.Title()}">
-荷重再一噸以上之堆高機操作人員學員訓前職能調查表</a>
+        <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: base64.b64encode(view.context.Title())}&uid=${view/context/UID}">
+荷重在一噸以上之堆高機操作人員學員訓前職能調查表</a>
         </th>
       </tr>
       <tr>
@@ -36,11 +39,11 @@ td, th{
       </tr>
       <tr>
         <th>
-          <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: view.context.Title()}">
+          <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: base64.b64encode(view.context.Title())}&uid=${view/context/UID}">
 丙種職業安全衛生業務主管學員訓前職能調查表</a>
         </th>
         <th>
-    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: view.context.Title()}">
+    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: base64.b64encode(view.context.Title())}&uid=${view/context/UID}">
 急救人員學員訓前職能調查表</a>
         </th>
       </tr>

@@ -201,8 +201,8 @@ class ResultSatisfaction(BrowserView):
 
         # 寄信通知
             if question9 or question10 or question11 or question12:
-                body_str = """科目:%s<br>課程:%s<br>期數:%s<br/>座號:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
-                    """ %(course, subject_name, period, seat, question9, question10, question11, question12)
+                body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
+                    """ %(course, subject_name, period, seat, teacher, date, question9, question10, question11, question12)
                 mime_text = MIMEText(body_str, 'html', 'utf-8')
                 api.portal.send_email(
                     recipient="lin@cshm.org.tw",
@@ -210,16 +210,27 @@ class ResultSatisfaction(BrowserView):
                     subject="%s-%s  意見提供" %(course, period),
                    body=mime_text.as_string(),
                 )
+                api.portal.send_email(
+                    recipient="yutin@cshm.org.tw",
+                    sender="henry@mingtak.com.tw",
+                    subject="%s-%s  意見提供" %(course, period),
+                   body=mime_text.as_string(),
+                )
 
             api.portal.show_message(message='填寫完成', type='info', request=request)
 
-        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
+        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, base64.b64encode(course), period))
 
 
 class Manager(BrowserView):
     template = ViewPageTemplateFile('template/manager.pt')
     def __call__(self):
-        self.course_title = self.request.get('course_title')
+        try:
+            self.course_title = base64.b64decode(self.request.get('course_title'))
+        except:
+            self.course_title = self.request.get('course_title')
+
+        self.uid = self.request.get('uid')
         return self.template()
 
 
@@ -242,7 +253,9 @@ class ResultManager(BrowserView):
         anw14 = request.get('anw14')
         course_name = request.get('course_name')
         course_period = request.get('course_period')
-        uid = self.context.UID()
+#        uid = self.context.UID()
+        uid = request.get('uid')
+
         # 處理複選
         new_anw6= ''
         if type(anw6) == list:
@@ -258,14 +271,20 @@ class ResultManager(BrowserView):
             """.format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, anw9, anw10, anw11, 
             anw12, anw13, anw14, uid)
         execSql.execSql(execStr)
+        return '填寫完成'
         api.portal.show_message(message='填寫完成', type='info', request=request)
-        request.response.redirect('%s/@@manager?course_title=%s_%s' %(api.portal.get().absolute_url(), course_name, course_period) )
+        course_title = base64.b64encode('%s_%s' %(course_name, course_period))
+        request.response.redirect('%s/@@manager?course_title=%s&uid=%s' %(api.portal.get().absolute_url(), course_title, uid) )
 
 
 class Stacker(BrowserView):
     template = ViewPageTemplateFile('template/stacker.pt')
     def __call__(self):
-        self.course_title = self.request.get('course_title')
+        try:
+            self.course_title = base64.b64decode(self.request.get('course_title'))
+        except:
+            self.course_title = self.request.get('course_title')
+        self.uid = self.request.get('uid')
         return self.template()
 
 
@@ -283,6 +302,9 @@ class ResultStacker(BrowserView):
         anw9 = request.get('anw9')
         course_name = request.get('course_name')
         course_period = request.get('course_period')
+#        uid = self.context.UID()
+        uid = request.get('uid')
+
         # 處理複選
         new_anw6= ''
         if type(anw6) == list:
@@ -292,18 +314,25 @@ class ResultStacker(BrowserView):
             new_anw6 = anw6
         execSql = SqlObj()
         execStr = """INSERT INTO `stacker`(course, period, `user`, `anw2`, `anw3`, `anw4`, `anw5`, `anw6`, 
-            `anw7`, `anw8`, `anw9`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
-            '{}','{}','{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
-            anw9)
+            `anw7`, `anw8`, `anw9`, uid) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
+            '{}','{}','{}', '{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
+            anw9, uid)
         execSql.execSql(execStr)
+        return '填寫完成'
         api.portal.show_message(message='填寫完成', type='info', request=request)
-        request.response.redirect('%s/@@stacker?course_title=%s_%s' %(api.portal.get().absolute_url(), course_name, course_period) )
+        course_title = base64.b64encode('%s_%s' %(course_name, course_period))
+        request.response.redirect('%s/@@stacker?course_title=%s&uid=%s'
+                                  %(api.portal.get().absolute_url(), course_title, uid) )
 
 
 class Emergency(BrowserView):
     template = ViewPageTemplateFile('template/emergency.pt')
     def __call__(self):
-        self.course_title = self.request.get('course_title')
+        try:
+            self.course_title = base64.b64decode(self.request.get('course_title'))
+        except:
+            self.course_title = self.request.get('course_title')
+        self.uid = self.request.get('uid')
         return self.template()
 
 
@@ -322,6 +351,9 @@ class ResultEmergency(BrowserView):
         anw10 = request.get('anw10')
         course_name = request.get('course_name')
         course_period = request.get('course_period')
+#        uid = self.context.UID()
+        uid = request.get('uid')
+
         # 處理複選
         new_anw6= ''
         if type(anw6) == list:
@@ -331,18 +363,24 @@ class ResultEmergency(BrowserView):
             new_anw6 = anw6
         execSql = SqlObj()
         execStr = """INSERT INTO `emergency`(course, period, `user`, `anw2`, `anw3`, `anw4`, `anw5`, `anw6`, 
-            `anw7`, `anw8`, `anw9`, `anw10`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
-            '{}','{}','{}','{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
-            anw9, anw10)
+            `anw7`, `anw8`, `anw9`, `anw10`, uid) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
+            '{}','{}','{}','{}', '{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
+            anw9, anw10, uid)
         execSql.execSql(execStr)
+        return '填寫完成'
         api.portal.show_message(message='填寫完成', type='info', request=request)
-        request.response.redirect('%s/@@emergency?course_title=%s_%s' %(api.portal.get().absolute_url(), course_name, course_period) )
+        course_title = base64.b64encode('%s_%s' %(course_name, course_period))
+        request.response.redirect('%s/@@emergency?course_title=%s&uid=%s' %(api.portal.get().absolute_url(), course_title, uid) )
 
 
 class Ctype(BrowserView):
     template = ViewPageTemplateFile('template/c_type.pt')
     def __call__(self):
-        self.course_title = self.request.get('course_title')
+        try:
+            self.course_title = base64.b64decode(self.request.get('course_title'))
+        except:
+            self.course_title = self.request.get('course_title')
+        self.uid = self.request.get('uid')
         return self.template()
 
 
@@ -360,6 +398,9 @@ class ResultCtype(BrowserView):
         anw9 = request.get('anw9')
         course_name = request.get('course_name')
         course_period = request.get('course_period')
+#        uid = self.context.UID()
+        uid = request.get('uid')
+
         # 處理複選
         new_anw6= ''
         if type(anw6) == list:
@@ -369,12 +410,14 @@ class ResultCtype(BrowserView):
             new_anw6 = anw6
         execSql = SqlObj()
         execStr = """INSERT INTO `c_type`(course, period, `user`, `anw2`, `anw3`, `anw4`, `anw5`, `anw6`, 
-            `anw7`, `anw8`, `anw9`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
-            '{}','{}','{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
-            anw9)
+            `anw7`, `anw8`, `anw9`, uid) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}',
+            '{}','{}','{}', '{}')""".format(course_name, course_period, anw1, anw2, anw3, anw4, anw5, new_anw6, anw7, anw8, 
+            anw9, uid)
         execSql.execSql(execStr)
+        return '填寫完成'
         api.portal.show_message(message='填寫完成', type='info', request=request)
-        request.response.redirect('%s/@@c_type?course_title=%s_%s' %(api.portal.get().absolute_url(), course_name, course_period) )
+        course_title = base64.b64encode('%s_%s' %(course_name, course_period))
+        request.response.redirect('%s/@@c_type?course_title=%s_%s' %(api.portal.get().absolute_url(), course_title, uid) )
 
 
 class FirePrevention(BrowserView):
@@ -622,7 +665,7 @@ class SurverView(BrowserView):
             satisfaction_url = """{}/satisfaction1?course_name={}&period={}&date={}&teacher={}""".format(abs_url, course_name, period, date, teacher)
             if course_name == '丙種職業安全衛生業務主管':
                 ex_url = "%s/surver1" % abs_url
-            elif course_name == '荷重再一噸以上之堆高機操作人員':
+            elif course_name == '荷重在一公噸以上之堆高機操作人員':
                 ex_url = "%s/surver2" % abs_url
             # 處理訓前網址
             if not ex_url_data.has_key(course_name):
@@ -648,6 +691,11 @@ class UploadCsvView(BrowserView):
 
 
 class UploadCsv(BrowserView):
+
+    def checkCourseName(self, course):
+        courseList = ['test', '職業安全管理師','職業衛生管理師','職業安全衛生管理員','甲種職業安全衛生業務主管','乙種職業安全衛生業務主管','丙種職業安全衛生業務主管','現場安全衛生監督人員','營造業甲種職業安全衛生業務主管','營造業乙種職業安全衛生業務主管','營造業丙種職業安全衛生業務主管','施工安全評估人員','製程安全評估人員','擋土支撐作業主管','模板支撐作業主管','隧道等挖掘作業主管','隧道等襯砌作業主管','施工架組配作業主管','鋼構組配作業主管','露天開挖作業主管','屋頂作業主管','有機溶劑作業主管','鉛作業主管','缺氧作業主管','特定化學物質作業主管','粉塵作業主管','防火管理人初訓','防火管理人複訓','急救人員','危險物品運送人員專業訓練(初訓)','吊升荷重在三公噸以上之固定式起重機操作人員','吊升荷重在三公噸以上之移動式起重機操作人員','甲級鍋爐操作人員','乙級鍋爐操作人員','丙級鍋爐操作人員','第一種壓力容器操作人員','高壓氣體特定設備操作人員','高壓氣體容器操作人員','高壓氣體製造安全主任','高壓氣體供應及消費作業主管','高壓氣體製造安全作業主管','高壓室內作業主管','小型鍋爐操作人員','荷重在一公噸以上之堆高機操作人員','吊升荷重在零點五公噸以上未滿三公噸之固定式起重機操作人員','吊升荷重在零點五公噸以上未滿三公噸之移動式起重機操作人員','使用起重機具從事吊掛作業人員','以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員','小型裝載機(小山貓)','一般安全衛生教育訓練','南科一般安全衛生教育訓練','隧道挖掘機考照班','挖掘機操作人員(輔導技能檢定)','乙級檢定考複習班','消防設備師','甲級安全師總複習班','甲級衛生師總複習班','堆高機技術士檢定輔導班','勞工安全衛生管理員輔導考照班','甲級廢棄物處裡技術人員(嘉藥科大專班)','乙級廢棄物處裡技術人員(嘉藥科大專班)','丙級廢棄物處裡技術人員(嘉藥科大專班)','三公噸以上固定式起重機架空式-地上操作輔導考照班','三公噸以上固定式起重機架空式-機上操作輔導考照班','三公噸以上移動式起重機伸臂可伸縮式輔導考照班','固定式起重機操作技術士檢定輔導班','室內空氣品質維護管理專責人員','業務主管結業測驗複習班','公寓大廈事務管理人員訓練','公寓大廈防火避難設施管理人員訓練','公寓大廈設備安全管理人員訓練','營造業工地主任220小時職能訓練','勞工健康服務護理人員','人因性危害評估專業人員','保稅工廠保稅業務人員','火藥爆破作業人員安全衛生訓練','一般高壓氣體類作業主管訓練','職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練','營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練','擋土支撐作業主管在職教育訓練','模板支撐作業主管在職教育訓練','施工架組配作業主管在職教育訓練','隧道等挖掘作業主管在職教育訓練','隧道等襯砌作業主管在職教育訓練','有機溶劑作業主管在職教育訓練','鉛作業主管在職教育訓練','粉塵作業主管在職教育訓練','缺氧作業主管在職教育訓練','特定化學物質作業主管在職教育訓練','急救人員在職教育訓練','固定式起重機操作人員在職教育訓練','移動式起重機操作人員在職教育訓練','荷重在一公噸以上之堆高機操作人員在職教育訓練','使用起重機具從事吊掛作業人員在職教育訓練','鍋爐操作人員在職教育訓練','第一種壓力容器操作人員安全衛生在職教育訓練','高壓氣體特定設備操作人員安全衛生在職教育訓練','有害作業主管在職教育訓練','以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練','營造業法施行前領有建築工程管理甲級或乙級技術士證者回訓課程講習','高壓室內作業人員在職教育訓練','高壓氣體、室內作業主管在職教育訓練','起重機操作及吊掛作業人員安全衛生在職教育訓練','具有危險性之機械操作人員在職教育訓練','具有危險性之設備操作人員在職教育訓練','各級業務主管在職教育訓練','高壓氣體作業主管在職教育訓練','營造作業主管在職教育訓練','一般安全衛生在職教育訓練','小型鍋爐操作人員在職教育訓練','火藥爆破作業人員在職教育訓練','露天開挖作業主管在職教育訓練','危險物品運送人員專業訓練(複訓)','起重機操作人員安全衛生在職教育訓練','鋼構組配作業主管在職教育訓練','高壓氣體容器操作人員安全衛生在職教育訓練','營造業業務主管人員在職教育訓練','施工安全評估人員在職教育訓練','危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練','製程安全評估人員在職教育訓練','人字臂起重桿操作人員安全衛生在職教育訓練','勞工健康服務護理人員在職教育訓練','具有危險性之設備暨小型鍋爐操作人員在職教育訓練','職業安全衛生管理人員在職教育訓練','職業安全衛生業務主管在職教育訓練','屋頂作業主管在職教育訓練','研討會','其他活動','98北市府專案一般安全衛生教育訓練─營造業','98北市府專案一般安全衛生教育訓練─局限空間作業','98北市府專案一般安全衛生教育訓練─住宿業','98北市府專案一般安全衛生教育訓練─製造業','98北市府專案一般安全衛生教育訓練─批發零售業','98北市府專案一般安全衛生教育訓練─金融及保險業','98北市府專案一般安全衛生教育訓練─醫療保健服務業','98北市府專案一般安全衛生教育訓練─餐館業','98北市府專案一般安全衛生教育訓練─建築物清潔服務業','98北市府專案一般安全衛生教育訓練─不動產及租賃業','98北市府專案一般安全衛生教育訓練─學校實驗室及實習工廠','98北市府專案一般安全衛生教育訓練─水電及燃氣供應業','98北市府專案一般安全衛生教育訓練─運輸及倉儲業','98北市府專案一般安全衛生教育訓練─保全業','98北市府專案一般安全衛生教育訓練─停車場業','98北市府專案一般安全衛生教育訓練─廢棄物處理及清除業','89勞委會委託辦理中小企業丙種勞工安全衛生業務主管函授教育訓練','一般安全衛生教育訓練-營造業','一般安全衛生教育訓練-營造業土木工程業','一般安全衛生教育訓練-營造業機電、電信及電路設備安裝業','一般安全衛生教育訓練-營造業屋頂作業','一般安全衛生教育訓練-營造業施工架作業','一般安全衛生教育訓練-營造業模板作業','一般安全衛生教育訓練-營造業泥作作業','一般安全衛生教育訓練-營造業清潔作業','一般安全衛生教育訓練-營造業金屬工程作業','一般安全衛生教育訓練-營造業拆除作業','一般安全衛生教育訓練-營造業鋼筋作業','一般安全衛生教育訓練-營造業油漆作業','一般安全衛生教育訓練-局限空間','一般安全衛生教育訓練-一般行業','一般安全衛生教育訓練-一般行業保全服務業','一般安全衛生教育訓練-一般行業餐旅業','一般安全衛生教育訓練-一般行業清潔服務業','一般安全衛生教育訓練-一般行業金融及保險業','一般安全衛生教育訓練-一般行業大眾傳播業','一般安全衛生教育訓練-一般行業水電燃氣業','一般安全衛生教育訓練-一般行業醫療保健服務業','一般安全衛生教育訓練-學校實驗室暨實習工廠','缺氧危害預防研討會','ISO45001說明會','安全衛生教育訓練單位之專責輔導員講習']
+        return course in courseList
+
     def __call__(self):
         request = self.request
         file_data = request.get('file_data')
@@ -667,14 +715,29 @@ class UploadCsv(BrowserView):
         result = api.content.find(context=portal['surver_content'], portal_type='Course')
         execSql = SqlObj()
         count = 0
+        flag = True
+        for item in reader:
+            course = item['course']
+            if course:
+                if not self.checkCourseName(course):
+                    flag = course
+                    break
+        if type(flag) == str:
+            api.portal.show_message(message='%s 不再課程名稱內!!!!' %flag, type='error', request=request)
+            request.response.redirect('%s/folder_contents' %portal.absolute_url())
+            return
+
         # 蒐集現有Course的名子及uid,方便後面比對
         for item in result:
             title = item.Title
             uid = item.UID
             course_list[title] = uid
+
+        f = StringIO(text)
+        reader = csv.DictReader(f, delimiter=',')
         for item in reader:
             try:
-                if item:
+                if item and item['course']:
                     # 課程名稱 + '_' + 期間
                     course = item['course']
                     period = item['period']
@@ -749,6 +812,7 @@ class CourseView(BrowserView):
         today = datetime.date.today()
         course = context.title.split('_')[0]
         period = context.title.split('_')[1]
+        uid = context.UID()
         numbers = context.numbers
         execSql = SqlObj()
         for item in subject_list.split('\n'):
@@ -768,6 +832,7 @@ class CourseView(BrowserView):
                 else:
                     rate = '尚未設定學生人數'
                 data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate])
+        course_name = base64.b64encode(course_name)
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
         # 滿意度
         qr = qrcode.QRCode()
@@ -778,26 +843,26 @@ class CourseView(BrowserView):
 
         # 四個訓前
         qr1 = qrcode.QRCode()
-        title = context.title
-        qr1.add_data('%s/@@manager?course_title=%s' %(abs_url, title))
+        title = base64.b64encode(context.title)
+        qr1.add_data('%s/@@manager?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
         qr1.make_image().save('url.png')
         img = open('url.png', 'rb')
         self.managerQRcode = base64.b64encode(img.read())
 
         qr2 = qrcode.QRCode()
-        qr2.add_data('%s/@@stacker?course_title=%s' %(abs_url, title))
+        qr2.add_data('%s/@@stacker?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
         qr2.make_image().save('url.png')
         img = open('url.png', 'rb')
         self.stackerQRcode = base64.b64encode(img.read())
 
         qr3 = qrcode.QRCode()
-        qr3.add_data('%s/@@c_type?course_title=%s' %(abs_url, title))
+        qr3.add_data('%s/@@c_type?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
         qr3.make_image().save('url.png')
         img = open('url.png', 'rb')
         self.c_typeQRcode = base64.b64encode(img.read())
 
         qr4 = qrcode.QRCode()
-        qr4.add_data('%s/@@emergency?course_title=%s' %(abs_url, title))
+        qr4.add_data('%s/@@emergency?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
         qr4.make_image().save('url.png')
         img = open('url.png', 'rb')
         self.emergencyQRcode = base64.b64encode(img.read())
@@ -816,7 +881,11 @@ class CheckSurver(BrowserView):
         request = self.request
         portal = api.portal.get()
         abs_url = portal.absolute_url()
-        course_name = request.get('course_name')
+#        course_name = base64.b64decode(request.get('course_name'))
+        course_name = request.get('course_name').decode()
+        if not (u'\u4e00' <= course_name[0] <= u'\u9fa5'):
+            course_name = base64.b64decode(request.get('course_name'))
+
         period = request.get('period')
         seat_number = request.get('seat_number', '')
         if seat_number:
@@ -856,11 +925,14 @@ class CheckSurver(BrowserView):
                     else:
                         url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                     break;
-            request.response.redirect(url)
-            return
+            if url:
+                request.response.redirect(url)
+                return
+            else:
+                return self.finished()
 
         self.course = course_name
-        self.period =period
+        self.period = period
         return self.template()
 
 
@@ -881,6 +953,8 @@ class CalculateSatisfaction(BrowserView):
         request = self.request
         course = request.get('course')
         period = request.get('period')
+        self.course = course
+        self.period = period
         execSql = SqlObj()
         execStr = """SELECT * FROM `satisfaction` WHERE course = '{}' AND period = '{}'
             """.format(course, period)
@@ -901,13 +975,43 @@ class CalculateSatisfaction(BrowserView):
         option3_data = []
         option4_data = []
 
-        numbers = api.content.find(portal_type='Course', SearchableText='%s_%s' %(course, period))[0].getObject().numbers
+        courseContent = api.content.find(portal_type='Course', index_course='%s_%s' %(course, period))[0].getObject()
+        numbers = courseContent.numbers
+        subject_list = courseContent.subject_list
+
         execStr = """SELECT COUNT(id) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
         write_number = execSql.execSql(execStr)
+#        execStr = """SELECT COUNT(DISTINCT(subject)) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
+        execStr = """SELECT DISTINCT(subject) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
+        countSubject = execSql.execSql(execStr)
+
+        # 在content的subject_list自定義課程人數
+        customData = {}
+        for item in subject_list.split('\r\n'):
+            course = item.split(',')[4]
+            try:
+                customNumber = item.split(',')[9]
+                customData[course] = customNumber
+            except:
+                pass
+
         if numbers:
+            countNumbers = 0
+            for subject in countSubject:
+                subject = subject[0]
+                if customData.has_key(subject):
+                    # 有可能是空值
+                    if customData[subject]:
+                        countNumbers += int(customData[subject])
+                    else:
+                        countNumbers += numbers
+                else:
+                    countNumbers += numbers
+
             self.count = write_number[0][0]
-            self.numbers = numbers
-            self.write_rate = round((float(write_number[0][0]) / float(numbers) * 100) , 2)
+#            self.numbers = numbers * countSubject
+            self.numbers = countNumbers
+            self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
         else:
             return '<h3>請設定學生人數</h3>'
 
@@ -1100,8 +1204,6 @@ class CalculateSatisfaction(BrowserView):
 
         self.anw_data = anw_data
         self.total_anw = total_anw
-        self.period = period
-        self.course = course
         return self.template()
 
 
@@ -1133,10 +1235,11 @@ class CalculateTraining(BrowserView):
                 '13': {},
                 '14': {},
             }
-            execStr = """SELECT COUNT(id), uid FROM manager WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
+            execStr = """SELECT COUNT(id) FROM manager WHERE period = '{}'""".format(period)
+            count = execSql.execSql(execStr)[0][0]
+            execStr = """SELECT uid FROM manager WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+            uid = execSql.execSql(execStr)[0][0]
+
             content = api.content.get(UID=uid)
             numbers = content.numbers
             if numbers:
@@ -1224,11 +1327,13 @@ class CalculateTraining(BrowserView):
             self.result = result
             return self.template_manager()
 
-        elif course == '荷重再一噸以上之堆高機操作人員':
-            execStr = """SELECT COUNT(id), uid FROM stacker WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
+        elif course == '荷重在一公噸以上之堆高機操作人員':
+
+            execStr = """SELECT COUNT(id) FROM stacker WHERE period = '{}'""".format(period)
+            count = execSql.execSql(execStr)[0][0]
+            execStr = """SELECT uid FROM stacker WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+            uid = execSql.execSql(execStr)[0][0]
+
             content = api.content.get(UID=uid)
             numbers = content.numbers
             if numbers:
@@ -1303,10 +1408,11 @@ class CalculateTraining(BrowserView):
             return self.template_stacker()
 
         elif course == '丙種職業安全衛生業務主管':
-            execStr = """SELECT COUNT(id), uid FROM c_type WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
+            execStr = """SELECT COUNT(id) FROM c_type WHERE period = '{}'""".format(period)
+            count = execSql.execSql(execStr)[0][0]
+            execStr = """SELECT uid FROM c_type WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+            uid = execSql.execSql(execStr)[0][0]
+
             content = api.content.get(UID=uid)
             numbers = content.numbers
             if numbers:
@@ -1381,10 +1487,11 @@ class CalculateTraining(BrowserView):
             return self.template_ctype()
 
         elif course == '急救人員':
-            execStr = """SELECT COUNT(id), uid FROM emergency WHERE period = '{}' GROUP by uid""".format(period)
-            count_result = execSql.execSql(execStr)[0]
-            count = count_result[0]
-            uid = count_result[1]
+            execStr = """SELECT COUNT(id) FROM emergency WHERE period = '{}'""".format(period)
+            count = execSql.execSql(execStr)[0][0]
+            execStr = """SELECT uid FROM emergency WHERE period = '{}' and uid != '' LIMIT 1""".format(period)
+            uid = execSql.execSql(execStr)[0][0]
+
             content = api.content.get(UID=uid)
             numbers = content.numbers
             if numbers:
@@ -1394,7 +1501,6 @@ class CalculateTraining(BrowserView):
             else:
                 self.rate = False
                 self.abs_url = content.absolute_url()
-
             execStr = """SELECT * FROM emergency WHERE period = '{}'""".format(period)
             result = execSql.execSql(execStr)
             data = {

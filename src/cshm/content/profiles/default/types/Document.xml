@@ -14,7 +14,7 @@
     <element value="emergency"/>
     <element value="c_type"/>
     <element value="fire_prevention"/>
-    <element value="show_satisfaction_statistics"/>
+    <element value="show_satisfaction"/>
     <element value="show_manager_statistics"/>
     <element value="show_fire_statistics"/>
   </property>

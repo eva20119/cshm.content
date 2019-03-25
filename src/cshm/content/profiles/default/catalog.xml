@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<object name="portal_catalog">
+  <!--<column value="my_meta_column"/>-->
+  <index name="index_course" meta_type="FieldIndex">
+    <indexed_attr value="index_course" />
+  </index>
+  <column value="index_course"/>
+
+</object>
+
