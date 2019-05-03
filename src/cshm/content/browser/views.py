@@ -718,14 +718,23 @@ class UploadCsv(BrowserView):
         flag = True
         for item in reader:
             course = item['course']
+            year = int(item['year'])
             if course:
                 if not self.checkCourseName(course):
                     flag = course
                     break
+                if year < 1000:
+                    flag = year
+
         if type(flag) == str:
             api.portal.show_message(message='%s 不再課程名稱內!!!!' %flag, type='error', request=request)
             request.response.redirect('%s/folder_contents' %portal.absolute_url())
             return
+        if type(flag) == int:
+            api.portal.show_message(message='%s 年份錯誤!!!!' %flag, type='error', request=request)
+            request.response.redirect('%s/folder_contents' %portal.absolute_url())
+            return
+
 
         # 蒐集現有Course的名子及uid,方便後面比對
         for item in result:
