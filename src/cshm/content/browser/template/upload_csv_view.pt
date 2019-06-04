@@ -16,18 +16,26 @@ input{
 }
 </style>
 
+<h3 style='color: red'>特別注意事項：</h3>
+<h3>上傳檔名說明：課程_期別_教學中心.xlsx<span style='color: red;margin-left: 15px'>EX: 急救人員_1144_中壢.xlsx</span></h3>
+<h3>教學中心名稱：<span style='color: blue'>台北,花蓮,桃園,中壢,嘉義,南科,高雄,台中</span></h3>
+<br>
 <form action="upload_csv" method="post">
     <input type="file" onchange="showPreview(this)" />
     <input type="hidden" id='text' name="file_data"/>
+    <input type="hidden" id='file_name' name="file_name"/>
     <input type="submit" value="Send"/>
 </form>
 <script type="text/javascript">
+        document.getElementsByClassName('documentFirstHeading')[0].innerText = '檔案上傳'
+
 		function showPreview(source) {
 			var file = source.files[0];
 			if(window.FileReader) {
 				var fr = new FileReader();
 				fr.onloadend = function(e) {
-                    debugger                
+                    debugger
+                    $('#file_name').val(file.name)
                     $('#text').val(e.currentTarget.result)
 				};
 				fr.readAsDataURL(file);

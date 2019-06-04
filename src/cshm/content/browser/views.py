@@ -204,18 +204,47 @@ class ResultSatisfaction(BrowserView):
                 body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
                     """ %(course, subject_name, period, seat, teacher, date, question9, question10, question11, question12)
                 mime_text = MIMEText(body_str, 'html', 'utf-8')
-                api.portal.send_email(
-                    recipient="lin@cshm.org.tw",
-                    sender="henry@mingtak.com.tw",
-                    subject="%s-%s  意見提供" %(course, period),
-                   body=mime_text.as_string(),
-                )
-                api.portal.send_email(
-                    recipient="yutin@cshm.org.tw",
-                    sender="henry@mingtak.com.tw",
-                    subject="%s-%s  意見提供" %(course, period),
-                   body=mime_text.as_string(),
-                )
+
+                execStr = """SELECT location FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
+                    """.format(course, period, subject_name)
+                location = execSql.execSql(execStr)
+                try:
+                    location = location[0][0]
+                    if location:
+                        email = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject().description.split('\r\n')
+                    else:
+                        email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
+                except:
+                    email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
+                    temp = '%s設定錯誤' %location
+                    body_str = "%s<br>%s" %(temp, body_str)
+
+                for i in email:
+                    aa = api.portal.send_email(
+                        recipient=i,
+                        sender="henry@mingtak.com.tw",
+                        subject="%s-%s  意見提供" %(course, period),
+                        body=mime_text.as_string(),
+                    )
+
+#                mime_text = MIMEText(body_str, 'html', 'utf-8')
+#                api.portal.send_email(
+#                    recipient="lin@cshm.org.tw",
+#                    sender="henry@mingtak.com.tw",
+#                    subject="%s-%s  意見提供" %(course, period),
+#                   body=mime_text.as_string(),
+#                )
+#                api.portal.send_email(
+#                    recipient="yutin@cshm.org.tw",
+#                    sender=#                api.portal.send_email(
+#                    recipient="lin@cshm.org.tw",
+#                    sender="henry@mingtak.com.tw",
+#                    subject="%s-%s  意見提供" %(course, period),
+#                   body=mime_text.as_string(),
+#                )"henry@mingtak.com.tw",
+#                    subject="%s-%s  意見提供" %(course, period),
+#                   body=mime_text.as_string(),
+#                )
 
             api.portal.show_message(message='填寫完成', type='info', request=request)
 
@@ -698,8 +727,31 @@ class UploadCsv(BrowserView):
 
     def __call__(self):
         request = self.request
+        portal = api.portal.get()
         file_data = request.get('file_data')
         file_data = file_data.split(',')[1]
+
+        try:
+            file_name = request.get('file_name', '')
+            file_name = file_name.split('_')[1].split('.csv')[0]
+
+            file_dict = {
+                '台北': 'taipe',
+                '花蓮': 'hualien',
+                '桃園': 'taoyuan',
+                '中壢': 'lieutenant',
+                '嘉義': 'chiayi',
+                '南科': 'nanke',
+                '高雄': 'kaohsiung',
+                '台中': 'taichung'
+            }
+            location = file_dict[file_name]
+        except:
+                api.portal.show_message(message='地點錯誤!!!!', type='error', request=request)
+                request.response.redirect('%s/folder_contents' %portal.absolute_url())
+                return
+
+
         text = base64.b64decode(file_data)
         try:
             text = text.decode('utf-8')
@@ -711,7 +763,6 @@ class UploadCsv(BrowserView):
         create_data = {}
         exist_data = {}
         course_list = {}
-        portal = api.portal.get()
         result = api.content.find(context=portal['surver_content'], portal_type='Course')
         execSql = SqlObj()
         count = 0
@@ -762,14 +813,14 @@ class UploadCsv(BrowserView):
                                 """.format(course, period, subject)
                     if execSql.execSql(execStr):
                         execStr = """UPDATE course_list SET start_time='{}', week='{}', hour='{}', teacher='{}', 
-                                    number='{}', classroom='{}' WHERE course = '{}' AND period = '{}' AND subject = '{}'
+                                    number='{}', classroom='{}' WHERE course = '{}' AND period = '{}' AND subject = '{}' AND location = '{}'
                                     """.format(start_time, item['week'], item['hour'], item['teacher'], 
-                                    item['number'], item['classroom'], course, period, subject)
+                                    item['number'], item['classroom'], course, period, subject, location)
                     else:
                         execStr = """INSERT INTO `course_list`(`course`, `period`, `start_time`, `week`, `subject`, `hour`, 
-                            `teacher`, `number`, `classroom`, `quiz`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}')
+                            `teacher`, `number`, `classroom`, `quiz`, `location`) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}', '{}', '{}')
                             """.format(course, period, start_time, item['week'], subject,
-                               item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'])
+                               item['hour'], item['teacher'], item['number'], item['classroom'], item['quiz'], location)
                     print '33333'
 #                    import pdb; pdb.set_trace()
                     execSql.execSql(execStr)
@@ -787,8 +838,8 @@ class UploadCsv(BrowserView):
                             create_data[course_period] = data
             except Exception as e:
                 count += 1
-#                import pdb;pdb.set_trace()
                 print e
+                import pdb;pdb.set_trace()
         if count == 0:
             try:
                 # 更新
