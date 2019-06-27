@@ -807,7 +807,7 @@ class UploadCsv(BrowserView):
                     # 用在顯示格別科目
                     data = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n' %(item['quiz'], date, item['time'],
                                 item['week'], subject, item['hour'], item['teacher'], item['number'], item['classroom'])
-                    start_time = '%s %s:00:00' %(date, item['time'][:2])
+                    start_time = '%s %s:%s:00' %(date, item['time'][:2], item['time'][2:4])
                     # 寫進資料庫，之後用來顯示問卷
                     execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
                                 """.format(course, period, subject)
@@ -944,7 +944,10 @@ class CheckSurver(BrowserView):
 #        course_name = base64.b64decode(request.get('course_name'))
         course_name = request.get('course_name').decode()
         if not (u'\u4e00' <= course_name[0] <= u'\u9fa5'):
-            course_name = base64.b64decode(request.get('course_name'))
+            try:
+                course_name = base64.b64decode(request.get('course_name'))
+            except:
+                course_name = base64.b64decode(request.get('course_name').replace(' ', '+'))
 
         period = request.get('period')
         seat_number = request.get('seat_number', '')
