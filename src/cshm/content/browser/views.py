@@ -16,6 +16,7 @@ import requests
 from email.mime.text import MIMEText
 import xlsxwriter
 import inspect
+import urllib
 
 
 class CreateNews(BrowserView):
@@ -190,34 +191,33 @@ class ResultSatisfaction(BrowserView):
                 period, date, teacher, question1, question2, question3, question4, question5, 
                 question6, question7, question8, question9, question10, question11, question12, seat)
             execSql.execSql(execStr)
-#        identify = '%s_%s_%s' %(course, period ,subject_name)
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
-#        already_write.append(identify)
-#        request.response.setCookie('already_write', json.dumps(already_write))
 
         # 寄信通知
             if question9 or question10 or question11 or question12:
-                body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
-                    """ %(course, subject_name, period, seat, teacher, date, question9, question10, question11, question12)
-                mime_text = MIMEText(body_str, 'html', 'utf-8')
 
                 execStr = """SELECT location FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
                     """.format(course, period, subject_name)
                 location = execSql.execSql(execStr)
+                flag = True
                 try:
                     location = location[0][0]
                     if location:
                         email = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject().description.split('\r\n')
                     else:
+                        location = 'taipei'
                         email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
                 except:
+                    location = 'taipei'
                     email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
-                    temp = '%s設定錯誤' %location
-                    body_str = "%s<br>%s" %(temp, body_str)
+                    flag = False
+
+                body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>教學中心:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
+                    """ %(course, subject_name, period, seat, teacher, date, location, question9, question10, question11, question12)
+                if not flag:
+                    body_str += '教學中心設定錯誤，請去更改\r教學中心設定錯誤，請去更改'
+
+                mime_text = MIMEText(body_str, 'html', 'utf-8')
+
 
                 for i in email:
                     aa = api.portal.send_email(
@@ -227,28 +227,16 @@ class ResultSatisfaction(BrowserView):
                         body=mime_text.as_string(),
                     )
 
-#                mime_text = MIMEText(body_str, 'html', 'utf-8')
-#                api.portal.send_email(
-#                    recipient="lin@cshm.org.tw",
-#                    sender="henry@mingtak.com.tw",
-#                    subject="%s-%s  意見提供" %(course, period),
-#                   body=mime_text.as_string(),
-#                )
-#                api.portal.send_email(
-#                    recipient="yutin@cshm.org.tw",
-#                    sender=#                api.portal.send_email(
-#                    recipient="lin@cshm.org.tw",
-#                    sender="henry@mingtak.com.tw",
-#                    subject="%s-%s  意見提供" %(course, period),
-#                   body=mime_text.as_string(),
-#                )"henry@mingtak.com.tw",
-#                    subject="%s-%s  意見提供" %(course, period),
-#                   body=mime_text.as_string(),
-#                )
+                aa = api.portal.send_email(
+                    recipient="yutin@cshm.org.tw",
+                    sender="henry@mingtak.com.tw",
+                    subject="%s-%s  意見提供" %(course, period),
+                    body=mime_text.as_string(),
+                )
 
             api.portal.show_message(message='填寫完成', type='info', request=request)
 
-        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, base64.b64encode(course), period))
+        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
 
 
 class Manager(BrowserView):
@@ -736,7 +724,7 @@ class UploadCsv(BrowserView):
             file_name = file_name.split('_')[1].split('.csv')[0]
 
             file_dict = {
-                '台北': 'taipe',
+                '台北': 'taipei',
                 '花蓮': 'hualien',
                 '桃園': 'taoyuan',
                 '中壢': 'lieutenant',
@@ -892,7 +880,8 @@ class CourseView(BrowserView):
                 else:
                     rate = '尚未設定學生人數'
                 data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate])
-        course_name = base64.b64encode(course_name)
+#        course_name = base64.b64encode(course_name)
+        course_name = urllib.quote(course_name.encode('utf-8'))
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
         # 滿意度
         qr = qrcode.QRCode()
@@ -941,14 +930,7 @@ class CheckSurver(BrowserView):
         request = self.request
         portal = api.portal.get()
         abs_url = portal.absolute_url()
-#        course_name = base64.b64decode(request.get('course_name'))
         course_name = request.get('course_name').decode()
-        if not (u'\u4e00' <= course_name[0] <= u'\u9fa5'):
-            try:
-                course_name = base64.b64decode(request.get('course_name'))
-            except:
-                course_name = base64.b64decode(request.get('course_name').replace(' ', '+'))
-
         period = request.get('period')
         seat_number = request.get('seat_number', '')
         if seat_number:
@@ -981,8 +963,7 @@ class CheckSurver(BrowserView):
                 item_datetime = tmp['start_time']
                 teacher = tmp['teacher']
                 identify = '%s_%s_%s' %(course, period, subject)
-
-                if identify not in already_write:
+                if now >= item_datetime and now <= item_datetime + datetime.timedelta(days=1) and identify not in already_write:
                     if quiz == '是':
                         url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                     else:
