@@ -43,7 +43,7 @@ p{
 from plone import api
 abs_url = api.portal.get().absolute_url()
 ?>
-<p class="col-xs-12 col-sm-12" style="margin:0">尚未填寫完的問卷：</p>
+<p class="col-xs-12 col-sm-12" style="margin:0">尚未填寫完的問卷(${python: len(view.ex_data)})：</p>
 <select id='ex_data' class="col-xs-8 col-sm-8" tal:condition="view/ex_data" style="margin:0 15px 10px 15px ">
     <option>請選擇</option>
     <option tal:repeat="ex_data view/ex_data" data-url="${python:ex_data[1]}">${python:ex_data[0]}</option>
@@ -190,6 +190,7 @@ abs_url = api.portal.get().absolute_url()
 
 <script>
 $(function(){
+    $('.documentFirstHeading').text('${view/course_name}-${view/period}期')
     $('#ex_data').change(function(){
         if($(this).val() != '請選擇'){
             url = $('option:checked').data('url')

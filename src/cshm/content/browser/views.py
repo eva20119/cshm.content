@@ -17,6 +17,8 @@ from email.mime.text import MIMEText
 import xlsxwriter
 import inspect
 import urllib
+import smtplib
+from email.header import Header
 
 
 class CreateNews(BrowserView):
@@ -202,41 +204,34 @@ class ResultSatisfaction(BrowserView):
                 try:
                     location = location[0][0]
                     if location:
-                        email = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject().description.split('\r\n')
+                        content = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject()
+                        email = content.description.split('\r\n')
+                        trainingCenter = content.title
                     else:
-                        location = 'taipei'
+                        trainingCenter = '台北'
                         email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
                 except:
-                    location = 'taipei'
+                    trainingCenter = '台北'
                     email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
                     flag = False
 
                 body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>教學中心:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
-                    """ %(course, subject_name, period, seat, teacher, date, location, question9, question10, question11, question12)
+                    """ %(course, subject_name, period, seat, teacher, date, trainingCenter, question9, question10, question11, question12)
                 if not flag:
                     body_str += '教學中心設定錯誤，請去更改\r教學中心設定錯誤，請去更改'
 
                 mime_text = MIMEText(body_str, 'html', 'utf-8')
+                mime_text['Subject'] = Header("%s-%s-%s  意見提供" %(course, period, trainingCenter), 'utf-8')
 
+                smtpObj = smtplib.SMTP('localhost')
+                smtpObj.sendmail('henry@mingtak.com.tw', 'yutin@cshm.org.tw', mime_text.as_string())
 
                 for i in email:
-                    aa = api.portal.send_email(
-                        recipient=i,
-                        sender="henry@mingtak.com.tw",
-                        subject="%s-%s  意見提供" %(course, period),
-                        body=mime_text.as_string(),
-                    )
-
-                aa = api.portal.send_email(
-                    recipient="yutin@cshm.org.tw",
-                    sender="henry@mingtak.com.tw",
-                    subject="%s-%s  意見提供" %(course, period),
-                    body=mime_text.as_string(),
-                )
+                    smtpObj.sendmail('henry@mingtak.com.tw', i, mime_text.as_string())
 
             api.portal.show_message(message='填寫完成', type='info', request=request)
 
-        request.response.redirect('%s/check_surver?course_name=%s&period=%s' %(abs_url, course, period))
+        request.response.redirect('%s/check_surver?course_name=%s&period=%s&seat_number=%s' %(abs_url, course, period, seat))
 
 
 class Manager(BrowserView):
@@ -870,16 +865,22 @@ class CourseView(BrowserView):
                 execStr = """SELECT DISTINCT(seat) FROM satisfaction WHERE course = '{}' AND period = '{}' AND subject = '{}'
                     ORDER BY seat""".format(course, period, subject)
                 result = execSql.execSql(execStr)
-                seat_str = ''
-                count = 0
-                for seat in result:
-                    count += 1
-                    seat_str += '%s,' %dict(seat)['seat']
+                result = [i[0] for i in result ]
+
+                count = len(result)
+                seat_str = ','.join([str(i) for i in result])
+                notWrite = []
+
                 if numbers:
                     rate ='%s%%' %(round(float(count) / float(numbers), 2) * 100)
+                    for i in range(1, numbers + 1):
+                        if i not in result:
+                             notWrite.append(i)
+                    not_seat_str = ','.join([str(i) for i in notWrite])
                 else:
                     rate = '尚未設定學生人數'
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate])
+                    not_seat_str = '尚未設定學生人數'
+                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate, not_seat_str, count])
 #        course_name = base64.b64encode(course_name)
         course_name = urllib.quote(course_name.encode('utf-8'))
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
@@ -926,13 +927,19 @@ class CourseView(BrowserView):
 class CheckSurver(BrowserView):
     template = ViewPageTemplateFile('template/check_surver.pt')
     finished = ViewPageTemplateFile('template/finished.pt')
+    overtime = ViewPageTemplateFile('template/overtime.pt')
     def __call__(self):
         request = self.request
         portal = api.portal.get()
         abs_url = portal.absolute_url()
-        course_name = request.get('course_name').decode()
+
+        course_name = request.get('course_name')
         period = request.get('period')
+        if not api.content.find(Title='%s_%s' %(course_name, period)):
+            course_name = base64.b64decode(course_name)
+
         seat_number = request.get('seat_number', '')
+        ignore = request.get('ignore', False)
         if seat_number:
             now = datetime.datetime.now()
             now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -940,6 +947,15 @@ class CheckSurver(BrowserView):
             data = {}
             already_write = []
             execSql = SqlObj()
+
+            sqlStr = """SELECT MAX(start_time) as max  FROM course_list WHERE course = '{}' AND period = '{}'""".format(course_name, period)
+            maxTime = execSql.execSql(sqlStr)[0]['max']
+#            maxTime = datetime.datetime.combine(maxTime + datetime.timedelta(days=1), datetime.time(12,0))
+            maxTime = maxTime.date() + datetime.timedelta(days=2)
+
+            if not ignore and maxTime <= now.date() and ((course_name != '缺氧作業主管' and period != '412') and (course_name != '使用起重機具從事吊掛作業人員' and period != '333') and (course_name != '吊升荷重在零點五公噸以上未滿三公噸之移動式起重機操作人員' and period != '8') and (course_name != '荷重在一公噸以上之堆高機操作人員' and period != '1261')):
+                return self.overtime()
+
             execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time <= '{}' ORDER BY            
                 start_time DESC""".format(course_name, period, now_datetime)
             result = execSql.execSql(execStr)
@@ -947,6 +963,8 @@ class CheckSurver(BrowserView):
             execStr = """SELECT course,period,subject FROM `satisfaction` WHERE seat = '{}' AND course = '{}' AND 
                 period = '{}'""".format(seat_number, course_name, period)
             satisfaction_result = execSql.execSql(execStr)
+
+
             for item in satisfaction_result:
                 tmp = dict(item)
                 course = tmp['course']
@@ -963,7 +981,7 @@ class CheckSurver(BrowserView):
                 item_datetime = tmp['start_time']
                 teacher = tmp['teacher']
                 identify = '%s_%s_%s' %(course, period, subject)
-                if now >= item_datetime and now <= item_datetime + datetime.timedelta(days=1) and identify not in already_write:
+                if identify not in already_write:
                     if quiz == '是':
                         url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                     else:
@@ -987,6 +1005,7 @@ class ShowStatistics(BrowserView):
 
         execStr = """SELECT DISTINCT(course) FROM `course_list`"""
         result = execSql.execSql(execStr)
+        self.mode = self.request.get('mode', 0)
         self.result = result
         return self.template()
 
@@ -1021,44 +1040,63 @@ class CalculateSatisfaction(BrowserView):
 
         courseContent = api.content.find(portal_type='Course', index_course='%s_%s' %(course, period))[0].getObject()
         numbers = courseContent.numbers
-        subject_list = courseContent.subject_list
-
-        execStr = """SELECT COUNT(id) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-        write_number = execSql.execSql(execStr)
-#        execStr = """SELECT COUNT(DISTINCT(subject)) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-        execStr = """SELECT DISTINCT(subject) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-        countSubject = execSql.execSql(execStr)
-
-        # 在content的subject_list自定義課程人數
-        customData = {}
-        for item in subject_list.split('\r\n'):
-            course = item.split(',')[4]
-            try:
-                customNumber = item.split(',')[9]
-                customData[course] = customNumber
-            except:
-                pass
-
-        if numbers:
-            countNumbers = 0
-            for subject in countSubject:
-                subject = subject[0]
-                if customData.has_key(subject):
-                    # 有可能是空值
-                    if customData[subject]:
-                        countNumbers += int(customData[subject])
-                    else:
-                        countNumbers += numbers
-                else:
-                    countNumbers += numbers
-
-            self.count = write_number[0][0]
-#            self.numbers = numbers * countSubject
-            self.numbers = countNumbers
-            self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
-        else:
+        if not numbers:
             return '<h3>請設定學生人數</h3>'
 
+        sqlStr = """SELECT COUNT(id), subject FROM `satisfaction` WHERE course = '{}' AND period = {} GROUP BY subject""".format(course, period)
+        writeResult = execSql.execSql(sqlStr)
+        writeCount = {}
+        count = 0
+        for i in writeResult:
+            writeCount[i[1]] = round((float(i[0]) / float(numbers) * 100), 2)
+            count += i[0]
+        self.writeCount = writeCount
+        self.count = count
+        self.numbers = numbers * len(writeCount.keys())
+        self.write_rate = round((float(count) / float(self.numbers) * 100) , 2)
+#        self.count = write_number[0][0]
+#        self.numbers = numbers * countSubject
+#        self.numbers = countNumbers
+#        self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
+
+
+#        subject_list = courseContent.subject_list
+
+#        execStr = """SELECT COUNT(id) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
+#        write_number = execSql.execSql(execStr)
+
+#        execStr = """SELECT DISTINCT(subject) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
+#        countSubject = execSql.execSql(execStr)
+
+        # 在content的subject_list自定義課程人數
+#        customData = {}
+#        for item in subject_list.split('\r\n'):
+#            course = item.split(',')[4]
+#            try:
+#                customNumber = item.split(',')[9]
+#                customData[course] = customNumber
+#            except:
+#                pass
+#        if numbers:
+#            countNumbers = 0
+#            for subject in countSubject:
+#                import pdb;pdb.set_trace()
+#                subject = subject[0]
+#                if customData.has_key(subject):
+                    # 有可能是空值
+#                    if customData[subject]:
+#                        countNumbers += int(customData[subject])
+#                    else:
+#                        countNumbers += numbers
+#                else:
+#                    countNumbers += numbers
+
+#            self.count = write_number[0][0]
+#            self.numbers = numbers * countSubject
+#            self.numbers = countNumbers
+#            self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
+#        else:
+#            return '<h3>請設定學生人數</h3>'
         for item in result:
             tmp = dict(item)
             teacher = tmp['teacher'].strip()
@@ -1655,6 +1693,7 @@ class DownloadExcel(BrowserView):
         point_envir = request.get('point_envir')
         point_teacher = request.get('point_teacher')
         point_total = request.get('point_total')
+        writeCount = json.loads(request.get('writeCount'))
 
         output = StringIO()
         workbook = xlsxwriter.Workbook(output)
@@ -1789,29 +1828,31 @@ class DownloadExcel(BrowserView):
             'bg_color': '#000000'
         })
 
-        worksheet1.merge_range('A80:C81', '第%s期' %period, merge_format2)
-        worksheet1.merge_range('D80:I81', course, merge_format2)
-        worksheet1.merge_range('J80:L81', '訓練班', merge_format2)
-        worksheet1.merge_range('A83:L83', '總體權值分數', merge_format2)
-        worksheet1.merge_range('A84:L84', point_total, merge_format)
+        worksheet1.merge_range('A80:D81', '第%s期' %period, merge_format2)
+        worksheet1.merge_range('E80:I81', course, merge_format2)
+        worksheet1.merge_range('J80:N81', '訓練班', merge_format2)
+        worksheet1.merge_range('A83:N83', '總體權值分數', merge_format2)
+        worksheet1.merge_range('A84:N84', point_total, merge_format)
         worksheet1.merge_range('A85:D85', '環境權值分數', merge_format2)
-        worksheet1.merge_range('E85:H85', '輔導員權值分數', merge_format2)
-        worksheet1.merge_range('I85:L85', '講師整體權值分數', merge_format2)
+        worksheet1.merge_range('E85:J85', '輔導員權值分數', merge_format2)
+        worksheet1.merge_range('K85:N85', '講師整體權值分數', merge_format2)
         worksheet1.merge_range('A86:D86', point_space, merge_format)
-        worksheet1.merge_range('E86:H86', point_envir, merge_format)
-        worksheet1.merge_range('I86:L86', point_teacher, merge_format)
+        worksheet1.merge_range('E86:J86', point_envir, merge_format)
+        worksheet1.merge_range('K86:N86', point_teacher, merge_format)
 
         worksheet1.merge_range('A87:B87', '日期', merge_format2)
         worksheet1.merge_range('C87:F87', '科目', merge_format2)
         worksheet1.merge_range('G87:H87', '講師', merge_format2)
         worksheet1.merge_range('I87:J87', '平均權值', merge_format2)
         worksheet1.merge_range('K87:L87', '權值分數', merge_format2)
+        worksheet1.merge_range('M87:N87', '填寫率', merge_format2)
+
 
         write_rate = request.get('write_rate')
         count = request.get('count')
         numbers = request.get('numbers')
-        worksheet1.merge_range('N87:Q87', '已填人數 / 總人數 = 回收率', merge_format2)
-        worksheet1.merge_range('N88:Q88', '%s / %s = %s%%' %(count, numbers, write_rate), merge_format)
+        worksheet1.merge_range('P87:S87', '已填人數 / 總人數 = 回收率', merge_format2)
+        worksheet1.merge_range('P88:S88', '%s / %s = %s%%' %(count, numbers, write_rate), merge_format)
 
         count = 1
         row = 88
@@ -1821,6 +1862,8 @@ class DownloadExcel(BrowserView):
             worksheet1.merge_range('G%s:H%s' %(row, row), i[1], merge_format)
             worksheet1.merge_range('I%s:J%s' %(row, row), i[2], merge_format)
             worksheet1.merge_range('K%s:L%s' %(row, row), i[2] * 20, merge_format)
+            worksheet1.merge_range('M%s:N%s' %(row, row), '%s%%' %writeCount[i[3]], merge_format)
+
             count += 1
             row += 1
         workbook.close()

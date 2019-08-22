@@ -13,6 +13,57 @@ import xlsxwriter
 import inspect
 
 
+class DownloadOpinion(BrowserView):
+    def __call__(self):
+        request = self.request
+        response = request.response
+        course = request.get('course')
+        period = request.get('period')
+        execSql = SqlObj()
+        sqlStr = """SELECT seat, subject, date, teacher, question9, question10, question11, question12 FROM satisfaction WHERE
+                    (question9 != '' OR question10 != '' OR question11 != '' OR question12 != '') AND course = '{}' AND period = {}
+                    ORDER BY date""".format(course, period)
+        result = execSql.execSql(sqlStr)
+
+        output = StringIO()
+        workbook = xlsxwriter.Workbook(output)
+        merge_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+        })
+
+        worksheet1 = workbook.add_worksheet('Sheet1')
+
+        worksheet1.merge_range('A1:D1', '課程', merge_format)
+        worksheet1.merge_range('E1:F1', '座號', merge_format)
+        worksheet1.merge_range('G1:I1', '上課時間', merge_format)
+        worksheet1.merge_range('J1:K1', '老師', merge_format)
+        worksheet1.merge_range('L1:O1', '意見一', merge_format)
+        worksheet1.merge_range('P1:S1', '意見二', merge_format)
+        worksheet1.merge_range('T1:W1', '意見三', merge_format)
+        worksheet1.merge_range('X1:AA1', '意見四', merge_format)
+
+        index = 2
+        for i in result:
+            worksheet1.merge_range('A%s:D%s' %(index, index), i[1], merge_format)
+            worksheet1.merge_range('E%s:F%s' %(index, index), str(i[0]), merge_format)
+            worksheet1.merge_range('G%s:I%s' %(index, index), i[2], merge_format)
+            worksheet1.merge_range('J%s:K%s' %(index, index), i[3].encode(), merge_format)
+            worksheet1.merge_range('L%s:O%s' %(index, index), i[4].encode(), merge_format)
+            worksheet1.merge_range('P%s:S%s' %(index, index), i[5].encode(), merge_format)
+            worksheet1.merge_range('T%s:W%s' %(index, index), i[6].encode(), merge_format)
+            worksheet1.merge_range('X%s:AA%s' %(index, index), i[7].encode(), merge_format)
+            index += 1
+        workbook.close()
+
+        response.setHeader('Content-Type',  'application/x-xlsx')
+        response.setHeader('Content-Disposition', 'attachment; filename="%s-%s 意見回饋.xlsx"' %(course, period))
+        return output.getvalue()
+
+
+
 class DownloadManagerExcel(BrowserView):
     def __call__(self):
         request = self.request

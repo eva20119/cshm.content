@@ -18,6 +18,13 @@
       directory="static"
       />
   <browser:page
+      name='download_opinion'
+      for='*'
+      class='.download_excel.DownloadOpinion'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
       name='create_news'
       for='*'
       class='.views.CreateNews'

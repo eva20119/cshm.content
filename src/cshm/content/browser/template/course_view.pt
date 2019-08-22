@@ -72,6 +72,8 @@ import base64
         教室：<span>${python:item[7]}</span><br>
         <br>
         <p>以填座號：${python:item[8]}</p>
+        <p>未填座號：${python: item[10]}</p>
+        <p>填寫人數/總計數量： ${python: '%s/%s' %(item[11], view.context.numbers) if view.context.numbers else '尚未設定學生人數'}</p>
         <p>回收率: ${python: item[9]}</p>
         <hr/>
     </div>

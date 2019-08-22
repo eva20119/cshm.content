@@ -58,6 +58,16 @@ abs_url = api.portal.get().absolute_url()
 期數 <input type="number" id="period2"  />
 <button class='send' data-target="2" data-selected="2">送出</button>
 
+<tal:cond condition='view/mode'>
+  <form method='post' action='download_opinion'>
+    意見回饋
+    <select name='course' required>
+        <option tal:repeat="item view/result" value="${python: item[0]}">${python:item[0]}</option>
+    </select>
+    期數 <input type="number" name="period"  required/>
+    <button>送出</button>
+  </form>
+</tal:cond>
 
 <div id="result"></div>
 
