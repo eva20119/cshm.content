@@ -195,8 +195,7 @@ class ResultSatisfaction(BrowserView):
             execSql.execSql(execStr)
 
         # 寄信通知
-            if question9 or question10 or question11 or question12:
-
+            if len(question9) >= 15 or len(question10) >= 15 or len(question11) >= 15 or len(question12) >= 15:
                 execStr = """SELECT location FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
                     """.format(course, period, subject_name)
                 location = execSql.execSql(execStr)
@@ -892,31 +891,34 @@ class CourseView(BrowserView):
         b64_img = base64.b64encode(img.read())
 
         # 四個訓前
-        qr1 = qrcode.QRCode()
-        title = base64.b64encode(context.title)
-        qr1.add_data('%s/@@manager?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
-        qr1.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.managerQRcode = base64.b64encode(img.read())
+        if course in ['職業安全衛生管理員', '丙種職業安全衛生業務主管', '急救人員', '荷重在一公噸以上之堆高機操作人員']:
+            self.exSurvy = True
+            qr1 = qrcode.QRCode()
+            title = base64.b64encode(context.title)
+            qr1.add_data('%s/@@manager?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
+            qr1.make_image().save('url.png')
+            img = open('url.png', 'rb')
+            self.managerQRcode = base64.b64encode(img.read())
 
-        qr2 = qrcode.QRCode()
-        qr2.add_data('%s/@@stacker?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
-        qr2.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.stackerQRcode = base64.b64encode(img.read())
+            qr2 = qrcode.QRCode()
+            qr2.add_data('%s/@@stacker?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
+            qr2.make_image().save('url.png')
+            img = open('url.png', 'rb')
+            self.stackerQRcode = base64.b64encode(img.read())
 
-        qr3 = qrcode.QRCode()
-        qr3.add_data('%s/@@c_type?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
-        qr3.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.c_typeQRcode = base64.b64encode(img.read())
+            qr3 = qrcode.QRCode()
+            qr3.add_data('%s/@@c_type?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
+            qr3.make_image().save('url.png')
+            img = open('url.png', 'rb')
+            self.c_typeQRcode = base64.b64encode(img.read())
 
-        qr4 = qrcode.QRCode()
-        qr4.add_data('%s/@@emergency?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
-        qr4.make_image().save('url.png')
-        img = open('url.png', 'rb')
-        self.emergencyQRcode = base64.b64encode(img.read())
-
+            qr4 = qrcode.QRCode()
+            qr4.add_data('%s/@@emergency?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
+            qr4.make_image().save('url.png')
+            img = open('url.png', 'rb')
+            self.emergencyQRcode = base64.b64encode(img.read())
+        else:
+            self.exSurvy = False
 
         self.url = url
         self.b64_img = b64_img

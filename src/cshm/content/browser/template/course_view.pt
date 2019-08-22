@@ -23,7 +23,7 @@ td, th{
 import base64
 ?>
     <table>
-      <tr>
+      <tr tal:condition="view/exSurvy">
         <th>
           <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: base64.b64encode(view.context.Title())}
 &uid=${view/context/UID}">職業安全衛生管理員學員訓前職能調查表</a>
@@ -33,11 +33,11 @@ import base64
 &uid=${view/context/UID}">荷重在一噸以上之堆高機操作人員學員訓前職能調查表</a>
         </th>
       </tr>
-      <tr>
+      <tr tal:condition="view/exSurvy">
         <td><img src="data:image/png;base64,${view/managerQRcode}" style="width:200px"/></td>
         <td><img src="data:image/png;base64,${view/stackerQRcode}" style="width:200px"/></td>
       </tr>
-      <tr>
+      <tr tal:condition="view/exSurvy">
         <th>
           <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: base64.b64encode(view.context.Title())}
 &uid=${view/context/UID}">丙種職業安全衛生業務主管學員訓前職能調查表</a>
@@ -47,7 +47,7 @@ import base64
 &uid=${view/context/UID}">急救人員學員訓前職能調查表</a>
         </th>
       </tr>
-      <tr>
+      <tr tal:condition="view/exSurvy">
         <td><img src="data:image/png;base64,${view/c_typeQRcode}" style="width:200px"/></td>
         <td><img src="data:image/png;base64,${view/emergencyQRcode}" style="width:200px"/></td>
       </tr>
