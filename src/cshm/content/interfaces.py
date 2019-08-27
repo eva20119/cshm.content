@@ -6,6 +6,7 @@ from zope import schema
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from plone.namedfile.field import NamedBlobFile
+from plone.autoform import directives
 
 
 class ICshmContentLayer(IDefaultBrowserLayer):
@@ -38,7 +39,7 @@ class ISurver(Interface):
     )
 
 class ICourse(Interface):
-
+    directives.omitted('title', 'subject_list')
     title = schema.TextLine(
         title=_(u'Title'),
         required=True

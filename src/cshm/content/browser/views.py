@@ -82,10 +82,9 @@ class SatisfactionFirst(BrowserView):
                    ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
                 ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
         if not ex_data:
-            self.ex_data = False
+            self.ex_data = []
         else:
             self.ex_data = ex_data
-
         return self.template()
 
 
@@ -707,32 +706,20 @@ class UploadCsv(BrowserView):
         courseList = ['test', '職業安全管理師','職業衛生管理師','職業安全衛生管理員','甲種職業安全衛生業務主管','乙種職業安全衛生業務主管','丙種職業安全衛生業務主管','現場安全衛生監督人員','營造業甲種職業安全衛生業務主管','營造業乙種職業安全衛生業務主管','營造業丙種職業安全衛生業務主管','施工安全評估人員','製程安全評估人員','擋土支撐作業主管','模板支撐作業主管','隧道等挖掘作業主管','隧道等襯砌作業主管','施工架組配作業主管','鋼構組配作業主管','露天開挖作業主管','屋頂作業主管','有機溶劑作業主管','鉛作業主管','缺氧作業主管','特定化學物質作業主管','粉塵作業主管','防火管理人初訓','防火管理人複訓','急救人員','危險物品運送人員專業訓練(初訓)','吊升荷重在三公噸以上之固定式起重機操作人員','吊升荷重在三公噸以上之移動式起重機操作人員','甲級鍋爐操作人員','乙級鍋爐操作人員','丙級鍋爐操作人員','第一種壓力容器操作人員','高壓氣體特定設備操作人員','高壓氣體容器操作人員','高壓氣體製造安全主任','高壓氣體供應及消費作業主管','高壓氣體製造安全作業主管','高壓室內作業主管','小型鍋爐操作人員','荷重在一公噸以上之堆高機操作人員','吊升荷重在零點五公噸以上未滿三公噸之固定式起重機操作人員','吊升荷重在零點五公噸以上未滿三公噸之移動式起重機操作人員','使用起重機具從事吊掛作業人員','以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員','小型裝載機(小山貓)','一般安全衛生教育訓練','南科一般安全衛生教育訓練','隧道挖掘機考照班','挖掘機操作人員(輔導技能檢定)','乙級檢定考複習班','消防設備師','甲級安全師總複習班','甲級衛生師總複習班','堆高機技術士檢定輔導班','勞工安全衛生管理員輔導考照班','甲級廢棄物處裡技術人員(嘉藥科大專班)','乙級廢棄物處裡技術人員(嘉藥科大專班)','丙級廢棄物處裡技術人員(嘉藥科大專班)','三公噸以上固定式起重機架空式-地上操作輔導考照班','三公噸以上固定式起重機架空式-機上操作輔導考照班','三公噸以上移動式起重機伸臂可伸縮式輔導考照班','固定式起重機操作技術士檢定輔導班','室內空氣品質維護管理專責人員','業務主管結業測驗複習班','公寓大廈事務管理人員訓練','公寓大廈防火避難設施管理人員訓練','公寓大廈設備安全管理人員訓練','營造業工地主任220小時職能訓練','勞工健康服務護理人員','人因性危害評估專業人員','保稅工廠保稅業務人員','火藥爆破作業人員安全衛生訓練','一般高壓氣體類作業主管訓練','職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練','營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練','擋土支撐作業主管在職教育訓練','模板支撐作業主管在職教育訓練','施工架組配作業主管在職教育訓練','隧道等挖掘作業主管在職教育訓練','隧道等襯砌作業主管在職教育訓練','有機溶劑作業主管在職教育訓練','鉛作業主管在職教育訓練','粉塵作業主管在職教育訓練','缺氧作業主管在職教育訓練','特定化學物質作業主管在職教育訓練','急救人員在職教育訓練','固定式起重機操作人員在職教育訓練','移動式起重機操作人員在職教育訓練','荷重在一公噸以上之堆高機操作人員在職教育訓練','使用起重機具從事吊掛作業人員在職教育訓練','鍋爐操作人員在職教育訓練','第一種壓力容器操作人員安全衛生在職教育訓練','高壓氣體特定設備操作人員安全衛生在職教育訓練','有害作業主管在職教育訓練','以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練','營造業法施行前領有建築工程管理甲級或乙級技術士證者回訓課程講習','高壓室內作業人員在職教育訓練','高壓氣體、室內作業主管在職教育訓練','起重機操作及吊掛作業人員安全衛生在職教育訓練','具有危險性之機械操作人員在職教育訓練','具有危險性之設備操作人員在職教育訓練','各級業務主管在職教育訓練','高壓氣體作業主管在職教育訓練','營造作業主管在職教育訓練','一般安全衛生在職教育訓練','小型鍋爐操作人員在職教育訓練','火藥爆破作業人員在職教育訓練','露天開挖作業主管在職教育訓練','危險物品運送人員專業訓練(複訓)','起重機操作人員安全衛生在職教育訓練','鋼構組配作業主管在職教育訓練','高壓氣體容器操作人員安全衛生在職教育訓練','營造業業務主管人員在職教育訓練','施工安全評估人員在職教育訓練','危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練','製程安全評估人員在職教育訓練','人字臂起重桿操作人員安全衛生在職教育訓練','勞工健康服務護理人員在職教育訓練','具有危險性之設備暨小型鍋爐操作人員在職教育訓練','職業安全衛生管理人員在職教育訓練','職業安全衛生業務主管在職教育訓練','屋頂作業主管在職教育訓練','研討會','其他活動','98北市府專案一般安全衛生教育訓練─營造業','98北市府專案一般安全衛生教育訓練─局限空間作業','98北市府專案一般安全衛生教育訓練─住宿業','98北市府專案一般安全衛生教育訓練─製造業','98北市府專案一般安全衛生教育訓練─批發零售業','98北市府專案一般安全衛生教育訓練─金融及保險業','98北市府專案一般安全衛生教育訓練─醫療保健服務業','98北市府專案一般安全衛生教育訓練─餐館業','98北市府專案一般安全衛生教育訓練─建築物清潔服務業','98北市府專案一般安全衛生教育訓練─不動產及租賃業','98北市府專案一般安全衛生教育訓練─學校實驗室及實習工廠','98北市府專案一般安全衛生教育訓練─水電及燃氣供應業','98北市府專案一般安全衛生教育訓練─運輸及倉儲業','98北市府專案一般安全衛生教育訓練─保全業','98北市府專案一般安全衛生教育訓練─停車場業','98北市府專案一般安全衛生教育訓練─廢棄物處理及清除業','89勞委會委託辦理中小企業丙種勞工安全衛生業務主管函授教育訓練','一般安全衛生教育訓練-營造業','一般安全衛生教育訓練-營造業土木工程業','一般安全衛生教育訓練-營造業機電、電信及電路設備安裝業','一般安全衛生教育訓練-營造業屋頂作業','一般安全衛生教育訓練-營造業施工架作業','一般安全衛生教育訓練-營造業模板作業','一般安全衛生教育訓練-營造業泥作作業','一般安全衛生教育訓練-營造業清潔作業','一般安全衛生教育訓練-營造業金屬工程作業','一般安全衛生教育訓練-營造業拆除作業','一般安全衛生教育訓練-營造業鋼筋作業','一般安全衛生教育訓練-營造業油漆作業','一般安全衛生教育訓練-局限空間','一般安全衛生教育訓練-一般行業','一般安全衛生教育訓練-一般行業保全服務業','一般安全衛生教育訓練-一般行業餐旅業','一般安全衛生教育訓練-一般行業清潔服務業','一般安全衛生教育訓練-一般行業金融及保險業','一般安全衛生教育訓練-一般行業大眾傳播業','一般安全衛生教育訓練-一般行業水電燃氣業','一般安全衛生教育訓練-一般行業醫療保健服務業','一般安全衛生教育訓練-學校實驗室暨實習工廠','缺氧危害預防研討會','ISO45001說明會','安全衛生教育訓練單位之專責輔導員講習']
         return course in courseList
 
+    def getLocation(self, groups):
+        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichang']
+        for i in locationList:
+            if i in groups:
+                return i
+
     def __call__(self):
         request = self.request
         portal = api.portal.get()
         file_data = request.get('file_data')
         file_data = file_data.split(',')[1]
+        groups = api.user.get_current().getGroups()
 
-        try:
-            file_name = request.get('file_name', '')
-            file_name = file_name.split('_')[1].split('.csv')[0]
-
-            file_dict = {
-                '台北': 'taipei',
-                '花蓮': 'hualien',
-                '桃園': 'taoyuan',
-                '中壢': 'lieutenant',
-                '嘉義': 'chiayi',
-                '南科': 'nanke',
-                '高雄': 'kaohsiung',
-                '台中': 'taichung'
-            }
-            location = file_dict[file_name]
-        except:
-                api.portal.show_message(message='地點錯誤!!!!', type='error', request=request)
-                request.response.redirect('%s/folder_contents' %portal.absolute_url())
-                return
-
+        location = self.getLocation(groups)
 
         text = base64.b64decode(file_data)
         try:
@@ -839,30 +826,37 @@ class UploadCsv(BrowserView):
                 api.portal.show_message(nessage='更新或建立失敗！！！', type='error', request=request)
         else:
             api.portal.show_message(message='上傳格式有錯！！！', type='error', request=request)
-        request.response.redirect('%s/folder_contents' %portal.absolute_url())
+        request.response.redirect('%s/course_listing' %portal.absolute_url())
 
 
 class CourseView(BrowserView):
     template = ViewPageTemplateFile('template/course_view.pt')
     def __call__(self):
-        context = self.context
+        request = self.request
+        course_name = request.get('course')
+        period = request.get('period')
+
+        self.course_name = course_name
+        self.period = period
+
+        context = api.content.find(index_course='%s_%s' %(course_name, period))[0].getObject()
+
         subject_list = context.subject_list
         data = []
         abs_url = api.portal.get().absolute_url()
-        course_name = context.title.split('_')[0]
-        period = context.title.split('_')[1]
-        today = datetime.date.today()
-        course = context.title.split('_')[0]
-        period = context.title.split('_')[1]
+
         uid = context.UID()
         numbers = context.numbers
+
+        self.editUrl = '%s/edit' %context.absolute_url()
+        self.numbers = numbers
         execSql = SqlObj()
         for item in subject_list.split('\n'):
             if item:
                 tmp = item.split(',')
                 subject= tmp[4]
                 execStr = """SELECT DISTINCT(seat) FROM satisfaction WHERE course = '{}' AND period = '{}' AND subject = '{}'
-                    ORDER BY seat""".format(course, period, subject)
+                    ORDER BY seat""".format(course_name, period, subject)
                 result = execSql.execSql(execStr)
                 result = [i[0] for i in result ]
 
@@ -880,7 +874,6 @@ class CourseView(BrowserView):
                     rate = '尚未設定學生人數'
                     not_seat_str = '尚未設定學生人數'
                 data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate, not_seat_str, count])
-#        course_name = base64.b64encode(course_name)
         course_name = urllib.quote(course_name.encode('utf-8'))
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
         # 滿意度
@@ -891,7 +884,7 @@ class CourseView(BrowserView):
         b64_img = base64.b64encode(img.read())
 
         # 四個訓前
-        if course in ['職業安全衛生管理員', '丙種職業安全衛生業務主管', '急救人員', '荷重在一公噸以上之堆高機操作人員']:
+        if course_name in ['職業安全衛生管理員', '丙種職業安全衛生業務主管', '急救人員', '荷重在一公噸以上之堆高機操作人員']:
             self.exSurvy = True
             qr1 = qrcode.QRCode()
             title = base64.b64encode(context.title)
@@ -1005,11 +998,22 @@ class ShowStatistics(BrowserView):
     def __call__(self):
         execSql = SqlObj()
 
-        execStr = """SELECT DISTINCT(course) FROM `course_list`"""
-        result = execSql.execSql(execStr)
-        self.mode = self.request.get('mode', 0)
-        self.result = result
+        user = api.user.get_current()
+
+        groups = user.getGroups()
+        location = self.getLocation(groups)
+        sqlStr = """SELECT DISTINCT(course) FROM course_list WHERE location = '{}'""".format(location)
+
+        self.id = user.id
+        self.result = execSql.execSql(sqlStr)
+
         return self.template()
+
+    def getLocation(self, groups):
+        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichang']
+        for i in locationList:
+            if i in groups:
+                return i
 
 
 class CalculateSatisfaction(BrowserView):

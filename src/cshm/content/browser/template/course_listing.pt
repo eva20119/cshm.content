@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="cshm.content">
+<body>
+
+
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core"
+                    tal:define="toc context/table_of_contents|nothing;">
+
+<style>
+td, th{
+    text-align: center;
+    vertical-align: middle !important;
+    padding: 5px;
+    font-size: 18px;
+}
+#content header{
+    display: none;
+}
+</style>
+  <button class='context' onclick="location.href='${view/context/absolute_url}/upload_csv_view'">課程上傳</button>
+  <button class='context' onclick="location.href='${view/context/absolute_url}/show_satisfaction'">問卷結果</button>
+
+  <div style='margin: 15px 0'>
+    <span style='font-size: 18px'>輸入課程名稱或期別後按Enter:</span>
+    <input id='search' type='text' style='display: inline;width: 80%'/>
+  </div>
+
+  <table>
+    <tr>
+      <th>課程</th>
+      <th>期別</th>
+      <th></th>
+      <th>開/結訓日期</th>
+    </tr>
+    <tr tal:repeat="course view/courseList" class='line' data-title="${python: '%s%s' %(course['course'], course['period'])}">
+      <td>${python: course['course']}</td>
+      <td>${python: course['period']}</td>
+      <td>
+        <a href="${python: 'course_view?course=%s&period=%s' %(course['course'], course['period'])}">查看課程</a>
+      </td>
+      <td>${python: view.getDateRange(course['course'], course['period'])}</td>
+    </tr>
+  </table>
+
+<script>
+$(function(){
+    $('#search').change(function(e){
+       val = $(this).val()       
+       $('.line').each(function(){
+           title = $(this).data()['title']
+           if(title.indexOf(val) == -1){
+               $(this).hide()
+           }
+           else{
+               $(this).show()
+           }
+       })
+    })
+})
+</script>
+
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

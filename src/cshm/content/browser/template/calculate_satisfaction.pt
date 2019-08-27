@@ -37,7 +37,7 @@ import json
     <input value="${python:view.numbers}" type='hidden' name='numbers'>
     <input value="${python:view.count}" type='hidden' name='count'>
     <input value="${python: json.dumps(view.writeCount)}" type='hidden' name='writeCount'>
-    <input type='submit' value='下載Excel' />
+    <input type='submit' value='下載Excel' class='context'/>
 </form>
 <table>
     <tr>

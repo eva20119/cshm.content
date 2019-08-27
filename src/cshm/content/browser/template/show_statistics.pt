@@ -37,8 +37,9 @@ th{
 from plone import api
 abs_url = api.portal.get().absolute_url()
 ?>
-<button id='back' style='margin-bottom:20px'>回目錄</button>
-<br/>
+
+<button class='context' onclick="window.history.back()" style='margin-bottom: 20px'>返回列表</button>
+<br>
 訓前
 <select name="course" id="course1">
     <option value="職業安全衛生管理員">職業安全衛生管理員 </option>
@@ -48,24 +49,88 @@ abs_url = api.portal.get().absolute_url()
 </select>
 
 期數 <input type="number" id="period1"  />
-<button class='send' data-target="1" data-selected="1">送出</button>
+<button class='send context' data-target="1" data-selected="1">送出</button>
 <br>
 
 滿意度
 <select id="course2">
-    <option tal:repeat="item view/result" value="${python: item[0]}">${python:item[0]}</option>
+    <option tal:repeat="course view/result" value="${python: course[0]}">${python: course[0]}</option>
 </select>
 期數 <input type="number" id="period2"  />
-<button class='send' data-target="2" data-selected="2">送出</button>
+<button class='send context' data-target="2" data-selected="2">送出</button>
 
-<tal:cond condition='view/mode'>
+<tal:cond condition='python: view.id == "admin"'>
   <form method='post' action='download_opinion'>
     意見回饋
     <select name='course' required>
-        <option tal:repeat="item view/result" value="${python: item[0]}">${python:item[0]}</option>
+        <option value="甲種業務主管">甲種業務主管</option>
+        <option value="乙種業務主管">乙種業務主管</option>
+        <option value="丙種業務主管">丙種業務主管</option>
+        <option value="營造業甲種業務主管">營造業甲種業務主管</option>
+        <option value="營造業乙種業務主管">營造業乙種業務主管</option>
+        <option value="營造業丙種業務主管">營造業丙種業務主管</option>
+        <option value="職業安全管理師">職業安全管理師</option>
+        <option value="職業衛生管理師">職業衛生管理師</option>
+        <option value="職業安全衛生管理員">職業安全衛生管理員</option>
+        <option value="甲級化學性因子作業環境監測人員">甲級化學性因子作業環境監測人員</option>
+        <option value="甲級物理性因子作業環境監測人員">甲級物理性因子作業環境監測人員</option>
+        <option value="乙級化學性因子作業環境監測人員">乙級化學性因子作業環境監測人員</option>
+        <option value="乙級物理性因子作業環境監測人員">乙級物理性因子作業環境監測人員</option>
+        <option value="施工安全評估人員">施工安全評估人員</option>
+        <option value="製程安全評估人員">製程安全評估人員</option>
+        <option value="高壓氣體製作安全主任">高壓氣體製作安全主任</option>
+        <option value="高壓氣體製作安全作業主管">高壓氣體製作安全作業主管</option>
+        <option value="高壓氣體供應及消費作業主管">高壓氣體供應及消費作業主管</option>
+        <option value="擋土支撐作業主管">擋土支撐作業主管</option>
+        <option value="露天開挖作業主管">露天開挖作業主管</option>
+        <option value="模板支撐作業主管">模板支撐作業主管</option>
+        <option value="隧道等挖掘作業主管">隧道等挖掘作業主管</option>
+        <option value="隧道等襯砌作業主管">隧道等襯砌作業主管</option>
+        <option value="施工架組配作業主管">施工架組配作業主管</option>
+        <option value="鋼構組配作業主管">鋼構組配作業主管</option>
+        <option value="屋頂作業主管">屋頂作業主管</option>
+        <option value="有機溶劑作業主管">有機溶劑作業主管</option>
+        <option value="鉛作業主管">鉛作業主管</option>
+        <option value="四烷基鉛作業主管">四烷基鉛作業主管</option>
+        <option value="缺氧作業主管">缺氧作業主管</option>
+        <option value="特定化學物質作業主管">特定化學物質作業主管</option>
+        <option value="粉塵作業主管">粉塵作業主管</option>
+        <option value="高壓室內作業主管">高壓室內作業主管</option>
+        <option value="潛水作業主管">潛水作業主管</option>
+        <option value="三上固定式或一上斯達卡起重機操作人員">三上固定式或一上斯達卡起重機操作人員</option>
+        <option value="三上移動式">三上移動式</option>
+        <option value="三上人字臂">三上人字臂</option>
+        <option value="導軌或升降路之高度在二十公尺以上之營建用提升機操作人員">導軌或升降路之高度在二十公尺以上之營建用提升機操作人員</option>
+        <option value="吊籠操作人員">吊籠操作人員</option>
+        <option value="鍋爐操作人員">鍋爐操作人員</option>
+        <option value="第一種壓力容器操作人員">第一種壓力容器操作人員</option>
+        <option value="高壓氣體特定設備操作人員">高壓氣體特定設備操作人員</option>
+        <option value="高壓氣體容器操作人員">高壓氣體容器操作人員</option>
+        <option value="小型鍋爐操作人員">小型鍋爐操作人員</option>
+        <option value="荷重在一公噸以上之堆高機操作人員">荷重在一公噸以上之堆高機操作人員</option>
+        <option value="三下固定式或一下斯達卡起重機操作人員">三下固定式或一下斯達卡起重機操作人員</option>
+        <option value="三下移動式">三下移動式</option>
+        <option value="三下人字臂">三下人字臂</option>
+        <option value="使用起重機具從事吊掛作業人員">使用起重機具從事吊掛作業人員</option>
+        <option value="以乙炔熔接裝置或氣體集合熔接裝置從事金屬之熔接、切斷或加熱作業人員">以乙炔熔接裝置或氣體集合熔接裝置從事金屬之熔接、切斷或加熱作業人員</option>
+        <option value="火藥爆破作業人員">火藥爆破作業人員</option>
+        <option value="胸高直徑七十公分以上之伐木作業人員">胸高直徑七十公分以上之伐木作業人員</option>
+        <option value="機械集材運材作業人員">機械集材運材作業人員</option>
+        <option value="高壓室內作業人員">高壓室內作業人員</option>
+        <option value="潛水作業人員">潛水作業人員</option>
+        <option value="油輪清艙作業人員">油輪清艙作業人員</option>
+        <option value="勞工健康服務護理人員">勞工健康服務護理人員</option>
+        <option value="急救人員">急救人員</option>
+        <option value="在職教育訓練">在職教育訓練</option>
+        <option value="防火管理人初訓">防火管理人初訓</option>
+        <option value="防火管理人複訓">防火管理人複訓</option>
+        <option value="危險物品運送人員專業訓練(初訓)">危險物品運送人員專業訓練(初訓)</option>
+        <option value="危險物品運送人員專業訓練(複訓)">危險物品運送人員專業訓練(複訓)</option>
+        <option value="室內空氣品質維護管理專責人員">室內空氣品質維護管理專責人員</option>
+        <option value="營造業工地主任220小時職能訓練">營造業工地主任220小時職能訓練</option>
     </select>
     期數 <input type="number" name="period"  required/>
-    <button>送出</button>
+    <button class='context'>送出</button>
   </form>
 </tal:cond>
 

@@ -18,6 +18,13 @@
       directory="static"
       />
   <browser:page
+      name='course_listing'
+      for='*'
+      class='.custom.CourseListing'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
       name='download_opinion'
       for='*'
       class='.download_excel.DownloadOpinion'
