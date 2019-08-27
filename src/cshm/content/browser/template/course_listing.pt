@@ -51,7 +51,7 @@ td, th{
 <script>
 $(function(){
     $('#search').change(function(e){
-       val = $(this).val()       
+       val = $(this).val().trim()
        $('.line').each(function(){
            title = $(this).data()['title']
            if(title.indexOf(val) == -1){

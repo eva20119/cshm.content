@@ -11,9 +11,6 @@
 <metal:content-core define-macro="content-core"
                     tal:define="toc context/table_of_contents|nothing;">
 <style>
-table{
-    width: 80%;
-}
 td, th{
     font-size: 20px;
     text-align: center;
@@ -32,12 +29,10 @@ import base64
     <table>
       <tr tal:condition="view/exSurvy">
         <th>
-          <a href=" ${python: view.context.absolute_url()}/@@manager?course_title=${python: base64.b64encode(view.context.Title())}
-&uid=${view/context/UID}">職業安全衛生管理員學員訓前職能調查表</a>
+          <a href="${view/url1}">職業安全衛生管理員學員訓前職能調查表</a>
         </th>
         <th>
-        <a href=" ${python: view.context.absolute_url()}/@@stacker?course_title=${python: base64.b64encode(view.context.Title())}
-&uid=${view/context/UID}">荷重在一噸以上之堆高機操作人員學員訓前職能調查表</a>
+        <a href="${view/url2}">荷重在一噸以上之堆高機操作人員學員訓前職能調查表</a>
         </th>
       </tr>
       <tr tal:condition="view/exSurvy">
@@ -46,12 +41,10 @@ import base64
       </tr>
       <tr tal:condition="view/exSurvy">
         <th>
-          <a href=" ${python: view.context.absolute_url()}/@@c_type?course_title=${python: base64.b64encode(view.context.Title())}
-&uid=${view/context/UID}">丙種職業安全衛生業務主管學員訓前職能調查表</a>
+          <a href="${view/url3}">丙種職業安全衛生業務主管學員訓前職能調查表</a>
         </th>
         <th>
-    <a href=" ${python: view.context.absolute_url()}/@@emergency?course_title=${python: base64.b64encode(view.context.Title())}
-&uid=${view/context/UID}">急救人員學員訓前職能調查表</a>
+    <a href="${view/url4}">急救人員學員訓前職能調查表</a>
         </th>
       </tr>
       <tr tal:condition="view/exSurvy">
