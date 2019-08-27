@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    >
+
+    <subscriber
+        for="Products.PlonePAS.events.IUserLoggedInEvent"
+        handler=".event.initUser"
+    />
+
+   <subscriber
+       for="cshm.content.interfaces.ICourse plone.dexterity.interfaces.IEditFinishedEvent"
+       handler=".event.compeleteEdit"
+   />
+
+   <subscriber
+       for="cshm.content.interfaces.ICourse plone.dexterity.interfaces.IEditCancelledEvent"
+       handler=".event.compeleteEdit"
+   />
+
+</configure>
+
+
