@@ -26,7 +26,7 @@ input{
     <input type="file" onchange="showPreview(this)" />
     <input type="hidden" id='text' name="file_data"/>
     <input type="hidden" id='file_name' name="file_name"/>
-    <input type="submit" value="Send" class='context'/>
+    <input type="submit" value="上傳" class='context'/>
 </form>
 <script type="text/javascript">
         document.getElementsByClassName('documentFirstHeading')[0].innerText = '檔案上傳'

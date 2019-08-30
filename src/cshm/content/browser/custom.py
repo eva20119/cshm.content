@@ -16,6 +16,7 @@ class CourseListing(BrowserView):
             return
         user = api.user.get_current()
         groups = user.getGroups()
+        self.id = user.id
 
         offset = request.get('offset', 0)
 
@@ -25,8 +26,8 @@ class CourseListing(BrowserView):
             sqlStr = """SELECT course, period, MAX(timestamp) as maxtime FROM `course_list` WHERE location = '{}' GROUP BY course, period
                         ORDER BY `maxtime` DESC""".format(location)
         else:
-            sqlStr = """SELECT course, period, MAX(timestamp) as maxtime FROM `course_list` GROUP BY course, period ORDER BY maxtime
-                         DESC LIMIT 100"""
+            sqlStr = """SELECT course, period, MAX(timestamp) as maxtime, location FROM `course_list` GROUP BY course, period, location
+                        ORDER BY maxtime  DESC"""
 
         self.courseList = execSql.execSql(sqlStr)
         return self.template()
@@ -46,7 +47,7 @@ class CourseListing(BrowserView):
             return 'error'
 
     def getLocation(self, groups):
-        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichang']
+        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
         for i in locationList:
             if i in groups:
                 return i

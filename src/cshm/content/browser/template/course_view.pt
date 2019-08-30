@@ -23,6 +23,10 @@ td, th{
 import base64
 ?>
     <h1>${view/course_name}${view/period}</h1>
+    <h2>開始時間: ${view/minDate}</h2>
+    <h2>結束時間: ${view/maxDate}</h2>
+    <h3 style='color: red'>回收率低於80%: ${python: view.alertStr if view.numbers else '尚未設定人數'}</h3>
+
     <button class='context' onclick="location.href='course_listing'" style='margin: 20px 0'>返回列表</button>
     <button class='context' onclick="location.href='${view/editUrl}'" style='margin: 20px 0'>設定上課人數</button>
 

@@ -707,7 +707,7 @@ class UploadCsv(BrowserView):
         return course in courseList
 
     def getLocation(self, groups):
-        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichang']
+        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
         for i in locationList:
             if i in groups:
                 return i
@@ -851,6 +851,18 @@ class CourseView(BrowserView):
         self.editUrl = '%s/edit' %context.absolute_url()
         self.numbers = numbers
         execSql = SqlObj()
+
+        sqlStr = """SELECT start_time FROM course_list WHERE course = '{}' AND period = {} ORDER BY start_time LIMIT 1
+                 """.format(course_name, period)
+        self.minDate = execSql.execSql(sqlStr)[0][0]
+
+        sqlStr = """SELECT start_time, hour FROM course_list WHERE course = '{}' AND period = {} ORDER BY start_time DESC LIMIT 1
+                 """.format(course_name, period)
+        maxDate = execSql.execSql(sqlStr)[0]
+        self.maxDate = maxDate[0] + datetime.timedelta(hours = maxDate[1])
+
+        self.alertStr = ''
+
         for item in subject_list.split('\n'):
             if item:
                 tmp = item.split(',')
@@ -865,15 +877,20 @@ class CourseView(BrowserView):
                 notWrite = []
 
                 if numbers:
-                    rate ='%s%%' %(round(float(count) / float(numbers), 2) * 100)
+                    rate = round(float(count) / float(numbers), 2) * 100
+                    if rate < 80:
+                        self.alertStr += '%s,  ' %subject
+
+                    rateStr ='%s%%' %(rate)
+
                     for i in range(1, numbers + 1):
                         if i not in result:
                              notWrite.append(i)
                     not_seat_str = ','.join([str(i) for i in notWrite])
                 else:
-                    rate = '尚未設定學生人數'
+                    rateStr = '尚未設定學生人數'
                     not_seat_str = '尚未設定學生人數'
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rate, not_seat_str, count])
+                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rateStr, not_seat_str, count])
 
         # 四個訓前
         if course_name in ['職業安全衛生管理員', '丙種職業安全衛生業務主管', '急救人員', '荷重在一公噸以上之堆高機操作人員']:
@@ -1015,7 +1032,7 @@ class ShowStatistics(BrowserView):
         return self.template()
 
     def getLocation(self, groups):
-        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichang']
+        locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
         for i in locationList:
             if i in groups:
                 return i
