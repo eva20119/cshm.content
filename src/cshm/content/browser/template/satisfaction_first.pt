@@ -189,10 +189,10 @@ $(function(){
         }
     })
     $('form').submit(function(){
-        question9 = $('textarea[name="question9"]').val()
-        question10 = $('textarea[name="question10"]').val()
-        question11 = $('textarea[name="question11"]').val()
-        question12 = $('textarea[name="question12"]').val()
+        q9 = $('textarea[name="question9"]').val().length
+        q10 = $('textarea[name="question10"]').val().length
+        q11 = $('textarea[name="question11"]').val().length
+        q12 = $('textarea[name="question12"]').val().length
         var count = 0
 
         $('input:radio:checked').each(function(){
@@ -201,11 +201,13 @@ $(function(){
             }
         })
         if(count >= 1){
-            if(question9.length <= 15 && question10.length <=15 && question11.length <= 15 && 
-                question12.length <= 15){
+            if(q9 <= 15 && q10 <=15 && q11 <= 15 && q12 <= 15){
                 alert('您有選擇不太滿意或很不滿意，請填寫下面的意見欄，字數需多於15個字')
                 return false; 
             }
+        }else if((q9 && q9 <= 15) || (q10 && q10 <= 15) || (q11 && q11 <= 15) || (q12 && q12 <= 15)){
+            alert('意見回饋字數須多餘15個字')
+            return false
         }
     })
 })

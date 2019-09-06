@@ -101,7 +101,7 @@ div{
 $(function(){
     uid = location.href.split('uid=')[1]
     $('#uid').val(uid)
-    $('.documentFirstHeading').html('<h2>中國勞工安全衛生管理學會</h2>')
+    $('.documentFirstHeading').html('<h2>荷重在一噸以上之堆高機操作人員學員訓前職能調查表</h2>')
 
     $('form').submit(function(){
         if($('input[name="anw6"]:checked').length == 0){

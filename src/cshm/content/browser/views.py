@@ -838,7 +838,6 @@ class CourseView(BrowserView):
 
         self.course_name = course_name
         self.period = period
-
         context = api.content.find(index_course='%s_%s' %(course_name, period))[0].getObject()
 
         subject_list = context.subject_list
@@ -861,7 +860,7 @@ class CourseView(BrowserView):
         maxDate = execSql.execSql(sqlStr)[0]
         self.maxDate = maxDate[0] + datetime.timedelta(hours = maxDate[1])
 
-        self.alertStr = ''
+        self.alertList = []
 
         for item in subject_list.split('\n'):
             if item:
@@ -879,7 +878,7 @@ class CourseView(BrowserView):
                 if numbers:
                     rate = round(float(count) / float(numbers), 2) * 100
                     if rate < 80:
-                        self.alertStr += '%s,  ' %subject
+                        self.alertList.append(subject)
 
                     rateStr ='%s%%' %(rate)
 

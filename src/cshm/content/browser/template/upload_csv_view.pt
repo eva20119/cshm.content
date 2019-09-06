@@ -18,10 +18,10 @@ input{
 
 <button class='context' onclick="window.history.back()">返回列表</button>
 
-<h3 style='color: red'>特別注意事項：</h3>
-<h3>上傳檔名說明：課程_教學中心.csv<span style='color: red;margin-left: 15px'>EX: 急救人員_中壢.csv</span></h3>
-<h3>教學中心名稱：<span style='color: blue'>台北,花蓮,桃園,中壢,嘉義,南科,高雄,台中</span></h3>
-<br>
+<br><br>
+<a href="${view/context/absolute_url}/example/@@download/file">下載範例</a>
+
+<br><br>
 <form action="upload_csv" method="post">
     <input type="file" onchange="showPreview(this)" />
     <input type="hidden" id='text' name="file_data"/>

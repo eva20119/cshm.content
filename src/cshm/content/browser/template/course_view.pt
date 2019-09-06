@@ -25,7 +25,17 @@ import base64
     <h1>${view/course_name}${view/period}</h1>
     <h2>開始時間: ${view/minDate}</h2>
     <h2>結束時間: ${view/maxDate}</h2>
-    <h3 style='color: red'>回收率低於80%: ${python: view.alertStr if view.numbers else '尚未設定人數'}</h3>
+    <h3 style='color: red'>
+      回收率低於80%:
+      <tal:cond condition="view/alertList">
+        <tal:rep repeat="alert view/alertList">
+          <a href="#${alert}">${alert}</a>/
+        </tal:rep>
+      </tal:cond>
+      <tal:cond condition="not: view/alertList">
+        尚未設定人數
+      </tal:cond>
+    </h3>
 
     <button class='context' onclick="location.href='course_listing'" style='margin: 20px 0'>返回列表</button>
     <button class='context' onclick="location.href='${view/editUrl}'" style='margin: 20px 0'>設定上課人數</button>
@@ -66,7 +76,7 @@ import base64
     </table>
 
     <br/>
-    <div tal:repeat="item view/data">
+    <div tal:repeat="item view/data" id='${python: item[3]}'>
         日期：<span>${python:item[0]}</span><br>
         時間：<span>${python:item[1]}</span><br>
         星期：<span>${python:item[2]}</span><br>
