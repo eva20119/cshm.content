@@ -237,10 +237,7 @@ class ResultSatisfaction(BrowserView):
 class Manager(BrowserView):
     template = ViewPageTemplateFile('template/manager.pt')
     def __call__(self):
-        try:
-            self.course_title = base64.b64decode(self.request.get('course_title'))
-        except:
-            self.course_title = self.request.get('course_title')
+        self.course_title = self.request.get('course_title')
 
         self.uid = self.request.get('uid')
         return self.template()
@@ -292,10 +289,7 @@ class ResultManager(BrowserView):
 class Stacker(BrowserView):
     template = ViewPageTemplateFile('template/stacker.pt')
     def __call__(self):
-        try:
-            self.course_title = base64.b64decode(self.request.get('course_title'))
-        except:
-            self.course_title = self.request.get('course_title')
+        self.course_title = self.request.get('course_title')
         self.uid = self.request.get('uid')
         return self.template()
 
@@ -340,10 +334,7 @@ class ResultStacker(BrowserView):
 class Emergency(BrowserView):
     template = ViewPageTemplateFile('template/emergency.pt')
     def __call__(self):
-        try:
-            self.course_title = base64.b64decode(self.request.get('course_title'))
-        except:
-            self.course_title = self.request.get('course_title')
+        self.course_title = self.request.get('course_title')
         self.uid = self.request.get('uid')
         return self.template()
 
@@ -388,10 +379,8 @@ class ResultEmergency(BrowserView):
 class Ctype(BrowserView):
     template = ViewPageTemplateFile('template/c_type.pt')
     def __call__(self):
-        try:
-            self.course_title = base64.b64decode(self.request.get('course_title'))
-        except:
-            self.course_title = self.request.get('course_title')
+        self.course_title = self.request.get('course_title')
+
         self.uid = self.request.get('uid')
         return self.template()
 
@@ -893,7 +882,7 @@ class CourseView(BrowserView):
 
         # 四個訓前
         qr1 = qrcode.QRCode()
-        title = base64.b64encode(context.title)
+        title = context.title
         qr1.add_data('%s/@@manager?course_title=%s&uid=%s' %(context.absolute_url(), title, uid))
         qr1.make_image().save('url.png')
         img = open('url.png', 'rb')
@@ -935,8 +924,6 @@ class CheckSurver(BrowserView):
 
         course_name = request.get('course_name')
         period = request.get('period')
-        if not api.content.find(Title='%s_%s' %(course_name, period)):
-            course_name = base64.b64decode(course_name)
 
         seat_number = request.get('seat_number', '')
         ignore = request.get('ignore', False)
