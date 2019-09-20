@@ -951,8 +951,6 @@ class CheckSurver(BrowserView):
 
         course_name = request.get('course_name')
         period = request.get('period')
-        if not api.content.find(Title='%s_%s' %(course_name, period)):
-            course_name = base64.b64decode(course_name)
 
         seat_number = request.get('seat_number', '')
         ignore = request.get('ignore', False)
