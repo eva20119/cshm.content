@@ -27,6 +27,8 @@ td, th{
 locationDict = {'taipei': '台北', 'kaohsiung': '高雄', 'taoyuan': '桃園', 'hualien': '花蓮', 'chiayi': '嘉義', 'nanke': '南科', 'lieutenant': '中壢', 'taichung': '台中'}
 ?>
 
+  <button class='destructive' onclick="location.href='${view/context/absolute_url}/logout'" style='float: right'>登出</button>
+
   <button class='context' onclick="location.href='${view/context/absolute_url}/upload_csv_view'">課程上傳</button>
   <button class='context' onclick="location.href='${view/context/absolute_url}/show_satisfaction'">問卷結果</button>
 

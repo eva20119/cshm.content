@@ -41,29 +41,13 @@ import base64
     <button class='context' onclick="location.href='${view/editUrl}'" style='margin: 20px 0'>設定上課人數</button>
 
     <table>
-      <tr tal:condition="view/exSurvy">
+      <tr tal:condition="view/QRcode">
         <th>
-          <a href="${view/url1}">職業安全衛生管理員學員訓前職能調查表</a>
-        </th>
-        <th>
-        <a href="${view/url2}">荷重在一噸以上之堆高機操作人員學員訓前職能調查表</a>
+          <a href="${view/url}">${view/course_name}</a>
         </th>
       </tr>
-      <tr tal:condition="view/exSurvy">
-        <td><img src="data:image/png;base64,${view/managerQRcode}" style="width:200px"/></td>
-        <td><img src="data:image/png;base64,${view/stackerQRcode}" style="width:200px"/></td>
-      </tr>
-      <tr tal:condition="view/exSurvy">
-        <th>
-          <a href="${view/url3}">丙種職業安全衛生業務主管學員訓前職能調查表</a>
-        </th>
-        <th>
-    <a href="${view/url4}">急救人員學員訓前職能調查表</a>
-        </th>
-      </tr>
-      <tr tal:condition="view/exSurvy">
-        <td><img src="data:image/png;base64,${view/c_typeQRcode}" style="width:200px"/></td>
-        <td><img src="data:image/png;base64,${view/emergencyQRcode}" style="width:200px"/></td>
+      <tr tal:condition="view/QRcode">
+        <td><img src="data:image/png;base64,${view/QRcode}" style="width:200px"/></td>
       </tr>
       <tr>
         <th colspan=2><a href="${view/url}">問卷網址</a></th>
@@ -85,7 +69,7 @@ import base64
         講師：<span>${python:item[5]}</span><br>
         教室：<span>${python:item[7]}</span><br>
         <br>
-        <p>以填座號：${python:item[8]}</p>
+        <p>已填座號：${python:item[8]}</p>
         <p>未填座號：${python: item[10]}</p>
         <p>填寫人數/總計數量： ${python: '%s/%s' %(item[11], view.numbers) if view.numbers else '尚未設定學生人數'}</p>
         <p>回收率: ${python: item[9]}</p>

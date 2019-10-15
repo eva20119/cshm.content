@@ -52,16 +52,6 @@ abs_url = api.portal.get().absolute_url()
 <button class='send context' data-target="1" data-selected="1">送出</button>
 <br>
 
-<tal:cond condition="python: view.id != 'admin'">
-滿意度
-<select id="course2">
-    <option tal:repeat="course view/result" value="${python: course[0]}">${python: course[0]}</option>
-</select>
-期數 <input type="number" id="period2"  />
-<button class='send context' data-target="2" data-selected="2">送出</button>
-</tal:cond>
-
-<tal:cond condition="python: view.id == 'admin'">
 滿意度
 <select id="course2">
         <option value="甲種業務主管">甲種業務主管</option>
@@ -129,14 +119,58 @@ abs_url = api.portal.get().absolute_url()
         <option value="危險物品運送人員專業訓練(複訓)">危險物品運送人員專業訓練(複訓)</option>
         <option value="室內空氣品質維護管理專責人員">室內空氣品質維護管理專責人員</option>
         <option value="營造業工地主任220小時職能訓練">營造業工地主任220小時職能訓練</option>
+        <option value="職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練">職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練</option>
+        <option value="營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練">營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練</option>
+        <option value="擋土支撐作業主管在職教育訓練">擋土支撐作業主管在職教育訓練</option>
+        <option value="模板支撐作業主管在職教育訓練">模板支撐作業主管在職教育訓練</option>
+        <option value="施工架組配作業主管在職教育訓練">施工架組配作業主管在職教育訓練</option>
+        <option value="隧道等挖掘作業主管在職教育訓練">隧道等挖掘作業主管在職教育訓練</option>
+        <option value="隧道等襯砌作業主管在職教育訓練">隧道等襯砌作業主管在職教育訓練</option>
+        <option value="有機溶劑作業主管在職教育訓練">有機溶劑作業主管在職教育訓練</option>
+        <option value="鉛作業主管在職教育訓練">鉛作業主管在職教育訓練</option>
+        <option value="粉塵作業主管在職教育訓練">粉塵作業主管在職教育訓練</option>
+        <option value="缺氧作業主管在職教育訓練">缺氧作業主管在職教育訓練</option>
+        <option value="特定化學物質作業主管在職教育訓練">特定化學物質作業主管在職教育訓練</option>
+        <option value="急救人員在職教育訓練">急救人員在職教育訓練</option>
+        <option value="固定式起重機操作人員在職教育訓練">固定式起重機操作人員在職教育訓練</option>
+        <option value="移動式起重機操作人員在職教育訓練">移動式起重機操作人員在職教育訓練</option>
+        <option value="荷重在一公噸以上之堆高機操作人員在職教育訓練">荷重在一公噸以上之堆高機操作人員在職教育訓練</option>
+        <option value="使用起重機具從事吊掛作業人員在職教育訓練">使用起重機具從事吊掛作業人員在職教育訓練</option>
+        <option value="鍋爐操作人員在職教育訓練">鍋爐操作人員在職教育訓練</option>
+        <option value="第一種壓力容器操作人員安全衛生在職教育訓練">第一種壓力容器操作人員安全衛生在職教育訓練</option>
+        <option value="高壓氣體特定設備操作人員安全衛生在職教育訓練">高壓氣體特定設備操作人員安全衛生在職教育訓練</option>
+        <option value="有害作業主管在職教育訓練">有害作業主管在職教育訓練</option>
+        <option value="以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練">以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練</option>
+        <option value="高壓室內作業人員在職教育訓練">高壓室內作業人員在職教育訓練</option>
+        <option value="起重機操作及吊掛作業人員安全衛生在職教育訓練">起重機操作及吊掛作業人員安全衛生在職教育訓練</option>
+        <option value="具有危險性之機械操作人員在職教育訓練">具有危險性之機械操作人員在職教育訓練</option>
+        <option value="具有危險性之設備操作人員在職教育訓練">具有危險性之設備操作人員在職教育訓練</option>
+        <option value="各級業務主管在職教育訓練">各級業務主管在職教育訓練</option>
+        <option value="高壓氣體作業主管在職教育訓練">高壓氣體作業主管在職教育訓練</option>
+        <option value="營造作業主管在職教育訓練">營造作業主管在職教育訓練</option>
+        <option value="一般安全衛生在職教育訓練">一般安全衛生在職教育訓練</option>
+        <option value="小型鍋爐操作人員在職教育訓練">小型鍋爐操作人員在職教育訓練</option>
+        <option value="火藥爆破作業人員在職教育訓練">火藥爆破作業人員在職教育訓練</option>
+        <option value="露天開挖作業主管在職教育訓練">露天開挖作業主管在職教育訓練</option>
+        <option value="危險物品運送人員專業訓練(複訓)">危險物品運送人員專業訓練(複訓)</option>
+        <option value="起重機操作人員安全衛生在職教育訓練">起重機操作人員安全衛生在職教育訓練</option>
+        <option value="鋼構組配作業主管在職教育訓練">鋼構組配作業主管在職教育訓練</option>
+        <option value="高壓氣體容器操作人員安全衛生在職教育訓練">高壓氣體容器操作人員安全衛生在職教育訓練</option>
+        <option value="營造業業務主管人員在職教育訓練">營造業業務主管人員在職教育訓練</option>
+        <option value="施工安全評估人員在職教育訓練">施工安全評估人員在職教育訓練</option>
+        <option value="危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練">危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練</option>
+        <option value="製程安全評估人員在職教育訓練">製程安全評估人員在職教育訓練</option>
+        <option value="人字臂起重桿操作人員安全衛生在職教育訓練">人字臂起重桿操作人員安全衛生在職教育訓練</option>
+        <option value="具有危險性之設備暨小型鍋爐操作人員在職教育訓練">具有危險性之設備暨小型鍋爐操作人員在職教育訓練</option>
+        <option value="職業安全衛生管理人員在職教育訓練">職業安全衛生管理人員在職教育訓練</option>
+        <option value="職業安全衛生業務主管在職教育訓練">職業安全衛生業務主管在職教育訓練</option>
+        <option value="屋頂作業主管在職教育訓練">屋頂作業主管在職教育訓練</option>
 </select>
 期數 <input type="number" id="period2"  />
 <button class='send context' data-target="2" data-selected="2">送出</button>
-</tal:cond>
 
 
-<tal:cond condition='python: view.id == "admin"'>
-  <form method='post' action='download_opinion'>
+<form method='post' action='download_opinion'>
     意見回饋
     <select name='course' required>
         <option value="甲種業務主管">甲種業務主管</option>
@@ -204,11 +238,56 @@ abs_url = api.portal.get().absolute_url()
         <option value="危險物品運送人員專業訓練(複訓)">危險物品運送人員專業訓練(複訓)</option>
         <option value="室內空氣品質維護管理專責人員">室內空氣品質維護管理專責人員</option>
         <option value="營造業工地主任220小時職能訓練">營造業工地主任220小時職能訓練</option>
+        <option value="職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練">職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練</option>
+        <option value="營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練">營造業職業安全衛生業務主管暨職業安全衛生管理人員在職教育訓練</option>
+        <option value="擋土支撐作業主管在職教育訓練">擋土支撐作業主管在職教育訓練</option>
+        <option value="模板支撐作業主管在職教育訓練">模板支撐作業主管在職教育訓練</option>
+        <option value="施工架組配作業主管在職教育訓練">施工架組配作業主管在職教育訓練</option>
+        <option value="隧道等挖掘作業主管在職教育訓練">隧道等挖掘作業主管在職教育訓練</option>
+        <option value="隧道等襯砌作業主管在職教育訓練">隧道等襯砌作業主管在職教育訓練</option>
+        <option value="有機溶劑作業主管在職教育訓練">有機溶劑作業主管在職教育訓練</option>
+        <option value="鉛作業主管在職教育訓練">鉛作業主管在職教育訓練</option>
+        <option value="粉塵作業主管在職教育訓練">粉塵作業主管在職教育訓練</option>
+        <option value="缺氧作業主管在職教育訓練">缺氧作業主管在職教育訓練</option>
+        <option value="特定化學物質作業主管在職教育訓練">特定化學物質作業主管在職教育訓練</option>
+        <option value="急救人員在職教育訓練">急救人員在職教育訓練</option>
+        <option value="固定式起重機操作人員在職教育訓練">固定式起重機操作人員在職教育訓練</option>
+        <option value="移動式起重機操作人員在職教育訓練">移動式起重機操作人員在職教育訓練</option>
+        <option value="荷重在一公噸以上之堆高機操作人員在職教育訓練">荷重在一公噸以上之堆高機操作人員在職教育訓練</option>
+        <option value="使用起重機具從事吊掛作業人員在職教育訓練">使用起重機具從事吊掛作業人員在職教育訓練</option>
+        <option value="鍋爐操作人員在職教育訓練">鍋爐操作人員在職教育訓練</option>
+        <option value="第一種壓力容器操作人員安全衛生在職教育訓練">第一種壓力容器操作人員安全衛生在職教育訓練</option>
+        <option value="高壓氣體特定設備操作人員安全衛生在職教育訓練">高壓氣體特定設備操作人員安全衛生在職教育訓練</option>
+        <option value="有害作業主管在職教育訓練">有害作業主管在職教育訓練</option>
+        <option value="以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練">以乙炔熔接裝置或氣體集合裝置從事金屬之熔接、切斷或加熱作業人員安全衛生在職教育訓練</option>
+        <option value="高壓室內作業人員在職教育訓練">高壓室內作業人員在職教育訓練</option>
+        <option value="起重機操作及吊掛作業人員安全衛生在職教育訓練">起重機操作及吊掛作業人員安全衛生在職教育訓練</option>
+        <option value="具有危險性之機械操作人員在職教育訓練">具有危險性之機械操作人員在職教育訓練</option>
+        <option value="具有危險性之設備操作人員在職教育訓練">具有危險性之設備操作人員在職教育訓練</option>
+        <option value="各級業務主管在職教育訓練">各級業務主管在職教育訓練</option>
+        <option value="高壓氣體作業主管在職教育訓練">高壓氣體作業主管在職教育訓練</option>
+        <option value="營造作業主管在職教育訓練">營造作業主管在職教育訓練</option>
+        <option value="一般安全衛生在職教育訓練">一般安全衛生在職教育訓練</option>
+        <option value="小型鍋爐操作人員在職教育訓練">小型鍋爐操作人員在職教育訓練</option>
+        <option value="火藥爆破作業人員在職教育訓練">火藥爆破作業人員在職教育訓練</option>
+        <option value="露天開挖作業主管在職教育訓練">露天開挖作業主管在職教育訓練</option>
+        <option value="危險物品運送人員專業訓練(複訓)">危險物品運送人員專業訓練(複訓)</option>
+        <option value="起重機操作人員安全衛生在職教育訓練">起重機操作人員安全衛生在職教育訓練</option>
+        <option value="鋼構組配作業主管在職教育訓練">鋼構組配作業主管在職教育訓練</option>
+        <option value="高壓氣體容器操作人員安全衛生在職教育訓練">高壓氣體容器操作人員安全衛生在職教育訓練</option>
+        <option value="營造業業務主管人員在職教育訓練">營造業業務主管人員在職教育訓練</option>
+        <option value="施工安全評估人員在職教育訓練">施工安全評估人員在職教育訓練</option>
+        <option value="危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練">危險性之設備操作人員(鍋爐、一壓、小鍋)在職教育訓練</option>
+        <option value="製程安全評估人員在職教育訓練">製程安全評估人員在職教育訓練</option>
+        <option value="人字臂起重桿操作人員安全衛生在職教育訓練">人字臂起重桿操作人員安全衛生在職教育訓練</option>
+        <option value="具有危險性之設備暨小型鍋爐操作人員在職教育訓練">具有危險性之設備暨小型鍋爐操作人員在職教育訓練</option>
+        <option value="職業安全衛生管理人員在職教育訓練">職業安全衛生管理人員在職教育訓練</option>
+        <option value="職業安全衛生業務主管在職教育訓練">職業安全衛生業務主管在職教育訓練</option>
+        <option value="屋頂作業主管在職教育訓練">屋頂作業主管在職教育訓練</option>
     </select>
     期數 <input type="number" name="period"  required/>
     <button class='context'>送出</button>
-  </form>
-</tal:cond>
+</form>
 
 <div id="result"></div>
 

@@ -17,9 +17,27 @@ class DownloadOpinion(BrowserView):
     def __call__(self):
         request = self.request
         response = request.response
+        portal = api.portal.get()
         course = request.get('course')
         period = request.get('period')
         execSql = SqlObj()
+
+        user = api.user.get_current()
+        groups = user.getGroups()
+        # 判斷課程的location 跟登入者的是否一致
+        if user.id != 'admin':
+            locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
+            for i in locationList:
+                if i in groups:
+                    location = i
+                    break
+            sqlStr = """SELECT id FROM  course_list WHERE course = '{}' AND period = {} AND location = '{}'
+                     """.format(course, period, location)
+            if not execSql.execSql(sqlStr):
+                response.redirect('%s/show_satisfaction' %portal.absolute_url())
+                api.portal.show_message(message='查詢不到課程'.encode(), request=request, type='error')
+                return
+
         sqlStr = """SELECT seat, subject, date, teacher, question9, question10, question11, question12 FROM satisfaction WHERE
                     (question9 != '' OR question10 != '' OR question11 != '' OR question12 != '') AND course = '{}' AND period = {}
                     ORDER BY date""".format(course, period)

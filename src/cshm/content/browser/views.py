@@ -892,38 +892,24 @@ class CourseView(BrowserView):
                 data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rateStr, not_seat_str, count])
 
         # 四個訓前
-        if course_name in ['職業安全衛生管理員', '丙種職業安全衛生業務主管', '急救人員', '荷重在一公噸以上之堆高機操作人員']:
-            self.exSurvy = True
-            qr1 = qrcode.QRCode()
+        courseNameDict = {
+            '職業安全衛生管理員': 'manager',
+            '丙種職業安全衛生業務主管': 'c_type',
+            '急救人員': 'emergency',
+            '荷重在一公噸以上之堆高機操作人員': 'stacker'
+        }
+        if course_name in courseNameDict.keys():
             title = base64.b64encode(context.title)
-            self.url1 = '%s/@@manager?course_title=%s&uid=%s' %(context.absolute_url(), title, uid)
-            qr1.add_data(self.url1)
-            qr1.make_image().save('url.png')
-            img = open('url.png', 'rb')
-            self.managerQRcode = base64.b64encode(img.read())
+            qr = qrcode.QRCode()
 
-            qr2 = qrcode.QRCode()
-            self.url2 = '%s/@@stacker?course_title=%s&uid=%s' %(context.absolute_url(), title, uid)
-            qr2.add_data(self.url2)
-            qr2.make_image().save('url.png')
+            self.url = '%s/@@%s?course_title=%s&uid=%s' %(context.absolute_url(), courseNameDict[course_name], title, uid)
+            qr.add_data(self.url)
+            qr.make_image().save('url.png')
             img = open('url.png', 'rb')
-            self.stackerQRcode = base64.b64encode(img.read())
-
-            qr3 = qrcode.QRCode()
-            self.url3 = '%s/@@c_type?course_title=%s&uid=%s' %(context.absolute_url(), title, uid)
-            qr3.add_data(self.url3)
-            qr3.make_image().save('url.png')
-            img = open('url.png', 'rb')
-            self.c_typeQRcode = base64.b64encode(img.read())
-
-            qr4 = qrcode.QRCode()
-            self.url4 = '%s/@@emergency?course_title=%s&uid=%s' %(context.absolute_url(), title, uid)
-            qr4.add_data(self.url4)
-            qr4.make_image().save('url.png')
-            img = open('url.png', 'rb')
-            self.emergencyQRcode = base64.b64encode(img.read())
+            self.QRcode = base64.b64encode(img.read())
         else:
-            self.exSurvy = False
+            self.QRcode = False
+
 
         course_name = urllib.quote(course_name.encode('utf-8'))
         url = """{}/check_surver?course_name={}&period={}""".format(abs_url, course_name, period)
@@ -1043,9 +1029,26 @@ class CalculateSatisfaction(BrowserView):
         period = request.get('period')
         self.course = course
         self.period = period
+
         execSql = SqlObj()
+
+        user = api.user.get_current()
+        groups = user.getGroups()
+        # 判斷課程的location 跟登入者的是否一致
+        if user.id != 'admin':
+            locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
+            for i in locationList:
+                if i in groups:
+                    location = i
+                    break
+            execStr = """SELECT id FROM `course_list` WHERE course = '{}' AND period = '{}' AND location = '{}' LIMIT 1
+                """.format(course, period, location)
+            if not execSql.execSql(execStr):
+                return 'error'
+
         execStr = """SELECT * FROM `satisfaction` WHERE course = '{}' AND period = '{}'
             """.format(course, period)
+
         result = execSql.execSql(execStr)
         if not result:
             return 'error'
@@ -1079,49 +1082,7 @@ class CalculateSatisfaction(BrowserView):
         self.count = count
         self.numbers = numbers * len(writeCount.keys())
         self.write_rate = round((float(count) / float(self.numbers) * 100) , 2)
-#        self.count = write_number[0][0]
-#        self.numbers = numbers * countSubject
-#        self.numbers = countNumbers
-#        self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
 
-
-#        subject_list = courseContent.subject_list
-
-#        execStr = """SELECT COUNT(id) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-#        write_number = execSql.execSql(execStr)
-
-#        execStr = """SELECT DISTINCT(subject) FROM `satisfaction` WHERE course = '{}' AND period = '{}'""".format(course, period)
-#        countSubject = execSql.execSql(execStr)
-
-        # 在content的subject_list自定義課程人數
-#        customData = {}
-#        for item in subject_list.split('\r\n'):
-#            course = item.split(',')[4]
-#            try:
-#                customNumber = item.split(',')[9]
-#                customData[course] = customNumber
-#            except:
-#                pass
-#        if numbers:
-#            countNumbers = 0
-#            for subject in countSubject:
-#                import pdb;pdb.set_trace()
-#                subject = subject[0]
-#                if customData.has_key(subject):
-                    # 有可能是空值
-#                    if customData[subject]:
-#                        countNumbers += int(customData[subject])
-#                    else:
-#                        countNumbers += numbers
-#                else:
-#                    countNumbers += numbers
-
-#            self.count = write_number[0][0]
-#            self.numbers = numbers * countSubject
-#            self.numbers = countNumbers
-#            self.write_rate = round((float(write_number[0][0]) / float(self.numbers) * 100) , 2)
-#        else:
-#            return '<h3>請設定學生人數</h3>'
         for item in result:
             tmp = dict(item)
             teacher = tmp['teacher'].strip()
