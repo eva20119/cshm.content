@@ -13,6 +13,103 @@ import xlsxwriter
 import inspect
 
 
+class DownloadTeacherStatistics(BrowserView):
+    def __call__(self):
+        request = self.request
+        response = request.response
+        teacher = request.get('teacher')
+        execSql = SqlObj()
+
+        user = api.user.get_current()
+        groups = user.getGroups()
+        # 判斷課程的location 跟登入者的是否一致
+        if user.id != 'admin':
+            locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
+            for i in locationList:
+                if i in groups:
+                    location = i
+                    break
+
+            sqlStr = """SELECT * FROM `satisfaction` WHERE teacher = '{}' AND location = '{}'""".format(teacher, location)
+        else:
+            sqlStr = """SELECT * FROM `satisfaction` WHERE teacher = '{}'""".format(teacher)
+
+
+        data = {}
+        result = execSql.execSql(sqlStr)
+        for i in result:
+            course = i['course']
+            period = i['period']
+            subject = i['subject']
+            q1 = i['question1']
+            q2 = i['question2']
+            q3 = i['question3']
+            q4 = i['question4']
+            q5 = i['question5']
+            q8 = i['question8'] or 0
+
+            title = '%s_%s_%s' %(course, period, subject)
+            if not data.has_key(title):
+                data[title] = {
+                    'count': {5: 0, 4: 0, 3: 0, 2: 0, 1: 0, 0:0},
+                    'date': i['date'][:16]
+                }
+
+            data[title]['count'][q1] += 1
+            data[title]['count'][q2] += 1
+            data[title]['count'][q3] += 1
+            data[title]['count'][q4] += 1
+            data[title]['count'][q5] += 1
+            data[title]['count'][q8] += 1
+
+
+        output = StringIO()
+        workbook = xlsxwriter.Workbook(output)
+        merge_format = workbook.add_format({
+            'bold': 1,   
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+        })
+        merge_format2 = workbook.add_format({
+            'bold': 1,   
+            'border': 1,
+        })
+
+        worksheet1 = workbook.add_worksheet('Sheet1')
+
+        worksheet1.set_column('A:A', 20)
+        worksheet1.set_column('B:B', 50)
+        worksheet1.set_column('D:D', 50)
+
+        worksheet1.write('A1', '時間', merge_format)
+        worksheet1.write('B1', '課程', merge_format)
+        worksheet1.write('C1', '期別', merge_format)
+        worksheet1.write('D1', '科目', merge_format)
+        worksheet1.write('E1', '平均權值', merge_format)
+        worksheet1.write('F1', '權值分數', merge_format)
+
+        index = 2
+        data = sorted(data.items(), key=lambda x: x[1]['date'], reverse=True)
+        for i in data:
+            v = i[1]['count']
+            weight = float(v[5] * 5 + v[4] * 4 + v[3] * 3 + v[2] *2 + v[1] * 1)
+            score = round(weight / float(v[5] + v[4] + v[3] + v[2] + v[1]), 2)
+
+            worksheet1.write('A%s' %index, i[1]['date'], merge_format2)
+            worksheet1.write('B%s' %index, i[0].split('_')[0], merge_format2)
+            worksheet1.write('C%s' %index, i[0].split('_')[1], merge_format2)
+            worksheet1.write('D%s' %index, i[0].split('_')[2], merge_format2)
+            worksheet1.write('E%s' %index, str(score), merge_format2)
+            worksheet1.write('F%s' %index, str(round(float(score) * 20.0, 2)), merge_format2)
+            index += 1
+        workbook.close()
+
+        response.setHeader('Content-Type',  'application/x-xlsx')
+        response.setHeader('Content-Disposition', 'attachment; filename="%s.xlsx"' %(teacher))
+        return output.getvalue()
+
+
 class DownloadOpinion(BrowserView):
     def __call__(self):
         request = self.request

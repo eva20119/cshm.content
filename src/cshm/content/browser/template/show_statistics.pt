@@ -289,6 +289,13 @@ abs_url = api.portal.get().absolute_url()
     <button class='context'>送出</button>
 </form>
 
+<form action='download_teacher_statistics' method='post'>
+    教師<select name='teacher'>
+        <option tal:repeat="teacher view/teacherList" value='${python: teacher[0]}'>${python: teacher[0]}</option>
+    </select>
+    <button class='context'>送出</button>
+</form>
+<br><br>
 <div id="result"></div>
 
 

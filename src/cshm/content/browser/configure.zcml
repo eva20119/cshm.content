@@ -25,6 +25,13 @@
       permission='zope2.View'
       />
   <browser:page
+      name='download_teacher_statistics'
+      for='*'
+      class='.download_excel.DownloadTeacherStatistics'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
       name='download_opinion'
       for='*'
       class='.download_excel.DownloadOpinion'

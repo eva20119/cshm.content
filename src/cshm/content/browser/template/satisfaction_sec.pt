@@ -198,11 +198,24 @@ $(function(){
         }
     })
     $('form').submit(function(){
+        q1 = $("input[name='question1']:checked").val()
+        q2 = $("input[name='question2']:checked").val()
+        q3 = $("input[name='question3']:checked").val()
+        q4 = $("input[name='question4']:checked").val()
+        q5 = $("input[name='question5']:checked").val()
+        q6 = $("input[name='question6']:checked").val()
+        q7 = $("input[name='question7']:checked").val()
+
+
         q9 = $('textarea[name="question9"]').val().length
         q10 = $('textarea[name="question10"]').val().length
         q11 = $('textarea[name="question11"]').val().length
         q12 = $('textarea[name="question12"]').val().length
         var count = 0
+        if(q1 == 5 && q2 == 5 && q3 == 5 && q4 == 5 && q5 == 5 && q6 == 5 && q7 == 5){
+            alert('請勿全部都填非常滿意')
+            return false
+        }
 
         $('input:radio:checked').each(function(){
             if($(this).val() == 1 || $(this).val() == 2){

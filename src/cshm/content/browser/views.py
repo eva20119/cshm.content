@@ -1007,10 +1007,14 @@ class ShowStatistics(BrowserView):
 
         groups = user.getGroups()
         location = self.getLocation(groups)
-        sqlStr = """SELECT DISTINCT(course) FROM course_list WHERE location = '{}'""".format(location)
+
+        sqlStr = """SELECT DISTINCT(teacher) FROM `course_list`"""
+
+        if user.id != 'admin':
+            sqlStr += " WHERE location = '{}'".fromat(location)
 
         self.id = user.id
-        self.result = execSql.execSql(sqlStr)
+        self.teacherList = execSql.execSql(sqlStr)
 
         return self.template()
 
