@@ -884,7 +884,7 @@ class CourseView(BrowserView):
                     rateStr ='%s%%' %(rate)
 
                     for i in exceptList:
-                        if i not in result:
+                        if int(i) not in result:
                             notWrite.append(i)
                     not_seat_str = ','.join([str(j) for j in notWrite])
                 else:
@@ -902,6 +902,7 @@ class CourseView(BrowserView):
                     else:
                         rateStr = '尚未設定學生人數'
                         not_seat_str = '尚未設定學生人數'
+
                 item = dict(item)
                 item['seat_str'] = seat_str
                 item['rateStr'] = rateStr

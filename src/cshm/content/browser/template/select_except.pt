@@ -41,6 +41,11 @@ table td, table th{
 from datetime import datetime
 ?>
 
+<h2>${view/course}-${view/period}期</h2>
+
+<h3 style='color: red'>若沒有輸入座號代表全部人都可以填寫</h3>
+<h3 style='color: red'>若有輸入, 只有符合座號的才有辦法填寫, Ex: 1,3,9 代表只有1,3,9號可以填寫</h3>
+
 <button onclick='window.history.back()' class='context'>返回</button>
 <button class='context' id='save' style='float: right'>儲存</button>
 
