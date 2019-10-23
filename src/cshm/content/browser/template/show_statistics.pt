@@ -54,6 +54,7 @@ abs_url = api.portal.get().absolute_url()
 
 滿意度
 <select id="course2">
+        <option value="丙種職業安全衛生業務主管">丙種職業安全衛生業務主管</option>
         <option value="甲種業務主管">甲種業務主管</option>
         <option value="乙種業務主管">乙種業務主管</option>
         <option value="丙種業務主管">丙種業務主管</option>

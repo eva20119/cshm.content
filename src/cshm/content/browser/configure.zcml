@@ -18,6 +18,13 @@
       directory="static"
       />
   <browser:page
+      name='select_except'
+      for='*'
+      class='.custom.SelectExcept'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
+  <browser:page
       name='course_listing'
       for='*'
       class='.custom.CourseListing'

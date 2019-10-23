@@ -7,6 +7,39 @@ from db.connect.browser.views import SqlObj
 import json
 
 
+class SelectExcept(BrowserView):
+    template = ViewPageTemplateFile('template/select_except.pt')
+    def __call__(self):
+        request = self.request
+        portal = api.portal.get()
+        course = request.get('course')
+        period = request.get('period')
+        exceptList = request.get('exceptList')
+        execSql = SqlObj()
+
+        if exceptList:
+            try:
+                for k, v in json.loads(exceptList).items():
+                    tmp = [i for i in v.split(',') if i]
+                    sqlStr = """UPDATE course_list SET exceptList = %s WHERE course = '%s' AND period = '%s' and subject = '%s'
+                             """ %(json.dumps(','.join(sorted(set(tmp), key=lambda x: int(x)))), course, period, k)
+                    execSql.execSql(sqlStr)
+                return 'success'
+            except:
+                return 'error'
+
+        if course and period:
+            sqlStr = """SELECT subject, exceptList, start_time FROM course_list WHERE course = '%s' AND period = '%s' ORDER BY start_time
+                     """ %(course, period)
+            self.result = execSql.execSql(sqlStr)
+
+
+        self.course = course
+        self.period = period
+        return self.template()
+
+
+
 class CourseListing(BrowserView):
     template = ViewPageTemplateFile('template/course_listing.pt')
     def __call__(self):

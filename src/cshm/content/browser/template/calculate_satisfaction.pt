@@ -52,10 +52,10 @@ import json
         <td colspan='6'> &nbsp;</td>
     </tr>
     <tr>
-        <th>日期</th>
-        <th style='width: 500px'>科目</th>
-        <th>講師</th>
-        <th style='wdith: 250px'>平均權值</th>
+        <th style='width: 200px'>日期</th>
+        <th>科目</th>
+        <th style='width: 120px'>講師</th>
+        <th style='width: 100px'>平均權值</th>
         <th style='width: 100px'>權值分數</th>
         <th style='width: 100px'>填寫率</th>
     </tr>

@@ -37,17 +37,8 @@ class SatisfactionFirst(BrowserView):
         self.teacher = request.get('teacher')
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number')
-#        cookie_seat_number = request.cookies.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.seat_number = seat_number
-#        if cookie_seat_number != seat_number:
-#            request.response.setCookie('seat_number', seat_number)
-
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
 
         ex_url = ''
         ex_data = []
@@ -75,16 +66,26 @@ class SatisfactionFirst(BrowserView):
             item_datetime = tmp['start_time'].strftime('%Y-%m-%d %H:%M:%S')
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write and request.get('subject_name') != subject:
+            exceptList = tmp['exceptList'] or ''
+            argStr = """?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}
+                     """.format(subject, item_datetime, teacher, course, period, seat_number)
+            if exceptList:
+                if seat_number in exceptList.split(',') and request.get('subject') != subject and identify not in already_write:
+                    if item[5] == '是':
+                        ex_url = "/@@satisfaction_sec"
+                    else:
+                        ex_url = "/@@satisfaction_first"
+                    ex_url += abs_url + ex_url + argStr
+                    ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
+            elif identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = "/@@satisfaction_sec"
                 else:
-                   ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = "/@@satisfaction_first"
+                ex_url += abs_url + ex_url + argStr
                 ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
-        if not ex_data:
-            self.ex_data = []
-        else:
-            self.ex_data = ex_data
+
+        self.ex_data = ex_data or []
         return self.template()
 
 
@@ -101,16 +102,8 @@ class SatisfactionSec(BrowserView):
         self.subject_name = request.get('subject_name')
         seat_number = request.get('seat_number', '')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#        cookie_seat_number = request.cookies.get('seat_number', '')
         self.seat_number = seat_number
-#        if cookie_seat_number != seat_number:
-#            request.response.setCookie('seat_number', seat_number)
 
-#        already_write = request.cookies.get('already_write', [])
-#        if already_write:
-#            already_write = json.loads(already_write)
-#        else:
-#            already_write = []
         ex_url = ''
         ex_data = []
         execSql = SqlObj()
@@ -137,16 +130,26 @@ class SatisfactionSec(BrowserView):
             item_datetime = tmp['start_time'].strftime('%Y-%m-%d %H:%M:%S')
             teacher = tmp['teacher']
             identify = '%s_%s_%s' %(course, period, subject)
-            if identify not in already_write and request.get('subject_name') != subject:
+            exceptList = tmp['exceptList'] or ''
+            argStr = """?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}
+                     """.format(subject, item_datetime, teacher, course, period, seat_number)
+            if exceptList:
+                if seat_number in exceptList.split(',') and request.get('subject_name') != subject and identify not in already_write:
+                    if item[5] == '是':
+                        ex_url = "/@@satisfaction_sec"
+                    else:
+                        ex_url = "/@@satisfaction_first"
+                    ex_url += abs_url + ex_url + argStr
+                    ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
+            elif identify not in already_write and request.get('subject_name') != subject:
                 if item[5] == '是':
-                    ex_url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = "/@@satisfaction_sec"
                 else:
-                   ex_url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                    ex_url = "/@@satisfaction_first"
+                ex_url += abs_url + ex_url + argStr
                 ex_data.append( ['%s %s' %(item_datetime, subject), ex_url] )
-        if not ex_data:
-            self.ex_data = False
-        else:
-            self.ex_data = ex_data
+
+        self.ex_data = ex_data or []
 
         return self.template()
 
@@ -840,7 +843,6 @@ class CourseView(BrowserView):
         self.period = period
         context = api.content.find(index_course='%s_%s' %(course_name, period))[0].getObject()
 
-        subject_list = context.subject_list
         data = []
         abs_url = api.portal.get().absolute_url()
 
@@ -851,45 +853,61 @@ class CourseView(BrowserView):
         self.numbers = numbers
         execSql = SqlObj()
 
-        sqlStr = """SELECT start_time FROM course_list WHERE course = '{}' AND period = {} ORDER BY start_time LIMIT 1
-                 """.format(course_name, period)
-        self.minDate = execSql.execSql(sqlStr)[0][0]
-
-        sqlStr = """SELECT start_time, hour FROM course_list WHERE course = '{}' AND period = {} ORDER BY start_time DESC LIMIT 1
-                 """.format(course_name, period)
-        maxDate = execSql.execSql(sqlStr)[0]
-        self.maxDate = maxDate[0] + datetime.timedelta(hours = maxDate[1])
+        sqlStr = """SELECT * FROM course_list WHERE course = '{}' AND period = {} ORDER BY start_time""".format(course_name, period)
+        courseList = execSql.execSql(sqlStr)
+        self.minDate = courseList[0]['start_time']
+        self.maxDate = courseList[-1]['start_time'] + datetime.timedelta(hours=courseList[-1]['hour'])
 
         self.alertList = []
 
-        for item in subject_list.split('\n'):
+        for item in courseList:
             if item:
-                tmp = item.split(',')
-                subject= tmp[4]
+                subject= item['subject']
+                exceptList = item['exceptList']
                 execStr = """SELECT DISTINCT(seat) FROM satisfaction WHERE course = '{}' AND period = '{}' AND subject = '{}'
                     ORDER BY seat""".format(course_name, period, subject)
                 result = execSql.execSql(execStr)
                 result = [i[0] for i in result ]
 
+
                 count = len(result)
+
                 seat_str = ','.join([str(i) for i in result])
                 notWrite = []
 
-                if numbers:
-                    rate = round(float(count) / float(numbers), 2) * 100
+                if exceptList:
+                    exceptList = exceptList.split(',')
+                    rate = round(float(count) / float(len(exceptList)), 3) * 100
                     if rate < 80:
                         self.alertList.append(subject)
 
                     rateStr ='%s%%' %(rate)
 
-                    for i in range(1, numbers + 1):
+                    for i in exceptList:
                         if i not in result:
-                             notWrite.append(i)
-                    not_seat_str = ','.join([str(i) for i in notWrite])
+                            notWrite.append(i)
+                    not_seat_str = ','.join([str(j) for j in notWrite])
                 else:
-                    rateStr = '尚未設定學生人數'
-                    not_seat_str = '尚未設定學生人數'
-                data.append( [ tmp[1], tmp[2] , tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], seat_str , rateStr, not_seat_str, count])
+                    if numbers:
+                        rate = round(float(count) / float(numbers), 3) * 100
+                        if rate < 80:
+                            self.alertList.append(subject)
+
+                        rateStr ='%s%%' %(rate)
+
+                        for i in range(1, numbers + 1):
+                            if i not in result:
+                                 notWrite.append(i)
+                        not_seat_str = ','.join([str(j) for j in notWrite])
+                    else:
+                        rateStr = '尚未設定學生人數'
+                        not_seat_str = '尚未設定學生人數'
+                item = dict(item)
+                item['seat_str'] = seat_str
+                item['rateStr'] = rateStr
+                item['not_seat_str'] = not_seat_str
+                item['count'] = count
+                data.append(item)
 
         # 四個訓前
         courseNameDict = {
@@ -939,7 +957,7 @@ class CheckSurver(BrowserView):
         period = request.get('period')
 
         seat_number = request.get('seat_number', '')
-        ignore = request.get('ignore', False)
+
         if seat_number:
             now = datetime.datetime.now()
             now_datetime = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -950,10 +968,9 @@ class CheckSurver(BrowserView):
 
             sqlStr = """SELECT MAX(start_time) as max  FROM course_list WHERE course = '{}' AND period = '{}'""".format(course_name, period)
             maxTime = execSql.execSql(sqlStr)[0]['max']
-#            maxTime = datetime.datetime.combine(maxTime + datetime.timedelta(days=1), datetime.time(12,0))
             maxTime = maxTime.date() + datetime.timedelta(days=2)
-
-            if not ignore and maxTime <= now.date() and ((course_name != '缺氧作業主管' and period != '412') and (course_name != '使用起重機具從事吊掛作業人員' and period != '333') and (course_name != '吊升荷重在零點五公噸以上未滿三公噸之移動式起重機操作人員' and period != '8') and (course_name != '荷重在一公噸以上之堆高機操作人員' and period != '1261')):
+            id = api.user.get_current().id
+            if id != 'admin' and maxTime <= now.date():
                 return self.overtime()
 
             execStr = """SELECT * FROM course_list WHERE course = '{}' AND period = '{}' AND start_time <= '{}' ORDER BY            
@@ -980,15 +997,25 @@ class CheckSurver(BrowserView):
                 quiz = tmp['quiz']
                 item_datetime = tmp['start_time']
                 teacher = tmp['teacher']
+                exceptList = tmp['exceptList'] or ''
                 identify = '%s_%s_%s' %(course, period, subject)
-                if identify not in already_write:
+
+                if exceptList:
+                    if seat_number in exceptList.split(',') and identify not in already_write:
+                        if quiz == '是':
+                            url = "/@@satisfaction_sec"
+                        else:
+                            url = "/@@satisfaction_first"
+                        break;
+                elif identify not in already_write:
                     if quiz == '是':
-                        url = """{}/@@satisfaction_sec?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                        url = "/@@satisfaction_sec"
                     else:
-                        url = """{}/@@satisfaction_first?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}""".format(abs_url, subject, item_datetime, teacher, course, period, seat_number)
+                        url = "/@@satisfaction_first"
                     break;
             if url:
-                request.response.redirect(url)
+                request.response.redirect(abs_url + url + """?subject_name={}&date={}&teacher={}&course_name={}&period={}&seat_number={}
+                                """.format(subject, item_datetime, teacher, course, period, seat_number))
                 return
             else:
                 return self.finished()
@@ -1077,14 +1104,31 @@ class CalculateSatisfaction(BrowserView):
 
         sqlStr = """SELECT COUNT(id), subject FROM `satisfaction` WHERE course = '{}' AND period = {} GROUP BY subject""".format(course, period)
         writeResult = execSql.execSql(sqlStr)
+        sqlStr = """SELECT subject, exceptlist FROM course_list WHERE course = '{}' AND period = {}""".format(course, period)
+        courseList = execSql.execSql(sqlStr)
+        courseDict = {}
+        for i in courseList:
+            if i[1]:
+                courseDict[i[0]] = i[1]
+
         writeCount = {}
+        numbersCount = 0
         count = 0
         for i in writeResult:
-            writeCount[i[1]] = round((float(i[0]) / float(numbers) * 100), 2)
-            count += i[0]
+            countId = i[0]
+            subject = i[1]
+            if courseDict.has_key(subject):
+                leng = len(courseDict[subject].split(','))
+                writeCount[subject] = round(float(countId) / float(leng) * 100, 2)
+                numbersCount += leng
+            else:
+                writeCount[subject] = round((float(countId) / float(numbers) * 100), 2)
+                numbersCount += numbers
+            count += countId
+
         self.writeCount = writeCount
         self.count = count
-        self.numbers = numbers * len(writeCount.keys())
+        self.numbers = numbersCount
         self.write_rate = round((float(count) / float(self.numbers) * 100) , 2)
 
         for item in result:
@@ -1243,9 +1287,6 @@ class CalculateSatisfaction(BrowserView):
 
         self.point_total = round((float(self.point_space * 10) + float(self.point_envir * 20) + float(self.point_teacher * 70)) / 100,2) 
         # 圓餅圖的資料整理
-#        execStr = """SELECT COUNT(DISTINCT(teacher)) as teacher_numbers FROM satisfaction"""
-#        result = execSql.execSql(execStr)
-#        teacher_numbers = dict(result[0])['teacher_numbers']
         anw_data = {}
         anw_5 = 0
         anw_4 = 0

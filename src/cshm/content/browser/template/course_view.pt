@@ -21,6 +21,7 @@ td, th{
 </style>
 <?python
 import base64
+import datetime
 ?>
     <h1>${view/course_name}${view/period}</h1>
     <h2>開始時間: ${view/minDate}</h2>
@@ -39,7 +40,7 @@ import base64
 
     <button class='context' onclick="location.href='course_listing'" style='margin: 20px 0'>返回列表</button>
     <button class='context' onclick="location.href='${view/editUrl}'" style='margin: 20px 0'>設定上課人數</button>
-
+    <a href='${view/context/absolute_url}/select_except?course=${view/course_name}&period=${view/period}' class='context'>設定拆課學生</a>
     <table>
       <tr tal:condition="view/QRcode">
         <th>
@@ -60,19 +61,20 @@ import base64
     </table>
 
     <br/>
-    <div tal:repeat="item view/data" id='${python: item[3]}'>
-        日期：<span>${python:item[0]}</span><br>
-        時間：<span>${python:item[1]}</span><br>
-        星期：<span>${python:item[2]}</span><br>
-        授課名稱：<span>${python:item[3]}</span><br>
-        時數：<span>${python:item[4]}</span><br>
-        講師：<span>${python:item[5]}</span><br>
-        教室：<span>${python:item[7]}</span><br>
+
+    <div tal:repeat="item view/data"  id="${python: item['subject']}">
+        日期：<span>${python: item['start_time'].strftime('%Y-%m-%d')}</span><br>
+        時間：<span>${python: item['start_time'].strftime('%H:%m')}</span><br>
+        星期：<span>${python: item['week']}</span><br>
+        授課名稱：<span>${python: item['subject']}</span><br>
+        時數：<span>${python: item['hour']}</span><br>
+        講師：<span>${python: item['teacher']}</span><br>
+        教室：<span>${python: item['classroom']}</span><br>
         <br>
-        <p>已填座號：${python:item[8]}</p>
-        <p>未填座號：${python: item[10]}</p>
-        <p>填寫人數/總計數量： ${python: '%s/%s' %(item[11], view.numbers) if view.numbers else '尚未設定學生人數'}</p>
-        <p>回收率: ${python: item[9]}</p>
+        <p>已填座號：${python: item['seat_str']}</p>
+        <p>未填座號：${python: item['not_seat_str']}</p>
+        <p>填寫人數/總計數量： ${python: ''}</p>
+        <p>回收率: ${python: item['rateStr']}</p>
         <hr/>
     </div>
 </metal:content-core>
