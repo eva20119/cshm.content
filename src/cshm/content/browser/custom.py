@@ -24,6 +24,8 @@ class SelectExcept(BrowserView):
                     sqlStr = """UPDATE course_list SET exceptList = %s WHERE course = '%s' AND period = '%s' and subject = '%s'
                              """ %(json.dumps(','.join(sorted(set(tmp), key=lambda x: int(x)))), course, period, k)
                     execSql.execSql(sqlStr)
+
+                api.portal.show_message(message='更新成功!!'.encode(), request=request)
                 return 'success'
             except:
                 return 'error'
