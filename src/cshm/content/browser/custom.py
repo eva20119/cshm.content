@@ -61,7 +61,7 @@ class SendOpinion(BrowserView):
                     if m:
                         mime_text = MIMEText(mailStr, 'html', 'utf-8')
                         mime_text['Subject'] = Header("%s  意見提供" %(now), 'utf-8')
-                        # smtpObj.sendmail('henry@mingtak.com.tw', 'henry@mingtak.com.tw', mime_text.as_string())
+                        smtpObj.sendmail('henry@mingtak.com.tw', m, mime_text.as_string())
                         print 'send mail to %s' %k
 
 
