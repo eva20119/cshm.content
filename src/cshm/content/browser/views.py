@@ -197,38 +197,38 @@ class ResultSatisfaction(BrowserView):
             execSql.execSql(execStr)
 
         # 寄信通知
-            if len(question9) >= 15 or len(question10) >= 15 or len(question11) >= 15 or len(question12) >= 15:
-                execStr = """SELECT location FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
-                    """.format(course, period, subject_name)
-                location = execSql.execSql(execStr)
-                flag = True
-                try:
-                    location = location[0][0]
-                    if location:
-                        content = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject()
-                        email = content.description.split('\r\n')
-                        trainingCenter = content.title
-                    else:
-                        trainingCenter = '台北'
-                        email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
-                except:
-                    trainingCenter = '台北'
-                    email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
-                    flag = False
+            # if len(question9) >= 15 or len(question10) >= 15 or len(question11) >= 15 or len(question12) >= 15:
+            #     execStr = """SELECT location FROM course_list WHERE course = '{}' AND period = '{}' AND subject = '{}'
+            #         """.format(course, period, subject_name)
+            #     location = execSql.execSql(execStr)
+            #     flag = True
+            #     try:
+            #         location = location[0][0]
+            #         if location:
+            #             content = api.content.find(context=portal['contact'][location], portal_type='Document')[0].getObject()
+            #             email = content.description.split('\r\n')
+            #             trainingCenter = content.title
+            #         else:
+            #             trainingCenter = '台北'
+            #             email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
+            #     except:
+            #         trainingCenter = '台北'
+            #         email = api.content.find(context=portal['contact']['taipei'], portal_type='Document')[0].getObject().description.split('\r\n')
+            #         flag = False
 
-                body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>教學中心:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
-                    """ %(course, subject_name, period, seat, teacher, date, trainingCenter, question9, question10, question11, question12)
-                if not flag:
-                    body_str += '教學中心設定錯誤，請去更改\r教學中心設定錯誤，請去更改'
+            #     body_str = """科目:%s<br>課程:%s<br>期數:%s<br>座號:%s<br>講師:%s<br>時間:%s<br>教學中心:%s<br>意見提供:<br>%s<br/>%s<br/>%s<br>%s
+            #         """ %(course, subject_name, period, seat, teacher, date, trainingCenter, question9, question10, question11, question12)
+            #     if not flag:
+            #         body_str += '教學中心設定錯誤，請去更改\r教學中心設定錯誤，請去更改'
 
-                mime_text = MIMEText(body_str, 'html', 'utf-8')
-                mime_text['Subject'] = Header("%s-%s-%s  意見提供" %(course, period, trainingCenter), 'utf-8')
+            #     mime_text = MIMEText(body_str, 'html', 'utf-8')
+            #     mime_text['Subject'] = Header("%s-%s-%s  意見提供" %(course, period, trainingCenter), 'utf-8')
 
-                smtpObj = smtplib.SMTP('localhost')
-                smtpObj.sendmail('henry@mingtak.com.tw', 'yutin@cshm.org.tw', mime_text.as_string())
+            #     smtpObj = smtplib.SMTP('localhost')
+            #     smtpObj.sendmail('henry@mingtak.com.tw', 'yutin@cshm.org.tw', mime_text.as_string())
 
-                for i in email:
-                    smtpObj.sendmail('henry@mingtak.com.tw', i, mime_text.as_string())
+            #     for i in email:
+            #         smtpObj.sendmail('henry@mingtak.com.tw', i, mime_text.as_string())
 
             api.portal.show_message(message='填寫完成', type='info', request=request)
 
@@ -1039,7 +1039,7 @@ class ShowStatistics(BrowserView):
         sqlStr = """SELECT DISTINCT(teacher) FROM `course_list`"""
 
         if user.id != 'admin':
-            sqlStr += " WHERE location = '{}'".fromat(location)
+            sqlStr += " WHERE location = '{}'".format(location)
 
         self.id = user.id
         self.teacherList = execSql.execSql(sqlStr)

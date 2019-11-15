@@ -22,18 +22,8 @@ class DownloadTeacherStatistics(BrowserView):
 
         user = api.user.get_current()
         groups = user.getGroups()
-        # 判斷課程的location 跟登入者的是否一致
-        if user.id != 'admin':
-            locationList = ['taipei', 'hualien', 'taoyuan', 'lieutenant', 'chiayi', 'nanke', 'kaohsiung', 'taichung']
-            for i in locationList:
-                if i in groups:
-                    location = i
-                    break
 
-            sqlStr = """SELECT * FROM `satisfaction` WHERE teacher = '{}' AND location = '{}'""".format(teacher, location)
-        else:
-            sqlStr = """SELECT * FROM `satisfaction` WHERE teacher = '{}'""".format(teacher)
-
+        sqlStr = """SELECT * FROM `satisfaction` WHERE teacher = '{}'""".format(teacher)
 
         data = {}
         result = execSql.execSql(sqlStr)

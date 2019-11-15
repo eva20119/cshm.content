@@ -40,7 +40,7 @@ import datetime
 
     <button class='context' onclick="location.href='course_listing'" style='margin: 20px 0'>返回列表</button>
     <button class='context' onclick="location.href='${view/editUrl}'" style='margin: 20px 0'>設定上課人數</button>
-    <a href='${view/context/absolute_url}/select_except?course=${view/course_name}&period=${view/period}' class='context'>設定拆課學生</a>
+    <a href='${view/context/absolute_url}/select_except?course=${view/course_name}&period=${view/period}' class='context'>設定抵充時數學生</a>
     <table>
       <tr tal:condition="view/QRcode">
         <th>

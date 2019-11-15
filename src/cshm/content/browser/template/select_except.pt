@@ -39,14 +39,16 @@ table td, table th{
 
 <?python
 from datetime import datetime
+from plone import api
+portal = api.portal.get()
 ?>
 
 <h1>${view/course}${view/period}</h1>
 
-<h3 style='color: red'>若沒有輸入座號代表全部人都可以填寫</h3>
-<h3 style='color: red'>若有輸入, 只有符合座號的才有辦法填寫, Ex: 1,3,9 代表只有1,3,9號可以填寫</h3>
+<h3 style='color: red'>舉例若輸入1,3,9 代表只有1,3,9號可以填寫滿意度問卷, 若沒有輸入代表全部人都看的到</h3>
 
-<button onclick='window.history.back()' class='context'>返回</button>
+
+<button onclick="location.href='${portal/absolute_url}/course_view?course=${view/course}&period=${view/period}'" class='context'>返回</button>
 <button class='context' id='save' style='float: right'>儲存</button>
 
 <table class='table'>

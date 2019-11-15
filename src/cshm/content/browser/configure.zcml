@@ -17,6 +17,14 @@
       type="plone"
       directory="static"
       />
+      
+  <browser:page
+      name='send_opinion'
+      for='*'
+      class='.custom.SendOpinion'
+      layer='cshm.content.interfaces.ICshmContentLayer'
+      permission='zope2.View'
+      />
   <browser:page
       name='select_except'
       for='*'

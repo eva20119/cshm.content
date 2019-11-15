@@ -5,6 +5,64 @@ from plone import api
 from plone.protect.auto import safeWrite
 from db.connect.browser.views import SqlObj
 import json
+from datetime import datetime
+from email.header import Header
+from email.mime.text import MIMEText
+import smtplib
+
+
+class SendOpinion(BrowserView):
+    def __call__(self):
+        request = self.request
+        portal = api.portal.get()
+        execSql = SqlObj()
+
+        contact = {}
+        locationDict = {}
+        for i in portal['contact'].getChildNodes():
+            locationDict[i.id] = i.title
+            contact[i.id] = {
+                'good': '',
+                'bad': '',
+                'mail': i.description
+            }
+
+        now = datetime.now().strftime('%Y-%m-%d')
+        sqlStr = """SELECT sa.*, co.location FROM satisfaction as sa, course_list as co 
+            WHERE (question9 != '' OR question10 != '' OR question11 != '' OR question12 != '') 
+            AND sa.timestamp LIKE '{}%%' AND sa.course = co.course AND sa.period = co.period 
+            AND sa.subject = co.subject ORDER BY course
+            """.format(now)
+
+        result = execSql.execSql(sqlStr)
+        for i in result:
+            formatStr = """科目:{}<br>課程:{}<br>期數:{}<br>座號:{}<br>教學中心:{}<br>講師:{}<br>時間:{}<br>意見提供:<br>1. {}<br/>2. {}<br/>3. {}<br>4. {}<hr>
+                """.format(i['course'], i['subject'], i['period'], i['seat'], locationDict[i['location']]
+                , i['teacher'], i['date'], i['question9'], i['question10'], i['question11']
+                , i['question12'])
+            questionList = [i['question%s' %k] for k in range(1, 9)]
+            location = i['location']
+            if 1 in questionList or 2 in questionList:
+                contact[location]['bad'] += formatStr
+                contact['all']['bad'] += formatStr
+            else:
+                contact[location]['good'] += formatStr
+                contact['all']['good'] += formatStr
+        
+        smtpObj = smtplib.SMTP('localhost')
+
+        for k,v in contact.items():
+            mail = v['mail']
+            good = v['good']
+            bad = v['bad']
+            if good or bad:
+                mailStr = '<h1>好的評論</h1>' + good + '<h1>壞的評論</h1>' + bad
+                for m in mail.split('\r\n'):
+                    if m:
+                        mime_text = MIMEText(mailStr, 'html', 'utf-8')
+                        mime_text['Subject'] = Header("%s  意見提供" %(now), 'utf-8')
+                        # smtpObj.sendmail('henry@mingtak.com.tw', 'henry@mingtak.com.tw', mime_text.as_string())
+                        print 'send mail to %s' %k
 
 
 class SelectExcept(BrowserView):
